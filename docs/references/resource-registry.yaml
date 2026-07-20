@@ -1,0 +1,367 @@
+schema_version: "0.1.0"
+as_of: "2026-07-20"
+project: loopcraft
+purpose: >-
+  Register the exact source, authority, reusable mechanisms, localization
+  boundary, and prohibited uses of materials used to design Loopcraft.
+
+authority_order:
+  - rank: 1
+    source: approved_loopcraft_spec_and_adrs
+    rule: Approved Loopcraft decisions override every external reference.
+  - rank: 2
+    source: active_implementation_plan
+    rule: The active plan controls sequencing but cannot override the spec.
+  - rank: 3
+    source: verified_execution_records
+    rule: Reproducible tests, traces, receipts, and diffs bound completion claims.
+  - rank: 4
+    source: this_resource_registry
+    rule: References guide design only within their registered ownership boundary.
+  - rank: 5
+    source: handoff_claims_and_conversation_history
+    rule: Treat claims as leads until checked against source artifacts or evidence.
+
+reuse_modes:
+  adopt: Reuse the mechanism as a preferred design pattern.
+  localize: Preserve the proven logic but replace source-specific assumptions.
+  reference: Use for rationale, comparison, or terminology; do not copy as authority.
+  audit_target: Inspect as an implementation artifact; do not assume completion.
+  boundary_only: Use to define an edition boundary or prohibited dependency.
+
+entry_starting_points:
+  from_scratch_loop:
+    status: existing_candidate
+    source: phase1-handoff-package
+    evidence:
+      - "loopy/SKILL.md: Craft / Guided Design"
+      - "loopy/SKILL.md: Craft a loop through an interview"
+    work_mode: audit, detach Library coupling, rename, migrate, and harden against the approved spec
+    rule: Existing behavior reduces implementation work but does not prove Phase 2 conformance.
+  existing_skill_to_loop:
+    status: existing_candidate
+    source: phase1-handoff-package
+    evidence:
+      - "loopy/SKILL.md: Skill-to-Loop Upgrade route"
+      - "loopy/references/upgrade-skill.md: Loopability Gate and four verdicts"
+    work_mode: independently verify, migrate terminology, integrate Behavior Contract, and harden
+    rule: Do not rebuild from zero and do not accept handoff completion claims without rerunnable evidence.
+  conversation_to_workflow_to_loop_skill:
+    status: new_integration
+    source: workflow-skill-creator
+    work_mode: high-fidelity localization followed by the shared Loopability and Skill production pipeline
+    rule: Workflow extraction is new; Loop analysis and Skill generation must reuse common modules.
+
+resources:
+  - id: loop-engineering-dialogue
+    title: Loop Engineering and Writing Guide
+    supplied_by: user
+    kind: research_and_decision_history
+    location:
+      type: local_file
+      path: "C:/Users/Administrator/Downloads/Loop工程与写作指导.md"
+      sha256: "a6d2abd1652ed84f32f8af3fa6278dcef0ab1b93c17bf36735398c2c74734d84"
+    authority: reference
+    license: user-provided conversation record; embedded external sources retain their own terms
+    owns:
+      - historical rationale
+      - candidate terminology
+      - external-reading leads
+      - rejected and superseded alternatives
+    adopt:
+      - verifier-centered Loop framing
+      - dual Semantic IR and Execution IR distinction
+      - adapter categories and audit concerns
+      - maturity, risk, evidence, and governance question inventory
+    do_not_use:
+      - final schema authority
+      - executable instructions
+      - proof that cited external claims are current
+
+  - id: phase1-baseline-v1
+    title: Loopy Skill-to-Loop Upgrade PR Baseline
+    supplied_by: user
+    kind: historical_baseline
+    location:
+      type: local_file
+      path: "C:/Users/Administrator/Downloads/01_loopy_skill_to_loop_pr_baseline.md"
+      sha256: "cb19f2c1eff11c5872236965565c180d2330186076e6aff779ac156032ef693a"
+    authority: reference
+    owns:
+      - original Phase 1 intent
+      - initial Skill Contract extraction
+      - Loopability Gate criteria
+      - initial output classification and acceptance surface
+    adopt:
+      - feedback-driven versus one-shot gate
+      - preserve complete Skill output
+      - embedded and multiple-Loop analysis
+      - positive, negative, and boundary test categories
+    superseded:
+      - "standalone_loop is replaced by loop_first_skill in the current design"
+      - "Skill Contract is not the universal Kernel contract; use Behavior Contract"
+    do_not_use:
+      - independent proof that Phase 1 is complete
+      - final Phase 2 architecture
+
+  - id: phase2-baseline-v1
+    title: Loop IR Architecture Baseline
+    supplied_by: user
+    kind: architecture_baseline
+    location:
+      type: local_file
+      path: "C:/Users/Administrator/Downloads/02_loop_ir_architecture_baseline.md"
+      sha256: "ebfb34bdd275948f45a3c6304d99a0d7f3a5c0b06249081353af0484f8065015"
+    authority: reference
+    owns:
+      - Phase 2 problem inventory
+      - dual-IR seed architecture
+      - extension, adapter, version, source-map, receipt, importer, and conformance candidates
+    adopt:
+      - Semantic IR as semantic authority
+      - Execution IR as derived plan
+      - Core, standard extension, and vendor binding separation
+      - deterministic build, Source Map, Import Report, and conformance goals
+    superseded:
+      - "approval_required is a suspended reason, not a terminal status"
+      - "cancelled is an execution status; superseded is a cancellation reason"
+      - "policy denial is an authorization decision, not a runtime error"
+      - "Execution Override uses typed allow-listed operations"
+      - "v0.1 rejects recursive subloops and parallel child runs"
+      - "Behavior Contract replaces universal Skill Contract"
+    do_not_use:
+      - final schema without the approved Phase 2 spec
+      - runtime dependency on Loopy or Loop Library
+
+  - id: loopy-original-readme-extract
+    title: Original Loopy README Extract
+    supplied_by: user
+    kind: upstream_behavior_history
+    location:
+      type: local_file
+      path: "C:/Users/Administrator/Downloads/loopy_skill_extracted_from_readme.md"
+      sha256: "c0ddb5e6ceb9507d5116e07cd58f9bcbf20959115427256c561c17596c013441"
+    upstream:
+      repository: "https://github.com/Forward-Future/loopy"
+      revision: "75966cbd572a4185064971c9fe5e9c52e8f8456d"
+      license: MIT
+    authority: reference
+    owns:
+      - original Loopy product behavior and vocabulary
+      - find, discover, adapt, craft, run, debrief, save, and publish history
+      - compact Prompt precedent
+      - original Loopy and Loop Library relationship
+    adopt:
+      - goal-to-bounded-loop interview logic for the from-scratch entry
+      - audit, run, receipt, and debrief concepts where independently validated
+      - compact Prompt as an Adapter projection route
+    do_not_use:
+      - Loopy names or runtime dependencies in Loopcraft Clean
+      - Loop Library lookup, save, publish, or catalog behavior in Kernel
+      - compact Prompt as the canonical Loop definition
+
+  - id: phase1-handoff-package
+    title: Current Loopy Phase 1 Handoff
+    supplied_by: user
+    kind: implementation_audit_target
+    location:
+      type: local_directory
+      path: "C:/Users/Administrator/Documents/loopy-skill-handoff"
+    key_artifacts:
+      - path: "loopy/SKILL.md"
+        sha256: "cee9b627b8b78d3712e144527681943e6b403a276b3c40260fca0a393cec7938"
+      - path: "loopy/references/upgrade-skill.md"
+        sha256: "f22c61bd3d642f28d0f337319d0f9c0828680e7f0c5dd489a2b2fd804f505683"
+      - path: "docs/IMPLEMENTATION-HANDOFF.md"
+        sha256: "497f1d484e9bf4f6e5673f7dd91885ad5a6a85113f991220c2ac6ca19ebaa5c5"
+      - path: "docs/TESTING-HANDOFF.md"
+        sha256: "fed0f903c7268daf95b076289879a1bf0f4846d80cb98fd4a7ad49203edd654c"
+    authority: audit_target
+    owns:
+      - evidence of the current Phase 1 implementation
+      - concrete upgrade workflow and current naming
+      - handoff claims that require independent verification
+    adopt:
+      - Craft and guided-design behavior as the existing starting point for from-scratch Loop creation
+      - Skill-to-Loop Upgrade and its Loopability Gate as the existing starting point for Skill optimization
+      - only code or prose that passes the new specification and tests
+    risks:
+      - current directory is not a Git repository
+      - test handoff contains summary counts but no rerunnable fixtures or raw outputs
+      - current implementation differs from Phase 1 baseline terminology
+      - Loop Library connections remain and must not enter Loopcraft Clean
+    do_not_use:
+      - wholesale copy into the new repository
+      - final proof of correctness
+
+  - id: workflow-skill-creator
+    title: Workflow-to-Skill Distiller
+    supplied_by: user
+    kind: high_fidelity_localization_source
+    location:
+      type: local_directory
+      path: "C:/Users/Administrator/Downloads/workflow_skill_creator"
+    key_artifacts:
+      - path: SKILL.md
+        sha256: "4833b12e3bbe5298783a7ff5132951b494e661eecb034eb6f01973a8cccfaa18"
+      - path: references/cli_script_template.py
+        sha256: "8e85e845697fd44401c2d8ec471d61526465970206b60c37141757b289a8d4fe"
+    upstream:
+      repository: "https://github.com/google-deepmind/science-skills"
+      revision: "33557e0f1faf0f281d255940de58935c61b2143b"
+      license: Apache-2.0
+    authority: localize
+    owns:
+      - conversation and completed-workflow recovery
+      - iterative clarification after observing the workflow
+      - strict-versus-flexible step analysis
+      - dependency and resource discovery
+      - design approval before implementation
+    adopt:
+      - observed workflow summary followed by progressive questions
+      - explicit inputs, outputs, scope, error, dependency, and resource recovery
+      - skill design approval gate
+    localize:
+      - replace Science Skills bundle assumptions
+      - replace fixed uv and platform-path assumptions
+      - replace any-I/O-means-CLI rule with capability-based design
+      - make behavioral validation required in proportion to risk
+      - emit Behavior Contract before the common Loopability Gate
+    risks:
+      - issue: local extracted directory does not include the upstream LICENSE file
+        current_severity: non_blocking_for_private_learning_and_reference
+        deferred_gate: required before vendoring, redistribution, publication, or shipping copied/modified material
+      - issue: copied or modified material must retain Apache-2.0 and modification notices when distributed
+        current_severity: recorded_not_blocking
+    do_not_use:
+      - from-scratch Loop creation
+      - test fixture or benchmark question
+      - separate Workflow-to-Loop implementation that duplicates the common gate
+
+  - id: skill-polisher
+    title: Skill Polisher
+    supplied_by: user
+    kind: existing_skill_lifecycle_tool
+    upstream:
+      repository: "https://github.com/Conradgui/skill-polisher"
+      revision: "63df4b508acbbbe4d351d30f1c7d0701c8fc75f7"
+      license: MIT
+    authority: adopt
+    owns:
+      - existing Skill review, polish, and recheck
+      - proportional evidence boundary
+      - living-contract reconstruction
+      - learned-invariant versus sediment analysis
+      - release-drift audit
+    adopt:
+      - Review, Polish, and Recheck mode separation
+      - read-only review by default
+      - contract, system, evolution, and evidence evaluation axes
+      - smallest evidence-backed change and stable finding IDs
+      - source, repository, publication, CI, and installation state separation
+    localize:
+      - emit a normalized Behavior Contract and preserved-invariant ledger for Loopcraft
+      - hand full rebuilds to Skill Creator Pro
+    do_not_use:
+      - create a new Skill identity
+      - define Loop IR or Compiler behavior
+      - replace the common Loopability Gate
+
+  - id: skill-creator-pro
+    title: Skill Creator Pro
+    supplied_by: user
+    kind: new_skill_lifecycle_tool
+    upstream:
+      repository: "https://github.com/Conradgui/skill-creator-pro"
+      revision: "eb23656e56ea3555599a6c5278a8b5834dc56b6d"
+      license: Apache-2.0
+      ci_evidence: "https://github.com/Conradgui/skill-creator-pro/actions/runs/29337650517"
+    authority: adopt
+    owns:
+      - new Skill and deliberate rebuild behavior contract
+      - invocation and information hierarchy
+      - observable Done-when gates
+      - Skill scaffolding, structural validation, quality lint, and forward testing
+      - first packaging and release engineering
+    adopt:
+      - behavior-contract-first creation
+      - trigger branches and near misses
+      - one owner per behavior, artifact, adapter, and route
+      - conditional references and deterministic scripts
+      - quality_lint and risk-scaled fresh-context forward tests
+      - runtime artifact versus human documentation separation
+    localize:
+      - use only in Skill-facing entry and Adapter modules
+      - translate Codex-specific metadata through the Codex Skill Adapter
+      - omit release branches from the default build unless publication is requested
+    risks:
+      - intentionally does not own existing Skill in-place review
+      - more complex than the official baseline and must be applied proportionally
+      - current repository regression suite is focused rather than exhaustive
+    do_not_use:
+      - Kernel semantic authority
+      - Workflow extraction from completed conversations
+      - universal cross-platform metadata schema
+
+  - id: skill-writing-guidelines
+    title: Matt Pocock Inspired Skill Writing Guidelines
+    supplied_by: user
+    kind: cross_cutting_writing_reference
+    upstream:
+      repository: "https://github.com/Conradgui/matt-pocock-inspired-skill-writing"
+      revision: "86704943ddac32129ff8b5a411c5b9bcb195428a"
+      source_study_revision: "mattpocock/skills@66898f60e8c744e269f8ce06c2b2b99ce7660d5f"
+      license: MIT
+    authority: reference
+    owns:
+      - process-predictability writing principles
+      - primitive-versus-orchestrator vocabulary
+      - description-as-branch-index guidance
+      - observable gates, proportional rigor, progressive disclosure, and pruning guidance
+      - repository engineering reference
+    adopt:
+      - twelve writing principles as review heuristics
+      - one source of truth and purpose-built durable artifacts
+      - fail-fast gates and independent judgment axes
+      - runtime truth versus human documentation separation
+    localize:
+      - translate every harness-specific field through an Adapter
+      - apply mechanisms in proportion to Loopcraft module risk
+    do_not_use:
+      - generator or Compiler implementation
+      - claim that the twelve-part model is Matt Pocock's official framework
+      - proof of behavior without Loopcraft-specific tests
+
+  - id: official-codex-skill-creator
+    title: OpenAI Codex Skill Creator
+    supplied_by: platform
+    kind: compatibility_baseline
+    location:
+      type: installed_file
+      path: "C:/Users/Administrator/.codex/skills/.system/skill-creator/SKILL.md"
+      sha256: "2940e08d49e5197453e58a4387d14cb07101b97911c992ef75c8289e0a1734c0"
+    authority: boundary_only
+    owns:
+      - current Codex Skill folder and metadata compatibility baseline
+      - platform-native validation expectations
+    adopt:
+      - no primary workflow; Skill Creator Pro is the preferred creation source
+    do_not_use:
+      - primary Loopcraft Skill creation workflow
+      - reason to weaken Skill Creator Pro behavior and evidence gates
+
+edition_boundaries:
+  loopcraft_clean:
+    allowed:
+      - localized authoring mechanisms
+      - Behavior Contract, Loop IR, Compiler, Validator, Evidence Packager
+      - Skill, compact Prompt, runtime, presentation, and future-standard Adapters
+    forbidden:
+      - Loopy runtime dependency
+      - Loop Library catalog, lookup, publish, or registry dependency
+  loopcraft_library_edition:
+    base: loopcraft_clean
+    adds:
+      - Loop Library Catalog Adapter
+      - catalog discovery, version resolution, and publication integration
+    rule: Library Edition adapters depend on Kernel contracts; Kernel never depends on the library.
