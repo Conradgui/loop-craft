@@ -25,14 +25,17 @@
 
 ### D-003 Git 与环境是执行前置门槛
 
-Plan 要求在实施前先列出并获得批准：初始化 Git、是否重命名目录、隔离 branch/worktree、确认 Python/pytest/jsonschema 环境。首次基线检查时 `git status --short` 返回 `fatal: not a git repository`；后续已创建基线提交 `effd60b35d1ff438a75d6827d779011d433099f0`（短 SHA：`effd60b`，`docs: establish Loop Craft project baseline`）。当前仍在 `main`，尚无额外隔离 branch/worktree。Python `3.13.13`、pytest `9.0.3`、jsonschema `4.26.0` 已核对；安装/复制外部资源仍保持待批准状态。
+Plan 要求在实施前先列出并获得批准：初始化 Git、目录命名、隔离 branch/worktree、确认 Python/pytest/jsonschema 环境。用户已明确批准整份操作清单：保留本地 ASCII 路径 `C:\Users\Administrator\Documents\loopcraft`，项目显示名使用“Loopcraft开发”，创建隔离 worktree，并使用现有依赖而不安装新依赖。基线提交 `effd60b` 已由治理更新提交 `5a38ec7` 承接；`main` 跟踪 `origin/main`，远程 `origin` 为 `https://github.com/Conradgui/loop-craft.git`。`feature/core-vertical-slice` worktree 创建于 `C:\Users\Administrator\Documents\loopcraft\.worktrees\core-vertical-slice`，初始 HEAD 为 `5a38ec7`，当前跟踪 `origin/feature/core-vertical-slice`。Python `3.13.13`、pytest `9.0.3`、jsonschema `4.26.0` 已核对。G-01 因此满足；该结论只表示执行前置门槛通过，不表示任何实现或测试通过。
 
 ### D-004 资源记录中的过时陈述
 
-资源复用记录 §13 第 237 行此前称“阶段 2 最终 Spec 尚未写入”，现已更新为“阶段 2 最终 Spec 已写入并批准”；此前陈述已成为 `stale`，本 Agent 不修改原记录，后续以批准 Spec 为准。第 238 行的 Git 未初始化陈述因后续 `git init` 也已过时，实际状态以进度日志中的命令证据为准。
+资源复用记录 §13 第 237 行此前称“阶段 2 最终 Spec 尚未写入”，现已更新为“阶段 2 最终 Spec 已写入并批准”；此前陈述已成为 `stale`，本 Agent 不修改原记录，后续以批准 Spec 为准。第 238 行已记录 `effd60b` 和“尚未创建远程仓库”；远程已在本次复核中确认并推送 `main`，该部分陈述也已过时，实际状态以本日志和命令证据为准。
+
+### D-005 Task 1 验证边界
+
+Task 1（确定性序列化测试基础）已在 `feature/core-vertical-slice` 分支通过独立定向验证：提交链包含 `ab9116c`、`d95e4e3`、`8d811db`，`python -m pytest tests/unit/test_canonical.py -q` 输出 `4 passed in 0.02s`，worktree clean。该决策只确认 canonical serialization/harness 的当前子范围，不扩大为 Schema、Compiler、Adapter、Evidence 或阶段出口已完成；规格审查通过和代码质量审查 `Approved` 作为当前里程碑审查结论记录，后续任务仍需独立证据。
 
 ## 未决项
 
-- 是否完成隔离分支/worktree，以及是否将当前目录更名；基线 commit `effd60b` 已创建，但隔离工作区仍未完成。
 - Accepted Definition 的受限子集边界已写入修订后的 Spec/Plan；仍需 Schema、fixture、产品 Skill 和执行记录的测试证据，见 `risk-register.md` 的 `R-001`。
 - 五项 P1 质量门槛关闭前，不得把计划中的 Expected 或模板结果写成执行完成。
