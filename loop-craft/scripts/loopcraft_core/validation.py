@@ -57,10 +57,41 @@ def schema_issues(definition: dict[str, Any]) -> tuple[ValidationIssue, ...]:
     )
 
 
+def semantic_issues(definition: dict[str, Any]) -> tuple[ValidationIssue, ...]:
+    authority = definition["behavior_contract"]["authority"]
+    categories = {
+        name: set(authority[name])
+        for name in ("allowed", "approval_required", "forbidden")
+    }
+    issues: list[ValidationIssue] = []
+    for left, right in (
+        ("allowed", "approval_required"),
+        ("allowed", "forbidden"),
+        ("approval_required", "forbidden"),
+    ):
+        overlap = sorted(categories[left] & categories[right])
+        if overlap:
+            issues.append(
+                ValidationIssue(
+                    code="authority_overlap",
+                    path="/behavior_contract/authority",
+                    message=(
+                        f"{left} and {right} overlap: {', '.join(overlap)}"
+                    ),
+                )
+            )
+    return tuple(issues)
+
+
 def validate_definition(definition: dict[str, Any]) -> None:
     issues = schema_issues(definition)
     if issues:
         raise DefinitionValidationError(issues)
+
+    issues = semantic_issues(definition)
+    if issues:
+        raise DefinitionValidationError(issues)
+
     try:
         canonical_json_bytes(definition)
     except ValueError as exc:

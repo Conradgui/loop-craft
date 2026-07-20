@@ -37,6 +37,36 @@ def test_missing_behavior_contract_is_rejected() -> None:
     assert captured.value.issues[0].path == ""
 
 
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ("allowed", "approval_required"),
+        ("allowed", "forbidden"),
+        ("approval_required", "forbidden"),
+    ],
+)
+def test_authority_categories_must_not_overlap(left: str, right: str) -> None:
+    candidate = copy.deepcopy(load_valid())
+    authority = candidate["behavior_contract"]["authority"]
+    conflict = authority[left][0]
+    authority[right].append(conflict)
+
+    with pytest.raises(DefinitionValidationError) as captured:
+        validate_definition(candidate)
+
+    overlap_issues = [
+        issue
+        for issue in captured.value.issues
+        if issue.code == "authority_overlap"
+    ]
+    assert len(overlap_issues) == 1
+    issue = overlap_issues[0]
+    assert issue.path == "/behavior_contract/authority"
+    assert left in issue.message
+    assert right in issue.message
+    assert conflict in issue.message
+
+
 def test_json_pointer_escapes_reference_tokens() -> None:
     assert _json_pointer(["a/b", "c~d", 0]) == "/a~1b/c~0d/0"
 
