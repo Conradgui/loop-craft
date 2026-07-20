@@ -71,3 +71,106 @@
 - G-01：部分完成。基线 SHA、环境版本和主分支已可追溯；隔离 worktree/branch 及批准记录仍缺失。
 - G-02、G-03、G-04：待执行验证；设计修订已进入 `effd60b`，但没有实现、测试或构建通过证据。
 - G-05：保持 `OPEN`。
+
+## 2026-07-21：远程同步与隔离 worktree 复核
+
+### 已确认命令事实
+
+- `git remote -v`：`origin` fetch/push 均为 `https://github.com/Conradgui/loop-craft.git`。
+- `git show -1 5a38ec7`：完整 SHA `5a38ec760ebd63920b111c7592095988368c59b4`，提交信息 `docs: record project baseline verification`。
+- `git branch -vv`：`main` 为 `5a38ec7` 并跟踪 `origin/main`；本地 `feature/core-vertical-slice` 位于同一提交。
+- `git status --short --branch`（主工作树）：`## main...origin/main`，无输出的未提交文件，主工作树干净。
+- `git worktree list --porcelain`：主工作树之外，已创建 `C:/Users/Administrator/Documents/loopcraft/.worktrees/core-vertical-slice`，分支为 `feature/core-vertical-slice`，HEAD 为 `5a38ec760ebd63920b111c7592095988368c59b4`。
+- 在隔离 worktree 执行 `git status --short --branch`：`## feature/core-vertical-slice`，未见未提交文件；`git log -1` 同为 `5a38ec7`。
+- `git ls-remote --heads origin main feature/core-vertical-slice`：远端已确认 `main` 指向 `5a38ec7`；未返回 feature 分支，故 feature 当前仅有本地 worktree 证据。
+- `git merge-base --is-ancestor effd60b 5a38ec7` 返回成功；P1 设计修订所在基线已进入治理更新提交的祖先链。
+
+### 复核期间的状态变化
+
+- 首次命令检查时，主工作树和隔离 worktree 均未列出未提交文件。
+- 本次三份治理文档更新后，主工作树 `git status --short --branch` 显示 `decision-log.md`、`progress-log.md`、`quality-gates.md` 被修改，属于本次治理更新，尚未提交。
+- 同期再次检查隔离 worktree，状态变为 `## feature/core-vertical-slice` 与 `?? tests/`。这些未跟踪文件不是本 Agent 创建或修改的；本 Agent 未读取、删除或移动它们。
+- `tests/` 的存在不能证明测试已运行或通过；在有实际命令输出前，G-02 至 G-05 状态不变。
+
+### 中间复核
+
+- 隔离 worktree HEAD 仍为 `5a38ec7`，最新 `git status --short --branch` 显示以下新增文件已暂存：`loop-craft/scripts/loopcraft_core/__init__.py`、`loop-craft/scripts/loopcraft_core/canonical.py`、`pyproject.toml`、`tests/conftest.py`、`tests/unit/test_canonical.py`。
+- 这些文件表明实现/测试脚手架正在进入暂存区，但没有提供测试命令、测试结果或新提交证据；G-02 至 G-05 不变。
+- 主工作树仍有本次三份治理文档的未提交修改；本 Agent 未触碰隔离 worktree 中的实现/测试文件。
+
+### 随后复核
+
+- `git log -1`（隔离 worktree）：`ab9116c9c4230169f9c4c509361911b9bcb7f87f`，提交信息为 `test: establish deterministic core serialization`。
+- `git show --stat ab9116c`：提交包含前述五个文件，共 66 行新增；`git status --short --branch` 随后只输出 `## feature/core-vertical-slice`，worktree clean。
+- 未获得该提交对应的 pytest 命令或输出，因此只记录提交事实，不把提交信息中的 `test` 解释为测试通过。
+
+### 当前状态
+
+- G-01：部分完成。远程、main 推送、隔离 worktree/branch 和两处 HEAD 均有命令证据；目录命名决策尚未单独归档。
+- G-02、G-03、G-04：待执行验证；`5a38ec7` 证明治理/设计基线，`ab9116c` 证明首批实现/测试脚手架已提交，但均未提供测试通过证据。
+- G-05：保持 `OPEN`。
+- 本 Agent 未执行或验证生产代码、安装、测试、构建或官方 Skill 校验；隔离 worktree 中虽已有 `ab9116c`，仍未将提交写成测试完成。
+
+## 2026-07-21：Task 1 最终验证
+
+### 已确认命令事实
+
+- 隔离 worktree：`C:/Users/Administrator/Documents/loopcraft/.worktrees/core-vertical-slice`。
+- 分支：`feature/core-vertical-slice`，跟踪 `origin/feature/core-vertical-slice`。
+- `git log --oneline --decorate -8`：HEAD `8d811db`，其祖先包含 `d95e4e3`、`ab9116c`，基线为 `5a38ec7`。
+- `git status --short --branch`：`## feature/core-vertical-slice...origin/feature/core-vertical-slice`，worktree clean。
+- `python -m pytest tests/unit/test_canonical.py -q`：`.... [100%]`，`4 passed in 0.02s`。
+- 当前里程碑交接结论称规格审查通过、代码质量审查最终为 `Approved`；本记录不把这两项审查结论扩展为后续任务通过。
+
+### 门槛状态
+
+- G-02-T1（canonical serialization/harness）：已验证。
+- 全局 G-02：仅当前 Task 1 子范围有验证；Schema/Profile、单 Loop 负例、后续输入契约和范围边界仍待执行验证。
+- G-03、G-04：仍待执行验证。
+- G-05：仍为 `OPEN`；没有完整链路、官方校验、双构建、drift 或最终执行记录证据。
+
+### 边界声明
+
+Task 1 的 4 个测试通过只支持 canonical serialization/harness 的局部声明；不支持“Core vertical slice 已完成”或任何后续任务通过的声明。
+
+## 2026-07-21：G-01 前置门槛纠正
+
+### 用户已确认决策
+
+- 保留本地 ASCII 路径：`C:/Users/Administrator/Documents/loopcraft`，不改为中文目录名。
+- 项目显示名称：`Loopcraft开发`；本地目录名与产品显示名不要求相同。
+- 使用隔离 worktree：`C:/Users/Administrator/Documents/loopcraft/.worktrees/core-vertical-slice`。
+- 使用已确认的 Python/pytest/jsonschema 环境，不安装新依赖。
+
+### Git 事实
+
+- `git remote -v`：`origin` 为 `https://github.com/Conradgui/loop-craft.git`。
+- `git branch -vv`：`main` 跟踪 `origin/main`；`feature/core-vertical-slice` 跟踪 `origin/feature/core-vertical-slice`。
+- 用户已确认远程 feature 分支完成推送；本次 `git ls-remote` 复查因 `schannel` TLS 握手失败未取得远程响应，因此不把该失败命令当作反证或成功证据。
+- 隔离 worktree 正在推进后续任务；其当前未提交文件不影响 G-01 的“前置条件已建立”判断，也不能证明后续测试通过。
+
+### 门槛状态
+
+- G-01：`PASS`，仅表示执行前置门槛满足。
+- G-02-T1：保持已验证；全局 G-02 仍只部分验证。
+- G-03、G-04 仍待执行验证；G-05 保持 `OPEN`。
+
+## 2026-07-21：Task 2 审查断点
+
+### 已确认事实
+
+- 隔离 worktree 当前分支为 `feature/core-vertical-slice`，HEAD 为 `e21c970`（`feat: validate accepted loop definitions`）。
+- `git rev-list --left-right --count origin/feature/core-vertical-slice...feature/core-vertical-slice` 输出 `0 1`：feature 分支领先远程 1 个提交，尚未推送；worktree 当前 clean。
+- Task 2 已通过规格审查（当前任务交接结论）。
+- 独立联合定向命令：`python -m pytest tests/unit/test_canonical.py tests/unit/test_validation.py -q`，输出 `........ [100%]`、`8 passed in 0.06s`。
+- 独立 Schema 元校验输出：`Schema check passed`。
+- 首次代码质量审查返回 HTTP 503，未形成结论；重试审查正在进行。本记录不写 `Approved`，也不把 Task 2 标为完成。
+
+### 门槛状态
+
+- G-01：PASS，仅表示执行前置门槛满足。
+- G-02-T1：已验证。
+- G-02-T2：待质量审查；规格和定向测试证据已存在，但质量审查结论缺失。
+- 全局 G-02：部分验证，后续任务仍 OPEN。
+- G-03、G-04：待执行验证。
+- G-05：OPEN。
