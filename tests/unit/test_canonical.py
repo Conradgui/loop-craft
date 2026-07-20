@@ -9,6 +9,12 @@ def test_canonical_json_and_digest_are_independent_of_mapping_key_order():
     first = {"beta": 2, "alpha": 1, "nested": {"z": False, "a": "value"}}
     second = {"nested": {"a": "value", "z": False}, "alpha": 1, "beta": 2}
 
+    assert canonical_json_bytes(first) == (
+        '{"alpha":1,"beta":2,"nested":{"a":"value","z":false}}'.encode("utf-8")
+    )
+    assert sha256_digest(first) == (
+        "sha256:ec5c951a4e39b29b0b18c9fe8577facabc069f96ab62ae7851ebffefe253d3e7"
+    )
     assert canonical_json_bytes(first) == canonical_json_bytes(second)
     assert sha256_digest(first) == sha256_digest(second)
 
