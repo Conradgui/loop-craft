@@ -59,8 +59,17 @@ Task 3 由语义实现提交 `5299f81`（`feat: reject contradictory authority s
 
 验证快照时 feature HEAD 为 `2da604d`，worktree clean，相对 `origin/feature/core-vertical-slice` 领先 2 个提交；`5299f81` 和 `2da604d` 尚未推送。远端同步必须在实际推送和远端 HEAD 复核后另行记录。
 
+### D-010 Task 4 编译器边界、输入快照与 Source Map
+
+Task 4 提交 `61e9bbc`（`feat: compile accepted definitions deterministically`）把已接受定义投影为 Final Execution IR，并把以下行为固定为编译器契约：先执行 schema → canonical → semantic validation，再读取和投影字段；验证通过后对输入做 `deepcopy` 快照，避免调用方后续修改嵌套字典或列表时反向改变编译结果；递归调整任意字典键顺序时，Final Execution IR 的 canonical bytes、IR digest、`definition_digest` 和 Source Map canonical bytes 保持一致。
+
+Source Map 覆盖定义根摘要（`/definition_digest` → `""`）、Schema/Profile、Behavior Contract 字段、Loop id/entrypoint、每个 node 的 id/instruction/next，以及 terminal mapping/invariants。`compiler_version` 是编译过程生成的构建元数据，不来自 Semantic IR，因此不伪造语义来源映射。规格审查与代码质量审查均为 `Approved`，无 Critical 或 Important；保留 R-009 的测试契约增强项，不阻塞 Task 4。
+
+主控独立验证：compiler 定向测试 `5 passed`；validation + canonical + compiler 组合测试 `30 passed`；全量测试 `30 passed`；Draft 2020-12 Schema 元校验和 `git diff --check` 均通过。验证快照时 feature worktree clean，HEAD 为 `61e9bbc`，相对远端领先 1 个提交且尚未推送。本决策只确认 Compiler 与语义 Source Map 子范围，不覆盖 Adapter、Evidence、Runtime、Pipeline 或整个纵向切片。
+
 ## 未决项
 
 - Accepted Definition 的 Schema/fixture 子范围已由 Task 2 验证；产品 Skill、Evidence、Pipeline 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
-- Task 3 的 semantic/canonical 顺序和 surrogate 错误边界已验证，R-008 已关闭；Compiler、Adapter、Evidence、Pipeline 和阶段出口仍需后续任务证据。
+- Task 3 的 semantic/canonical 顺序和 surrogate 错误边界已验证，R-008 已关闭；其后续 Adapter、Evidence、Pipeline 和阶段出口仍需任务证据。
+- Task 4 的 Compiler 与语义 Source Map 子范围已验证；Adapter、Evidence、Pipeline、Runtime 和阶段出口仍需后续任务证据。
 - 当前 OPEN 的 P1 质量门槛关闭前，不得把计划中的 Expected 或模板结果写成执行完成。

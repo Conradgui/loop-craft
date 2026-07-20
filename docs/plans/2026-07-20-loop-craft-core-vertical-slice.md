@@ -704,6 +704,13 @@ git commit -m "fix: validate canonical input before semantic checks"
 
 ### Task 4: Deterministic Compiler and Source Map
 
+**Task 4 预检修订（执行门槛）：**
+
+- 用递归字典键重排证明等价 Accepted Definition 产生相同的 Final Execution IR canonical bytes/digest、`definition_digest` 和 Source Map canonical bytes；不能只比较普通 Python 字典相等。
+- `compile_definition` 必须先执行既有 validation，再读取和投影输入；验证通过后使用 `deepcopy` 隔离输入快照，调用方后续修改嵌套字段不得改变编译结果。
+- Source Map 必须覆盖根 `definition_digest`、Schema/Profile、Behavior Contract、Loop id/entrypoint、node id/instruction/next、terminal mapping 和 invariants。
+- `compiler_version` 是编译器生成元数据，不来自 Semantic IR，因此不得伪造 source mapping。Task 4 不实现 Adapter、Evidence、Runtime 或 Pipeline。
+
 **Files:**
 - Create: loop-craft/scripts/loopcraft_core/compiler.py
 - Create: tests/unit/test_compiler.py
@@ -712,40 +719,141 @@ git commit -m "fix: validate canonical input before semantic checks"
 
 ~~~python
 # tests/unit/test_compiler.py
-import copy
 import json
 from pathlib import Path
+from typing import Any
 
-from loopcraft_core.canonical import sha256_digest
+import pytest
+
+from loopcraft_core.canonical import canonical_json_bytes, sha256_digest
 from loopcraft_core.compiler import compile_definition
+from loopcraft_core.validation import DefinitionValidationError
 
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "accepted-definition.valid.json"
+FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures"
+    / "accepted-definition.valid.json"
+)
+CYCLE_ORDER = ("observe", "choose", "act", "verify", "record", "adapt")
 
 
-def load_valid() -> dict:
+def load_valid() -> dict[str, Any]:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 
-def test_compiler_is_deterministic() -> None:
-    definition = load_valid()
-    first = compile_definition(definition)
-    second = compile_definition(copy.deepcopy(definition))
+def reverse_mapping_order(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: reverse_mapping_order(item)
+            for key, item in reversed(tuple(value.items()))
+        }
+    if isinstance(value, list):
+        return [reverse_mapping_order(item) for item in value]
+    return value
 
-    assert first.final_execution_ir == second.final_execution_ir
-    assert first.source_map == second.source_map
-    assert first.final_execution_ir["definition_digest"] == sha256_digest(definition)
+
+def test_compiler_is_canonically_deterministic_for_equivalent_definitions() -> None:
+    definition = load_valid()
+    reordered_definition = reverse_mapping_order(definition)
+
+    first = compile_definition(definition)
+    second = compile_definition(reordered_definition)
+
+    assert canonical_json_bytes(first.final_execution_ir) == canonical_json_bytes(
+        second.final_execution_ir
+    )
+    assert sha256_digest(first.final_execution_ir) == sha256_digest(
+        second.final_execution_ir
+    )
+    assert first.final_execution_ir["definition_digest"] == second.final_execution_ir[
+        "definition_digest"
+    ]
+    assert canonical_json_bytes(first.source_map) == canonical_json_bytes(
+        second.source_map
+    )
 
 
 def test_compiler_maps_cycle_in_fixed_order() -> None:
     result = compile_definition(load_valid())
     nodes = result.final_execution_ir["loops"][0]["nodes"]
 
-    assert [node["id"] for node in nodes] == [
-        "observe", "choose", "act", "verify", "record", "adapt"
+    assert [node["id"] for node in nodes] == list(CYCLE_ORDER)
+    assert [node["next"] for node in nodes] == [
+        "choose",
+        "act",
+        "verify",
+        "record",
+        "adapt",
+        "observe",
     ]
-    assert result.source_map["/loops/0/nodes/0/instruction"] == [
-        "/loops/0/cycle/observe"
+
+
+def test_source_map_covers_all_critical_core_slice_fields() -> None:
+    result = compile_definition(load_valid())
+    source_map = result.source_map
+
+    assert source_map["/schema_version"] == ["/schema_version"]
+    assert source_map["/input_profile"] == ["/profile"]
+    assert source_map["/definition_digest"] == [""]
+    for field in (
+        "identity",
+        "purpose",
+        "applicability",
+        "interface",
+        "authority",
+        "capabilities",
+    ):
+        assert source_map[f"/{field}"] == [f"/behavior_contract/{field}"]
+
+    assert source_map["/loops/0/id"] == ["/loops/0/id"]
+    assert source_map["/loops/0/entrypoint"] == ["/loops/0/cycle/observe"]
+    for node_index, node_id in enumerate(CYCLE_ORDER):
+        next_id = CYCLE_ORDER[(node_index + 1) % len(CYCLE_ORDER)]
+        output_path = f"/loops/0/nodes/{node_index}"
+        assert source_map[f"{output_path}/id"] == [
+            f"/loops/0/cycle/{node_id}"
+        ]
+        assert source_map[f"{output_path}/instruction"] == [
+            f"/loops/0/cycle/{node_id}"
+        ]
+        assert source_map[f"{output_path}/next"] == [
+            f"/loops/0/cycle/{next_id}"
+        ]
+
+    assert source_map["/loops/0/terminal_mapping"] == [
+        "/loops/0/terminal_states"
     ]
+    assert source_map["/loops/0/invariants"] == ["/loops/0/invariants"]
+    assert "/compiler_version" not in source_map
+
+
+def test_compiler_result_does_not_alias_the_input_definition() -> None:
+    definition = load_valid()
+    result = compile_definition(definition)
+    original_ir_bytes = canonical_json_bytes(result.final_execution_ir)
+    original_ir_digest = sha256_digest(result.final_execution_ir)
+    original_source_map_bytes = canonical_json_bytes(result.source_map)
+    original_definition_digest = result.final_execution_ir["definition_digest"]
+
+    definition["behavior_contract"]["identity"]["name"] = "Changed"
+    definition["behavior_contract"]["capabilities"]["required"].append(
+        "network.write"
+    )
+    definition["loops"][0]["terminal_states"]["success"] = "Changed"
+    definition["loops"][0]["invariants"].append("Changed")
+
+    assert canonical_json_bytes(result.final_execution_ir) == original_ir_bytes
+    assert canonical_json_bytes(result.source_map) == original_source_map_bytes
+    assert result.final_execution_ir["definition_digest"] == original_definition_digest
+    assert sha256_digest(result.final_execution_ir) == original_ir_digest
+
+
+def test_compiler_validates_before_projecting_the_definition() -> None:
+    definition = load_valid()
+    definition.pop("behavior_contract")
+
+    with pytest.raises(DefinitionValidationError):
+        compile_definition(definition)
 ~~~
 
 - [ ] **Step 2: Verify RED**
@@ -764,6 +872,7 @@ Expected: import failure because loopcraft_core.compiler does not exist.
 # loop-craft/scripts/loopcraft_core/compiler.py
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from typing import Any
 
@@ -771,6 +880,7 @@ from .canonical import sha256_digest
 from .validation import validate_definition
 
 CYCLE_ORDER = ("observe", "choose", "act", "verify", "record", "adapt")
+COMPILER_VERSION = "0.1.0"
 
 
 @dataclass(frozen=True)
@@ -781,12 +891,13 @@ class CompileResult:
 
 def compile_definition(definition: dict[str, Any]) -> CompileResult:
     validate_definition(definition)
-    contract = definition["behavior_contract"]
-    ordered_loops = sorted(definition["loops"], key=lambda loop: loop["id"])
-    source_index = {loop["id"]: index for index, loop in enumerate(definition["loops"])}
+    snapshot = copy.deepcopy(definition)
+    contract = snapshot["behavior_contract"]
     compiled_loops: list[dict[str, Any]] = []
     source_map: dict[str, list[str]] = {
+        "/schema_version": ["/schema_version"],
         "/input_profile": ["/profile"],
+        "/definition_digest": [""],
         "/identity": ["/behavior_contract/identity"],
         "/purpose": ["/behavior_contract/purpose"],
         "/applicability": ["/behavior_contract/applicability"],
@@ -795,42 +906,54 @@ def compile_definition(definition: dict[str, Any]) -> CompileResult:
         "/capabilities": ["/behavior_contract/capabilities"],
     }
 
-    for compiled_index, loop in enumerate(ordered_loops):
-        original_index = source_index[loop["id"]]
-        nodes = []
+    for loop_index, loop in enumerate(snapshot["loops"]):
+        nodes: list[dict[str, str]] = []
+        cycle_path = f"/loops/{loop_index}/cycle"
+        output_loop_path = f"/loops/{loop_index}"
+
         for node_index, node_id in enumerate(CYCLE_ORDER):
+            next_id = CYCLE_ORDER[(node_index + 1) % len(CYCLE_ORDER)]
             nodes.append(
                 {
                     "id": node_id,
                     "instruction": loop["cycle"][node_id],
-                    "next": CYCLE_ORDER[(node_index + 1) % len(CYCLE_ORDER)],
+                    "next": next_id,
                 }
             )
-            source_map[f"/loops/{compiled_index}/nodes/{node_index}/instruction"] = [
-                f"/loops/{original_index}/cycle/{node_id}"
+            output_node_path = f"{output_loop_path}/nodes/{node_index}"
+            source_map[f"{output_node_path}/id"] = [f"{cycle_path}/{node_id}"]
+            source_map[f"{output_node_path}/instruction"] = [
+                f"{cycle_path}/{node_id}"
+            ]
+            source_map[f"{output_node_path}/next"] = [
+                f"{cycle_path}/{next_id}"
             ]
 
         compiled_loops.append(
             {
                 "id": loop["id"],
-                "entrypoint": "observe",
+                "entrypoint": CYCLE_ORDER[0],
                 "nodes": nodes,
                 "terminal_mapping": loop["terminal_states"],
                 "invariants": loop["invariants"],
             }
         )
-        source_map[f"/loops/{compiled_index}/terminal_mapping"] = [
-            f"/loops/{original_index}/terminal_states"
+        source_map[f"{output_loop_path}/id"] = [f"/loops/{loop_index}/id"]
+        source_map[f"{output_loop_path}/entrypoint"] = [
+            f"{cycle_path}/{CYCLE_ORDER[0]}"
         ]
-        source_map[f"/loops/{compiled_index}/invariants"] = [
-            f"/loops/{original_index}/invariants"
+        source_map[f"{output_loop_path}/terminal_mapping"] = [
+            f"/loops/{loop_index}/terminal_states"
+        ]
+        source_map[f"{output_loop_path}/invariants"] = [
+            f"/loops/{loop_index}/invariants"
         ]
 
-    execution = {
-        "schema_version": "0.1.0",
-        "compiler_version": "0.1.0",
-        "input_profile": definition["profile"],
-        "definition_digest": sha256_digest(definition),
+    final_execution_ir = {
+        "schema_version": snapshot["schema_version"],
+        "compiler_version": COMPILER_VERSION,
+        "input_profile": snapshot["profile"],
+        "definition_digest": sha256_digest(snapshot),
         "identity": contract["identity"],
         "purpose": contract["purpose"],
         "applicability": contract["applicability"],
@@ -839,7 +962,7 @@ def compile_definition(definition: dict[str, Any]) -> CompileResult:
         "capabilities": contract["capabilities"],
         "loops": compiled_loops,
     }
-    return CompileResult(execution, source_map)
+    return CompileResult(final_execution_ir, source_map)
 ~~~
 
 - [ ] **Step 4: Verify GREEN**
@@ -850,7 +973,7 @@ Run:
 python -m pytest tests/unit/test_compiler.py -v
 ~~~
 
-Expected: 2 passed.
+Expected: 5 passed.
 
 - [ ] **Step 5: Commit**
 
