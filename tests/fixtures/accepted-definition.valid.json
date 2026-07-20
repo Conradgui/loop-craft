@@ -1,0 +1,60 @@
+{
+  "schema_version": "0.1.0",
+  "profile": "core-slice-v0.1",
+  "behavior_contract": {
+    "identity": {
+      "id": "skill-polish-loop",
+      "name": "Skill Polish Loop",
+      "version": "0.1.0",
+      "description": "Improve an existing Agent Skill through bounded evidence-driven repairs."
+    },
+    "purpose": {
+      "outcome": "make the target Skill satisfy its approved behavior contract and validation gates"
+    },
+    "applicability": {
+      "use_when": [
+        "an existing Agent Skill needs iterative improvement based on fresh validation evidence"
+      ],
+      "do_not_use_when": [
+        "the request is a single deterministic edit"
+      ]
+    },
+    "interface": {
+      "inputs": ["skill_path"],
+      "outputs": ["updated_skill", "validation_report"]
+    },
+    "authority": {
+      "allowed": ["read_target", "edit_target", "run_local_validation"],
+      "approval_required": ["publish", "modify_outside_target"],
+      "forbidden": ["send_external_message"]
+    },
+    "capabilities": {
+      "required": ["filesystem.read", "filesystem.write", "validation.execute"],
+      "optional": ["git.diff"]
+    }
+  },
+  "loops": [
+    {
+      "id": "skill-polish",
+      "cycle": {
+        "observe": "Read the current Skill and the latest validation evidence.",
+        "choose": "Select one material in-scope failure.",
+        "act": "Apply one bounded repair.",
+        "verify": "Run the approved targeted validation.",
+        "record": "Record the repair, evidence, and remaining failures.",
+        "adapt": "Use the new evidence to select the next action or stop."
+      },
+      "terminal_states": {
+        "success": "All approved acceptance checks pass.",
+        "clean_no_op": "No material failure exists.",
+        "blocked": "Required evidence or capability is unavailable.",
+        "stagnated": "Fresh evidence no longer changes the next action.",
+        "exhausted": "The approved budget is exhausted."
+      },
+      "invariants": [
+        "Preserve unrelated user work.",
+        "Do not publish without approval."
+      ]
+    }
+  ]
+}
