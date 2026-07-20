@@ -2,6 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://loopcraft.local/schemas/accepted-definition.schema.json",
   "title": "Loop Craft Accepted Definition",
+  "$defs": {
+    "nonBlankString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "profile", "behavior_contract", "loops"],
@@ -18,10 +25,19 @@
           "additionalProperties": false,
           "required": ["id", "name", "version", "description"],
           "properties": {
-            "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
-            "name": {"type": "string", "minLength": 1},
-            "version": {"type": "string", "pattern": "^0\\.[0-9]+\\.[0-9]+$"},
-            "description": {"type": "string", "minLength": 1}
+            "id": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "not": {"pattern": "[\\u0000-\\u001F\\u007F-\\u009F]"}
+            },
+            "name": {"$ref": "#/$defs/nonBlankString"},
+            "version": {
+              "type": "string",
+              "pattern": "^0\\.[0-9]+\\.[0-9]+$",
+              "not": {"pattern": "[\\u0000-\\u001F\\u007F-\\u009F]"}
+            },
+            "description": {"$ref": "#/$defs/nonBlankString"}
           }
         },
         "purpose": {
@@ -29,7 +45,7 @@
           "additionalProperties": false,
           "required": ["outcome"],
           "properties": {
-            "outcome": {"type": "string", "minLength": 1}
+            "outcome": {"$ref": "#/$defs/nonBlankString"}
           }
         },
         "applicability": {
@@ -40,11 +56,11 @@
             "use_when": {
               "type": "array",
               "minItems": 1,
-              "items": {"type": "string", "minLength": 1}
+              "items": {"$ref": "#/$defs/nonBlankString"}
             },
             "do_not_use_when": {
               "type": "array",
-              "items": {"type": "string", "minLength": 1}
+              "items": {"$ref": "#/$defs/nonBlankString"}
             }
           }
         },
@@ -55,12 +71,12 @@
           "properties": {
             "inputs": {
               "type": "array",
-              "items": {"type": "string", "minLength": 1},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             },
             "outputs": {
               "type": "array",
-              "items": {"type": "string", "minLength": 1},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             }
           }
@@ -72,17 +88,17 @@
           "properties": {
             "allowed": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             },
             "approval_required": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             },
             "forbidden": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             }
           }
@@ -94,12 +110,12 @@
           "properties": {
             "required": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             },
             "optional": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {"$ref": "#/$defs/nonBlankString"},
               "uniqueItems": true
             }
           }
@@ -115,18 +131,22 @@
         "additionalProperties": false,
         "required": ["id", "cycle", "terminal_states", "invariants"],
         "properties": {
-          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "not": {"pattern": "[\\u0000-\\u001F\\u007F-\\u009F]"}
+          },
           "cycle": {
             "type": "object",
             "additionalProperties": false,
             "required": ["observe", "choose", "act", "verify", "record", "adapt"],
             "properties": {
-              "observe": {"type": "string", "minLength": 1},
-              "choose": {"type": "string", "minLength": 1},
-              "act": {"type": "string", "minLength": 1},
-              "verify": {"type": "string", "minLength": 1},
-              "record": {"type": "string", "minLength": 1},
-              "adapt": {"type": "string", "minLength": 1}
+              "observe": {"$ref": "#/$defs/nonBlankString"},
+              "choose": {"$ref": "#/$defs/nonBlankString"},
+              "act": {"$ref": "#/$defs/nonBlankString"},
+              "verify": {"$ref": "#/$defs/nonBlankString"},
+              "record": {"$ref": "#/$defs/nonBlankString"},
+              "adapt": {"$ref": "#/$defs/nonBlankString"}
             }
           },
           "terminal_states": {
@@ -134,17 +154,17 @@
             "additionalProperties": false,
             "required": ["success", "clean_no_op", "blocked", "stagnated", "exhausted"],
             "properties": {
-              "success": {"type": "string", "minLength": 1},
-              "clean_no_op": {"type": "string", "minLength": 1},
-              "blocked": {"type": "string", "minLength": 1},
-              "stagnated": {"type": "string", "minLength": 1},
-              "exhausted": {"type": "string", "minLength": 1}
+              "success": {"$ref": "#/$defs/nonBlankString"},
+              "clean_no_op": {"$ref": "#/$defs/nonBlankString"},
+              "blocked": {"$ref": "#/$defs/nonBlankString"},
+              "stagnated": {"$ref": "#/$defs/nonBlankString"},
+              "exhausted": {"$ref": "#/$defs/nonBlankString"}
             }
           },
           "invariants": {
             "type": "array",
             "minItems": 1,
-            "items": {"type": "string", "minLength": 1}
+            "items": {"$ref": "#/$defs/nonBlankString"}
           }
         }
       }

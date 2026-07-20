@@ -7,6 +7,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from loopcraft_core.canonical import canonical_json_bytes
+
 
 @dataclass(frozen=True)
 class ValidationIssue:
@@ -34,7 +36,7 @@ SCHEMA_PATH = (
 
 def _json_pointer(parts: list[Any]) -> str:
     if not parts:
-        return "/"
+        return ""
     escaped = [str(part).replace("~", "~0").replace("/", "~1") for part in parts]
     return "/" + "/".join(escaped)
 
@@ -59,3 +61,15 @@ def validate_definition(definition: dict[str, Any]) -> None:
     issues = schema_issues(definition)
     if issues:
         raise DefinitionValidationError(issues)
+    try:
+        canonical_json_bytes(definition)
+    except ValueError as exc:
+        raise DefinitionValidationError(
+            (
+                ValidationIssue(
+                    code="non_canonical_json",
+                    path="",
+                    message=str(exc),
+                ),
+            )
+        ) from exc
