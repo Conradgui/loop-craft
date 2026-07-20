@@ -88,10 +88,6 @@ def validate_definition(definition: dict[str, Any]) -> None:
     if issues:
         raise DefinitionValidationError(issues)
 
-    issues = semantic_issues(definition)
-    if issues:
-        raise DefinitionValidationError(issues)
-
     try:
         canonical_json_bytes(definition)
     except ValueError as exc:
@@ -104,3 +100,7 @@ def validate_definition(definition: dict[str, Any]) -> None:
                 ),
             )
         ) from exc
+
+    issues = semantic_issues(definition)
+    if issues:
+        raise DefinitionValidationError(issues)

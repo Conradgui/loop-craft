@@ -83,6 +83,21 @@ def test_unpaired_surrogate_is_reported_as_non_canonical_json() -> None:
     assert "JSON compliant" in captured.value.issues[0].message
 
 
+def test_non_canonical_authority_overlap_is_reported_before_semantics() -> None:
+    candidate = copy.deepcopy(load_valid())
+    authority = candidate["behavior_contract"]["authority"]
+    authority["allowed"].append("\ud800")
+    authority["forbidden"].append("\ud800")
+
+    with pytest.raises(DefinitionValidationError) as captured:
+        validate_definition(candidate)
+
+    error = captured.value
+    assert error.issues[0].code == "non_canonical_json"
+    assert error.issues[0].path == ""
+    assert "non_canonical_json" in str(error)
+
+
 @pytest.mark.parametrize(
     "path",
     [
