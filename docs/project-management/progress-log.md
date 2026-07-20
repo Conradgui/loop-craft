@@ -56,3 +56,18 @@
 - G-05：仍为 `OPEN`，阶段出口不能提前通过。
 - 残余检查：Adapter Source Map 已动态覆盖 workflow 的实际 Loop 集合，但其他生成元数据的字段级覆盖仍需在 G-03 验证；Plan 目前只显式注入 Adapter 失败，Evidence 写入失败由 staging 设计兜底但仍建议补定向测试。
 - 资源复用记录 §13 第 238 行“Git 仓库尚未初始化”已被实际 `git init` 超越；未修改原记录，后续治理以本日志的命令证据为准。
+
+## 2026-07-20：基线提交复核
+
+### 已确认
+
+- `git log -1`：`effd60b35d1ff438a75d6827d779011d433099f0`（短 SHA：`effd60b`），提交信息为 `docs: establish Loop Craft project baseline`。
+- `git status --short --branch`：当前分支为 `main`；基线提交已存在。当前工作树另有资源记录的修改待提交，不能视为 clean；这不代表生产代码已实现。
+- `git worktree list --porcelain`：只有主工作目录 `C:/Users/Administrator/Documents/loopcraft`，尚未创建额外隔离 worktree/branch。
+- 资源记录 Git 条目已更新为基线提交 `effd60b`；管理文档中的 P1 设计修订已包含在该基线提交中。
+
+### 当前状态
+
+- G-01：部分完成。基线 SHA、环境版本和主分支已可追溯；隔离 worktree/branch 及批准记录仍缺失。
+- G-02、G-03、G-04：待执行验证；设计修订已进入 `effd60b`，但没有实现、测试或构建通过证据。
+- G-05：保持 `OPEN`。
