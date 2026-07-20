@@ -570,20 +570,45 @@ git commit -m "feat: validate accepted loop definitions"
 - Modify: loop-craft/scripts/loopcraft_core/validation.py
 - Modify: tests/unit/test_validation.py
 
-- [ ] **Step 1: Add failing semantic tests**
+- [ ] **Step 1: Add failing semantic and ordering tests**
 
 ~~~python
-def test_authority_categories_must_not_overlap() -> None:
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ("allowed", "approval_required"),
+        ("allowed", "forbidden"),
+        ("approval_required", "forbidden"),
+    ],
+)
+def test_authority_categories_must_not_overlap(left: str, right: str) -> None:
     candidate = copy.deepcopy(load_valid())
-    candidate["behavior_contract"]["authority"]["forbidden"].append("edit_target")
+    authority = candidate["behavior_contract"]["authority"]
+    conflict = authority[left][0]
+    authority[right].append(conflict)
 
     with pytest.raises(DefinitionValidationError) as captured:
         validate_definition(candidate)
 
-    assert any(
-        issue.code == "authority_overlap" and issue.path == "/behavior_contract/authority"
-        for issue in captured.value.issues
-    )
+    overlap_issues = [
+        issue for issue in captured.value.issues
+        if issue.code == "authority_overlap"
+    ]
+    assert len(overlap_issues) == 1
+    assert overlap_issues[0].path == "/behavior_contract/authority"
+
+
+def test_non_canonical_authority_overlap_is_reported_before_semantics() -> None:
+    candidate = copy.deepcopy(load_valid())
+    authority = candidate["behavior_contract"]["authority"]
+    authority["allowed"].append("\ud800")
+    authority["forbidden"].append("\ud800")
+
+    with pytest.raises(DefinitionValidationError) as captured:
+        validate_definition(candidate)
+
+    assert captured.value.issues[0].code == "non_canonical_json"
+    assert captured.value.issues[0].path == ""
 ~~~
 
 - [ ] **Step 2: Verify RED**
@@ -594,7 +619,7 @@ Run:
 python -m pytest tests/unit/test_validation.py -v
 ~~~
 
-Expected: the new test fails because semantic issues are not checked.
+Expected: the authority-overlap cases fail before semantic validation exists; the combined surrogate + overlap regression fails until canonical validation runs before semantic formatting.
 
 - [ ] **Step 3: Implement semantic validation**
 
@@ -626,13 +651,30 @@ def semantic_issues(definition: dict[str, Any]) -> tuple[ValidationIssue, ...]:
     return tuple(issues)
 ~~~
 
-Replace validate_definition:
+Keep the current Profile boundary explicit: `core-slice-v0.1` accepts exactly one Loop, so this task does not add a `duplicate_loop_id` semantic rule.
+
+Replace validate_definition so the validation layers run in this fixed order:
 
 ~~~python
 def validate_definition(definition: dict[str, Any]) -> None:
     issues = schema_issues(definition)
-    if not issues:
-        issues = semantic_issues(definition)
+    if issues:
+        raise DefinitionValidationError(issues)
+
+    try:
+        canonical_json_bytes(definition)
+    except ValueError as exc:
+        raise DefinitionValidationError(
+            (
+                ValidationIssue(
+                    code="non_canonical_json",
+                    path="",
+                    message=str(exc),
+                ),
+            )
+        ) from exc
+
+    issues = semantic_issues(definition)
     if issues:
         raise DefinitionValidationError(issues)
 ~~~
@@ -643,15 +685,21 @@ Run:
 
 ~~~powershell
 python -m pytest tests/unit/test_validation.py -v
+python -m pytest tests/unit/test_validation.py tests/unit/test_canonical.py -q
+python -m pytest -q
 ~~~
 
-Expected: all validation tests pass, including the authority-overlap case and the Task 2 hardening regressions.
+Expected: all validation tests pass, including all three authority category pairs, the surrogate + authority overlap ordering regression, and the Task 2 hardening regressions. The combined validation + canonical run and the full current suite must both report 25 passed.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit implementation and review fix**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/validation.py tests/unit/test_validation.py
-git commit -m "feat: reject contradictory loop semantics"
+git commit -m "feat: reject contradictory authority semantics"
+
+# If review finds semantic validation preceding canonical validation:
+git add loop-craft/scripts/loopcraft_core/validation.py tests/unit/test_validation.py
+git commit -m "fix: validate canonical input before semantic checks"
 ~~~
 
 ### Task 4: Deterministic Compiler and Source Map
