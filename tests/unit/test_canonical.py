@@ -13,6 +13,20 @@ def test_canonical_json_and_digest_are_independent_of_mapping_key_order():
     assert sha256_digest(first) == sha256_digest(second)
 
 
+def test_canonical_json_uses_exact_unicode_wire_format_and_digest():
+    payload = {"z": 2, "a": "值"}
+
+    assert canonical_json_bytes(payload) == '{"a":"值","z":2}'.encode("utf-8")
+    assert sha256_digest(payload) == (
+        "sha256:3a3487c67187dea60f65acb01536f67d77a0a650f5afacd7ca59f516cb38d661"
+    )
+
+
 def test_canonical_json_rejects_nan_as_not_json_compliant():
     with pytest.raises(ValueError, match="JSON compliant"):
         canonical_json_bytes({"value": math.nan})
+
+
+def test_canonical_json_rejects_unpaired_surrogate_as_not_json_compliant():
+    with pytest.raises(ValueError, match="JSON compliant"):
+        canonical_json_bytes({"value": "\ud800"})
