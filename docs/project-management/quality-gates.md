@@ -31,7 +31,7 @@ Task 2 的“已验证”不覆盖 Task 3、Compiler、Adapter、Evidence、Pipe
 
 | 子门槛 | 范围 | 证据 | 状态 |
 |---|---|---|---|
-| Task 3：Semantic Validation | authority overlap 语义检查及其 canonical 错误边界 | 代码质量审查发现 `5299f81` 的执行顺序和 surrogate 错误消息问题；修复 Agent 目标顺序为 schema → canonical → semantic，提交待定 | 质量阻塞 |
+| Task 3：Semantic Validation | authority overlap 语义检查及其 canonical 错误边界 | `5299f81` 触发 surrogate + authority overlap finding；修复提交 `2da604d` 已调整为 canonical 先于 semantic，但回归测试与代码质量复审尚无结论 | 质量阻塞 |
 
 Task 3 未获得 Approved 结论；修复提交、回归测试和复审完成前，不得标记已验证或完成。
 

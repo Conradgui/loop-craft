@@ -49,6 +49,8 @@ feature 在 Task 2 验证快照时合并 main 形成 `20d3ad4`，并已推送与
 
 Task 3 当前不批准。代码质量审查发现 `5299f81` 在 semantic 检查后才执行 canonical 校验；当同一孤立 surrogate 同时出现在 authority 集合重叠场景时，错误消息格式化可能触发 `UnicodeEncodeError`，而不是稳定的验证错误。修复目标顺序已确定为 schema → canonical → semantic，并已启动修复 Agent；修复提交和复审结论待定。Task 3 保持未完成，不能推送或宣称纵向切片完成。
 
+修复 Agent 随后提交 `2da604d`（`fix: validate canonical input before semantic checks`），feature 当前相对 origin 领先 2 且 worktree clean；该提交尚无本次治理范围内的回归测试输出或代码质量复审结论，R-008 继续 OPEN。
+
 ## 未决项
 
 - Accepted Definition 的 Schema/fixture 子范围已由 Task 2 验证；产品 Skill、Evidence、Pipeline 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
