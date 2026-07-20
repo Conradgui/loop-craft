@@ -336,7 +336,7 @@ def test_missing_behavior_contract_is_rejected() -> None:
         validate_definition(candidate)
 
     assert captured.value.issues[0].code == "schema"
-    assert captured.value.issues[0].path == "/"
+    assert captured.value.issues[0].path == ""
 
 
 @pytest.mark.parametrize("loop_count", [0, 2])
@@ -516,7 +516,7 @@ SCHEMA_PATH = Path(__file__).resolve().parent / "kernel" / "schemas" / "accepted
 
 def _json_pointer(parts: list[Any]) -> str:
     if not parts:
-        return "/"
+        return ""
     escaped = [str(part).replace("~", "~0").replace("/", "~1") for part in parts]
     return "/" + "/".join(escaped)
 
@@ -547,7 +547,15 @@ Run:
 python -m pytest tests/unit/test_validation.py -v
 ~~~
 
-Expected: 4 passed.
+Expected: all Task 2 validation tests pass, including the original valid and invalid cases plus the hardening regressions.
+
+**Quality hardening amendment:** Before accepting this task, validation must also
+reject non-canonical JSON values (including isolated Unicode surrogates), control
+characters that can bypass slug/version boundaries, blank or whitespace-only
+free-text and authority/capability items, and Skill IDs longer than 64 characters.
+Validation issue paths use RFC 6901 JSON Pointers, so the document root is the
+empty string. Add regression tests for these boundaries and keep the one-Loop
+Profile unchanged.
 
 - [ ] **Step 7: Commit**
 
@@ -565,16 +573,6 @@ git commit -m "feat: validate accepted loop definitions"
 - [ ] **Step 1: Add failing semantic tests**
 
 ~~~python
-def test_duplicate_loop_ids_are_rejected() -> None:
-    candidate = copy.deepcopy(load_valid())
-    candidate["loops"].append(copy.deepcopy(candidate["loops"][0]))
-
-    with pytest.raises(DefinitionValidationError) as captured:
-        validate_definition(candidate)
-
-    assert any(issue.code == "duplicate_loop_id" for issue in captured.value.issues)
-
-
 def test_authority_categories_must_not_overlap() -> None:
     candidate = copy.deepcopy(load_valid())
     candidate["behavior_contract"]["authority"]["forbidden"].append("edit_target")
@@ -596,7 +594,7 @@ Run:
 python -m pytest tests/unit/test_validation.py -v
 ~~~
 
-Expected: the two new tests fail because semantic issues are not checked.
+Expected: the new test fails because semantic issues are not checked.
 
 - [ ] **Step 3: Implement semantic validation**
 
@@ -605,17 +603,6 @@ Add before validate_definition:
 ~~~python
 def semantic_issues(definition: dict[str, Any]) -> tuple[ValidationIssue, ...]:
     issues: list[ValidationIssue] = []
-    loop_ids = [loop["id"] for loop in definition["loops"]]
-
-    for loop_id in sorted(set(loop_ids)):
-        if loop_ids.count(loop_id) > 1:
-            issues.append(
-                ValidationIssue(
-                    "duplicate_loop_id",
-                    "/loops",
-                    f"Loop id appears more than once: {loop_id}",
-                )
-            )
 
     authority = definition["behavior_contract"]["authority"]
     categories = {
@@ -658,7 +645,7 @@ Run:
 python -m pytest tests/unit/test_validation.py -v
 ~~~
 
-Expected: 4 passed.
+Expected: all validation tests pass, including the authority-overlap case and the Task 2 hardening regressions.
 
 - [ ] **Step 5: Commit**
 
@@ -865,7 +852,51 @@ def test_adapter_generates_clean_complete_skill(tmp_path: Path) -> None:
     assert "Use when an existing Agent Skill" in skill_text
     assert "Loopy" not in skill_text
     assert "Loop Library" not in skill_text
-    assert result.source_map["SKILL.md#workflow"] == ["/loops/0/nodes"]
+    assert result.source_map["SKILL.md#workflow"] == [
+        "/loops/0/nodes",
+        "/loops/0/terminal_mapping",
+    ]
+
+
+def test_adapter_is_deterministic_for_equivalent_terminal_key_order(tmp_path: Path) -> None:
+    definition = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    reordered = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    terminal_states = reordered["loops"][0]["terminal_states"]
+    reordered["loops"][0]["terminal_states"] = dict(reversed(list(terminal_states.items())))
+
+    first = render_codex_skill(compile_definition(definition), tmp_path / "first")
+    second = render_codex_skill(compile_definition(reordered), tmp_path / "second")
+
+    assert first.artifact_digest == second.artifact_digest
+    assert (first.skill_dir / "SKILL.md").read_bytes() == (
+        second.skill_dir / "SKILL.md"
+    ).read_bytes()
+
+
+def test_adapter_quotes_and_preserves_rich_applicability_metadata(tmp_path: Path) -> None:
+    definition = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    definition["behavior_contract"]["applicability"]["use_when"] = [
+        "an input: value <must> be checked"
+    ]
+    definition["behavior_contract"]["applicability"]["do_not_use_when"] = [
+        "the request is already complete"
+    ]
+
+    result = render_codex_skill(
+        compile_definition(definition), tmp_path / "rich-applicability"
+    )
+    skill_text = (result.skill_dir / "SKILL.md").read_text(encoding="utf-8")
+
+    assert 'description: "Use when an input: value must be checked"' in skill_text
+    assert "an input: value <must> be checked" in skill_text
+    assert "the request is already complete" in skill_text
+    assert result.source_map["SKILL.md#applicability"] == [
+        "/applicability/use_when/0",
+        "/applicability/do_not_use_when/0",
+    ]
+    assert result.source_map["SKILL.md#authority"] == ["/authority"]
+    assert result.source_map["SKILL.md#capabilities"] == ["/capabilities"]
+    assert result.source_map["SKILL.md#invariants"] == ["/loops/0/invariants"]
 ~~~
 
 - [ ] **Step 2: Verify RED**
@@ -917,7 +948,8 @@ def directory_digest(root: Path) -> str:
 
 def _description(use_when: str) -> str:
     value = use_when.strip().rstrip(".")
-    return value if value.lower().startswith("use when ") else f"Use when {value}"
+    value = value if value.lower().startswith("use when ") else f"Use when {value}"
+    return value.replace("<", "").replace(">", "")[:1024].rstrip()
 
 
 def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArtifact:
@@ -935,22 +967,64 @@ def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArt
         for index, node in enumerate(loop["nodes"], start=1):
             workflow.append(f"{index}. **{node['id'].title()}:** {node['instruction']}")
         workflow.extend(["", "Stop according to these outcomes:"])
-        for name, condition in loop["terminal_mapping"].items():
+        for name in sorted(loop["terminal_mapping"]):
+            condition = loop["terminal_mapping"][name]
             workflow.append(f"- **{name}:** {condition}")
         workflow.append("")
+
+    applicability = execution["applicability"]
+    applicability_lines = ["## Applicability", "", "Use when:"]
+    applicability_lines.extend(f"- {item}" for item in applicability["use_when"])
+    if applicability["do_not_use_when"]:
+        applicability_lines.extend(["", "Do not use when:"])
+        applicability_lines.extend(
+            f"- {item}" for item in applicability["do_not_use_when"]
+        )
+
+    authority = execution["authority"]
+    authority_lines = [
+        "## Authority",
+        "",
+        f"- Allowed: {', '.join(authority['allowed']) or 'none'}",
+        f"- Approval required: {', '.join(authority['approval_required']) or 'none'}",
+        f"- Forbidden: {', '.join(authority['forbidden']) or 'none'}",
+    ]
+
+    capabilities = execution["capabilities"]
+    capability_lines = [
+        "## Capabilities",
+        "",
+        f"- Required: {', '.join(capabilities['required']) or 'none'}",
+        f"- Optional: {', '.join(capabilities['optional']) or 'none'}",
+    ]
+
+    invariant_lines = ["## Invariants", ""]
+    for loop in execution["loops"]:
+        invariant_lines.extend(f"- {item}" for item in loop["invariants"])
 
     skill_text = "\n".join(
         [
             "---",
             f"name: {identity['id']}",
-            f"description: {_description(execution['applicability']['use_when'][0])}",
+            "description: "
+            + json.dumps(
+                _description(execution["applicability"]["use_when"][0]),
+                ensure_ascii=False,
+            ),
             "---",
             "",
             f"# {identity['name']}",
             "",
             identity["description"],
             "",
+            *applicability_lines,
+            "",
             *workflow,
+            *authority_lines,
+            "",
+            *capability_lines,
+            "",
+            *invariant_lines,
             "Read references/final-execution-ir.json when exact machine-readable execution details are required.",
             "",
         ]
@@ -976,10 +1050,36 @@ def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArt
     adapter_map.update(
         {
             "SKILL.md#description": ["/applicability/use_when/0"],
+            "SKILL.md#applicability": [
+                *[
+                    f"/applicability/use_when/{index}"
+                    for index, _ in enumerate(execution["applicability"]["use_when"])
+                ],
+                *[
+                    f"/applicability/do_not_use_when/{index}"
+                    for index, _ in enumerate(
+                        execution["applicability"]["do_not_use_when"]
+                    )
+                ],
+            ],
             "SKILL.md#workflow": [
-                f"/loops/{index}/nodes"
+                *[
+                    f"/loops/{index}/nodes"
+                    for index, _ in enumerate(execution["loops"])
+                ],
+                *[
+                    f"/loops/{index}/terminal_mapping"
+                    for index, _ in enumerate(execution["loops"])
+                ],
+            ],
+            "SKILL.md#authority": ["/authority"],
+            "SKILL.md#capabilities": ["/capabilities"],
+            "SKILL.md#invariants": [
+                f"/loops/{index}/invariants"
                 for index, _ in enumerate(execution["loops"])
             ],
+            "agents/openai.yaml#display_name": ["/identity/name"],
+            "agents/openai.yaml#short_description": ["/identity/description"],
             "agents/openai.yaml#default_prompt": ["/purpose/outcome"],
         }
     )
@@ -994,7 +1094,7 @@ Run:
 python -m pytest tests/unit/test_codex_skill_adapter.py -v
 ~~~
 
-Expected: 1 passed.
+Expected: 3 passed.
 
 - [ ] **Step 5: Run the official structural validator**
 
@@ -1029,6 +1129,7 @@ import json
 from pathlib import Path
 
 from loopcraft_core.adapters.codex_skill import render_codex_skill
+from loopcraft_core.canonical import sha256_digest
 from loopcraft_core.compiler import compile_definition
 from loopcraft_core.evidence.package import package_evidence
 
@@ -1054,6 +1155,14 @@ def test_evidence_is_separate_and_manifest_binds_artifact(tmp_path: Path) -> Non
     assert manifest["artifact_digest"] == artifact.artifact_digest
     assert manifest["definition_digest"] == compiled.final_execution_ir["definition_digest"]
     assert manifest["semantic_ir_digest"].startswith("sha256:")
+    assert manifest["semantic_ir_digest"] == sha256_digest(
+        {
+            "schema_version": definition["schema_version"],
+            "profile": definition["profile"],
+            "behavior_contract": definition["behavior_contract"],
+            "loops": definition["loops"],
+        }
+    )
     assert manifest["override_mode"] == "none"
     assert manifest["override_digest"] is None
     assert sorted(path.name for path in result.evidence_dir.iterdir()) == [
@@ -1118,7 +1227,9 @@ def package_evidence(
         "definition_digest": sha256_digest(definition),
         "semantic_ir_digest": sha256_digest(
             {
+                "schema_version": definition["schema_version"],
                 "profile": definition["profile"],
+                "behavior_contract": definition["behavior_contract"],
                 "loops": definition["loops"],
             }
         ),
@@ -1489,7 +1600,7 @@ Run:
 python -m pytest tests/unit/test_drift.py tests/integration/test_build_pipeline.py -v
 ~~~
 
-Expected: 3 passed.
+Expected: 4 passed (one drift test and the three pipeline tests).
 
 - [ ] **Step 7: Verify clean and drifted CLI behavior**
 
