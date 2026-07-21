@@ -101,3 +101,87 @@ def test_evidence_result_is_frozen(tmp_path: Path) -> None:
 
     with pytest.raises(FrozenInstanceError):
         result.evidence_dir = tmp_path / "other"
+
+
+def test_rejects_definition_that_does_not_match_compiled_ir(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    compiled = compile_definition(definition)
+    artifact = render_codex_skill(compiled, tmp_path / "artifact")
+    definition["behavior_contract"]["identity"]["name"] = "Changed"
+    evidence_dir = tmp_path / "evidence"
+
+    with pytest.raises(ValueError, match="definition"):
+        package_evidence(
+            definition=definition,
+            compiled=compiled,
+            artifact=artifact,
+            evidence_dir=evidence_dir,
+        )
+
+    assert not evidence_dir.exists()
+
+
+def test_rejects_artifact_that_does_not_match_compiled_ir(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    compiled = compile_definition(definition)
+    other_definition = load_valid()
+    other_definition["behavior_contract"]["identity"]["name"] = "Other"
+    artifact = render_codex_skill(
+        compile_definition(other_definition),
+        tmp_path / "artifact",
+    )
+    evidence_dir = tmp_path / "evidence"
+
+    with pytest.raises(ValueError, match="execution IR"):
+        package_evidence(
+            definition=definition,
+            compiled=compiled,
+            artifact=artifact,
+            evidence_dir=evidence_dir,
+        )
+
+    assert not evidence_dir.exists()
+
+
+def test_rejects_evidence_directory_nested_inside_artifact(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    compiled = compile_definition(definition)
+    artifact = render_codex_skill(compiled, tmp_path / "artifact")
+    evidence_dir = artifact.skill_dir / "evidence"
+
+    with pytest.raises(ValueError, match="physically separate"):
+        package_evidence(
+            definition=definition,
+            compiled=compiled,
+            artifact=artifact,
+            evidence_dir=evidence_dir,
+        )
+
+    assert not evidence_dir.exists()
+
+
+def test_rejects_artifact_drift_without_creating_evidence(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    compiled = compile_definition(definition)
+    artifact = render_codex_skill(compiled, tmp_path / "artifact")
+    skill_file = artifact.skill_dir / "SKILL.md"
+    skill_file.write_bytes(skill_file.read_bytes() + b"manual edit\n")
+    evidence_dir = tmp_path / "evidence"
+
+    with pytest.raises(ValueError, match="digest"):
+        package_evidence(
+            definition=definition,
+            compiled=compiled,
+            artifact=artifact,
+            evidence_dir=evidence_dir,
+        )
+
+    assert not evidence_dir.exists()
