@@ -75,9 +75,18 @@ Task 5 由原始实现提交 `db4e4b2`（`feat: render target Codex Skills from 
 
 规格复审与代码质量复审结论均为 `Approved`，无 Critical 或 Important。主控使用 fresh Python 3.13 独立运行 Task 5 定向测试得 `8 passed`，全量得 `38 passed`，静态检查通过。官方 `quick_validate.py` 在修复前的 rich fixture 上由主控独立确认输出 `Skill is valid!`；修复后的 hardened injection fixture validator 仅有实现 Agent 报告通过，主控随后重跑因自动审批服务并发错误被拒，因此不能登记为主控独立验证证据。Task 5 的通过只确认 Adapter 子范围，不覆盖 Evidence、Runtime、Library、Pipeline 或整个纵向切片。
 
+### D-012 Task 6 Evidence 绑定与写入前拒绝边界
+
+Task 6 由实现提交 `826f285`（`feat: package auditable build evidence`）和审查修复提交 `475b2a4`（`fix: reject inconsistent evidence inputs`）共同构成。Evidence Package 与 artifact 物理隔离，固定写出五份 canonical JSON + LF；Build Manifest 绑定 definition digest、完整 core semantic subset digest、Final Execution IR digest、Profile、Adapter 和当前 artifact digest，并明确无 Override。
+
+`package_evidence` 在创建目录前核对 definition/Execution IR、artifact 内嵌 Execution IR/compiled Execution IR、artifact 当前内容/记录摘要，以及 Evidence/artifact 是否相同或互为祖先/后代；任一不一致均先抛出 `ValueError`，不留下 Evidence 目录。初始 TDD RED 为 import failure，审查加固的四类 RED 均为 `DID NOT RAISE ValueError`；最终规格复审与代码质量复审均为 `Approved`，无 Missing、Extra、Misinterpreted、越界、Critical 或 Important。
+
+主控使用 fresh Python 3.13 独立运行 Evidence 定向测试得 `6 passed`，全量得 `44 passed`，`git diff --check` 通过。验证快照时 feature HEAD 为 `475b2a4`，worktree clean，相对远端领先 2 个提交，尚未 push。`artifact.source_map` 仍是浅可变字典，调用方可在 render 后篡改；当前内部立即传递且 Task 6 没有 Source Map 自身摘要契约，因此登记为 R-011 deferred Minor，不阻塞 Task 6。该结论只确认 Evidence/Manifest 子范围，不关闭全局 G-04 或 G-05。
+
 ## 未决项
 
-- Accepted Definition 的 Schema/fixture 子范围已由 Task 2 验证；产品 Skill、Evidence、Pipeline 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
-- Task 3 的 semantic/canonical 顺序和 surrogate 错误边界已验证，R-008 已关闭；其后续 Adapter、Evidence、Pipeline 和阶段出口仍需任务证据。
-- Task 4 的 Compiler 与语义 Source Map 子范围已验证；Adapter、Evidence、Pipeline、Runtime 和阶段出口仍需后续任务证据。
+- Accepted Definition 的 Schema/fixture 子范围已由 Task 2 验证；产品 Skill、Pipeline 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
+- Task 3 的 semantic/canonical 顺序和 surrogate 错误边界已验证，R-008 已关闭；Pipeline 和阶段出口仍需任务证据。
+- Task 4 的 Compiler 与语义 Source Map 子范围已验证；Pipeline、Runtime 和阶段出口仍需后续任务证据。
+- Task 6 的 Evidence/Manifest 子范围已验证；双构建、Pipeline 原子提交、drift 和阶段出口仍需后续任务证据。
 - 当前 OPEN 的 P1 质量门槛关闭前，不得把计划中的 Expected 或模板结果写成执行完成。
