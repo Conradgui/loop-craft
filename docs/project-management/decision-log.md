@@ -67,6 +67,14 @@ Source Map 覆盖定义根摘要（`/definition_digest` → `""`）、Schema/Pro
 
 主控独立验证：compiler 定向测试 `5 passed`；validation + canonical + compiler 组合测试 `30 passed`；全量测试 `30 passed`；Draft 2020-12 Schema 元校验和 `git diff --check` 均通过。验证快照时 feature worktree clean，HEAD 为 `61e9bbc`，相对远端领先 1 个提交且尚未推送。本决策只确认 Compiler 与语义 Source Map 子范围，不覆盖 Adapter、Evidence、Runtime、Pipeline 或整个纵向切片。
 
+### D-011 Task 5 Adapter 投影与产物边界
+
+Task 5 由原始实现提交 `db4e4b2`（`feat: render target Codex Skills from execution IR`）和审查修复提交 `c282fc6`（`fix: harden generated Skill boundaries`）共同构成。Codex Skill Adapter 只把 Final Execution IR 确定性投影为干净的目标 Skill：`SKILL.md`、`agents/openai.yaml` 和 `references/final-execution-ir.json`。它不生成 Evidence Package，不承担 Runtime，不引入 Loop Library 或 Library Edition 内容。
+
+自由文本在 Markdown 正文中以单行 JSON string literal 表达，使换行、标题和列表注入保留为数据而不改变 Markdown 结构；这是一种传输边界，不等同于 HTML sanitization，正文中的 JSON literal 仍可保留 `<...>`。目录摘要按排序后的 POSIX 相对路径和文件 bytes 计算，并分别为 path 和 content 加入 8-byte big-endian 长度前缀，关闭 NUL 分隔歧义。Adapter 的 coarse workflow Source Map 覆盖每个 Loop 的 `id`、`entrypoint`、`nodes`、`terminal_mapping` 和 `invariants`，同时保留细粒度字段映射；固定 stop rule 明确 terminal condition 一旦满足即停止，terminal outcome 优先于 node 的 `Next` 转移。
+
+规格复审与代码质量复审结论均为 `Approved`，无 Critical 或 Important。主控使用 fresh Python 3.13 独立运行 Task 5 定向测试得 `8 passed`，全量得 `38 passed`，静态检查通过。官方 `quick_validate.py` 在修复前的 rich fixture 上由主控独立确认输出 `Skill is valid!`；修复后的 hardened injection fixture validator 仅有实现 Agent 报告通过，主控随后重跑因自动审批服务并发错误被拒，因此不能登记为主控独立验证证据。Task 5 的通过只确认 Adapter 子范围，不覆盖 Evidence、Runtime、Library、Pipeline 或整个纵向切片。
+
 ## 未决项
 
 - Accepted Definition 的 Schema/fixture 子范围已由 Task 2 验证；产品 Skill、Evidence、Pipeline 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
