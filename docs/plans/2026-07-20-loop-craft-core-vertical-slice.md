@@ -1331,12 +1331,20 @@ git commit -m "feat: render target Codex Skills from execution IR"
 
 ### Task 6: Evidence Package and Build Manifest
 
+**Task 6 预检修订（执行门槛）：**
+
+- Evidence Package 与 artifact 必须物理隔离；`evidence_dir` 不得与 artifact 目录相同，也不得互为祖先/后代。
+- 固定输出五份 canonical JSON + LF：Accepted Definition、Final Execution IR、Source Map、Validation Report 和 Build Manifest。
+- Manifest 必须绑定 definition、完整 core semantic subset、Final Execution IR、Profile、Adapter 与当前 artifact digest，并明确 `override_mode: none`、`override_digest: null`。
+- 写入前必须拒绝 definition/Execution IR、artifact/Execution IR、当前 artifact digest 错配和目录关系冲突；所有拒绝都必须发生在 `mkdir` 前，不能留下 Evidence 目录。
+- 本任务验收矩阵固定为 6 个 Evidence 单元测试；Evidence Package 不扩大为 Pipeline、双构建、drift 或阶段出口验收。
+
 **Files:**
 - Create: loop-craft/scripts/loopcraft_core/evidence/__init__.py
 - Create: loop-craft/scripts/loopcraft_core/evidence/package.py
 - Create: tests/unit/test_evidence_package.py
 
-- [ ] **Step 1: Write the failing Evidence Package test**
+- [x] **Step 1: Write the six failing Evidence Package tests**
 
 ~~~python
 # tests/unit/test_evidence_package.py
@@ -1389,7 +1397,16 @@ def test_evidence_is_separate_and_manifest_binds_artifact(tmp_path: Path) -> Non
     ]
 ~~~
 
-- [ ] **Step 2: Verify RED**
+The six-test matrix must cover:
+
+1. Evidence 与 artifact 物理隔离，五份文件均为 canonical JSON + LF，Manifest 完整绑定当前构建。
+2. `EvidenceResult` 为 frozen result object。
+3. definition 与 compiled Execution IR 不一致时，在创建 Evidence 目录前拒绝。
+4. artifact 内嵌 Execution IR 与 compiled Execution IR 不一致时，在创建 Evidence 目录前拒绝。
+5. Evidence 与 artifact 目录相同或互为祖先/后代时，在创建 Evidence 目录前拒绝。
+6. artifact 当前内容摘要与 Adapter 返回摘要不一致时，在创建 Evidence 目录前拒绝。
+
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -1397,9 +1414,11 @@ Run:
 python -m pytest tests/unit/test_evidence_package.py -v
 ~~~
 
-Expected: import failure because loopcraft_core.evidence.package does not exist.
+Recorded RED: 初始 TDD 为 import failure；审查加固的四类 mismatch/path 测试均为 `DID NOT RAISE ValueError`。
 
-- [ ] **Step 3: Implement the Evidence Packager**
+- [x] **Step 3: Implement the Evidence Packager and hardened preflight**
+
+The implementation must satisfy the Task 6 preflight contract above. Validate all cross-object digests and resolved directory relationships before `mkdir`; the six-test matrix is authoritative.
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/evidence/__init__.py
@@ -1414,7 +1433,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from ..adapters.codex_skill import SkillArtifact
+from ..adapters.codex_skill import SkillArtifact, directory_digest
 from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
 
@@ -1429,6 +1448,40 @@ def _write_json(path: Path, value: Any) -> None:
     path.write_bytes(canonical_json_bytes(value) + b"\n")
 
 
+def _validate_inputs(
+    *,
+    definition: dict[str, Any],
+    compiled: CompileResult,
+    artifact: SkillArtifact,
+    evidence_dir: Path,
+) -> None:
+    execution_ir = compiled.final_execution_ir
+    if execution_ir.get("definition_digest") != sha256_digest(definition):
+        raise ValueError("definition does not match compiled execution IR")
+
+    artifact_dir = artifact.skill_dir.resolve()
+    resolved_evidence_dir = evidence_dir.resolve()
+    if (
+        resolved_evidence_dir == artifact_dir
+        or resolved_evidence_dir in artifact_dir.parents
+        or artifact_dir in resolved_evidence_dir.parents
+    ):
+        raise ValueError(
+            "evidence directory must be physically separate from artifact"
+        )
+
+    execution_ir_path = artifact.skill_dir / "references" / "final-execution-ir.json"
+    try:
+        artifact_execution_ir = execution_ir_path.read_bytes()
+    except OSError as exc:
+        raise ValueError("artifact execution IR reference is unavailable") from exc
+    if artifact_execution_ir != canonical_json_bytes(execution_ir) + b"\n":
+        raise ValueError("artifact execution IR does not match compiled execution IR")
+
+    if directory_digest(artifact.skill_dir) != artifact.artifact_digest:
+        raise ValueError("artifact digest does not match current artifact contents")
+
+
 def package_evidence(
     *,
     definition: dict[str, Any],
@@ -1436,6 +1489,12 @@ def package_evidence(
     artifact: SkillArtifact,
     evidence_dir: Path,
 ) -> EvidenceResult:
+    _validate_inputs(
+        definition=definition,
+        compiled=compiled,
+        artifact=artifact,
+        evidence_dir=evidence_dir,
+    )
     evidence_dir.mkdir(parents=True, exist_ok=False)
     manifest = {
         "schema_version": "0.1.0",
@@ -1476,7 +1535,7 @@ def package_evidence(
     return EvidenceResult(evidence_dir, manifest)
 ~~~
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -1484,14 +1543,16 @@ Run:
 python -m pytest tests/unit/test_evidence_package.py -v
 ~~~
 
-Expected: 1 passed.
+Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit implementation and review hardening**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/evidence tests/unit/test_evidence_package.py
 git commit -m "feat: package auditable build evidence"
 ~~~
+
+Recorded commits: `826f285` (`feat: package auditable build evidence`) and `475b2a4` (`fix: reject inconsistent evidence inputs`).
 
 ### Task 7: End-to-End Pipeline and CLI
 
