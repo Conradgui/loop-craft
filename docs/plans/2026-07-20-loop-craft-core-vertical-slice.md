@@ -1556,12 +1556,20 @@ Recorded commits: `826f285` (`feat: package auditable build evidence`) and `475b
 
 ### Task 7: End-to-End Pipeline and CLI
 
+**Task 7 预检修订（执行门槛）：**
+
+- Pipeline 必须在 `output_root.parent` 内创建 `TemporaryDirectory`，按 Adapter → Evidence 顺序构建，只在全部成功后用 `staging_root.replace(output_root)` 提交正式输出。
+- 非法定义和 Adapter 失败不得留下正式 output；已被 dangling symlink 占用的输出路径不得被覆盖，占用判断必须使用 `output_root.exists() or output_root.is_symlink()`。
+- 两次构建必须产生 byte-identical 文件树和相同 Manifest；目标输出固定包含 artifact 3 文件、Evidence 5 文件。
+- 本任务 CLI 仅接受 `definition`、`output` 两个位置参数；drift/verify 子命令属于 Task 8。
+- 本任务验收矩阵固定为 4 个 Pipeline integration tests 加一次真实 CLI smoke；不得扩大为强杀、非本地文件系统原子性或阶段出口验收。
+
 **Files:**
 - Create: loop-craft/scripts/loopcraft_core/pipeline.py
 - Create: loop-craft/scripts/build_loop.py
 - Create: tests/integration/test_build_pipeline.py
 
-- [ ] **Step 1: Write failing integration tests**
+- [x] **Step 1: Write the four failing integration tests**
 
 ~~~python
 # tests/integration/test_build_pipeline.py
@@ -1622,7 +1630,9 @@ def test_adapter_failure_cleans_staging_output(
     assert not output.exists()
 ~~~
 
-- [ ] **Step 2: Verify RED**
+The four-test matrix must cover deterministic dual builds, invalid definition cleanup, Adapter failure cleanup, and dangling output symlink preservation.
+
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -1630,9 +1640,9 @@ Run:
 python -m pytest tests/integration/test_build_pipeline.py -v
 ~~~
 
-Expected: import failure because loopcraft_core.pipeline does not exist.
+Recorded RED: 初始 TDD 为 `ModuleNotFoundError`（`loopcraft_core.pipeline`）；dangling symlink 回归在最终 `replace` 处触发 `PermissionError: [WinError 5]`。
 
-- [ ] **Step 3: Implement pipeline sequencing**
+- [x] **Step 3: Implement pipeline sequencing and occupied-path hardening**
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/pipeline.py
@@ -1663,7 +1673,7 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
     validate_definition(definition)
     compiled = compile_definition(definition)
 
-    if output_root.exists():
+    if output_root.exists() or output_root.is_symlink():
         raise FileExistsError(f"Output already exists: {output_root}")
     output_root.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1689,7 +1699,7 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
     )
 ~~~
 
-- [ ] **Step 4: Add a thin build CLI**
+- [x] **Step 4: Add a thin build CLI**
 
 ~~~python
 # loop-craft/scripts/build_loop.py
@@ -1722,7 +1732,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ~~~
 
-- [ ] **Step 5: Verify GREEN**
+- [x] **Step 5: Verify GREEN**
 
 Run:
 
@@ -1730,9 +1740,9 @@ Run:
 python -m pytest tests/integration/test_build_pipeline.py -v
 ~~~
 
-Expected: 3 passed.
+Expected: 4 passed.
 
-- [ ] **Step 6: Exercise the CLI**
+- [x] **Step 6: Exercise the CLI**
 
 Run:
 
@@ -1742,12 +1752,14 @@ python loop-craft/scripts/build_loop.py tests/fixtures/accepted-definition.valid
 
 Expected: exits 0 and prints artifact and evidence paths.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit implementation and security hardening**
 
 ~~~powershell
 git add loop-craft/scripts/build_loop.py loop-craft/scripts/loopcraft_core/pipeline.py tests/integration/test_build_pipeline.py
 git commit -m "feat: build Skill and evidence in one deterministic pipeline"
 ~~~
+
+Recorded commits: `8253c24` (`feat: build Skill and evidence in one deterministic pipeline`) and `6d295ab` (`fix: preserve occupied output paths`).
 
 ### Task 8: Build Drift Verification
 
