@@ -11,6 +11,12 @@ from ..canonical import canonical_json_bytes
 from ..compiler import CompileResult
 
 
+STOP_RULE = (
+    "Stop immediately when any terminal condition is met; the terminal outcome "
+    "takes precedence over every node's Next transition."
+)
+
+
 @dataclass(frozen=True)
 class SkillArtifact:
     skill_dir: Path
@@ -26,10 +32,12 @@ def directory_digest(root: Path) -> str:
         if path.is_file()
     )
     for relative_path, path in files:
-        hasher.update(relative_path.encode("utf-8"))
-        hasher.update(b"\0")
-        hasher.update(path.read_bytes())
-        hasher.update(b"\0")
+        path_bytes = relative_path.encode("utf-8")
+        content = path.read_bytes()
+        hasher.update(len(path_bytes).to_bytes(8, "big"))
+        hasher.update(path_bytes)
+        hasher.update(len(content).to_bytes(8, "big"))
+        hasher.update(content)
     return f"sha256:{hasher.hexdigest()}"
 
 
@@ -42,9 +50,13 @@ def _frontmatter_description(use_when: str) -> str:
     return description[:1024].rstrip()
 
 
+def _markdown_literal(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
 def _append_list(lines: list[str], heading: str, values: list[str]) -> None:
     lines.extend([f"### {heading}", ""])
-    lines.extend(f"- {value}" for value in values)
+    lines.extend(f"- {_markdown_literal(value)}" for value in values)
     if not values:
         lines.append("- None.")
     lines.append("")
@@ -60,13 +72,13 @@ def _skill_body(execution: dict[str, Any]) -> str:
     loops = execution["loops"]
 
     lines = [
-        f"# {identity['name']}",
+        f"# {_markdown_literal(identity['name'])}",
         "",
-        identity["description"],
+        _markdown_literal(identity["description"]),
         "",
         "## Purpose",
         "",
-        purpose["outcome"],
+        _markdown_literal(purpose["outcome"]),
         "",
         "## Applicability",
         "",
@@ -94,15 +106,19 @@ def _skill_body(execution: dict[str, Any]) -> str:
             lines.extend(
                 [
                     f"{index}. **{node['id']}**",
-                    f"   - Instruction: {node['instruction']}",
+                    "   - Instruction: "
+                    + _markdown_literal(node["instruction"]),
                     f"   - Next: `{node['next']}`",
                 ]
             )
-        lines.extend(["", "#### Terminal mapping", ""])
+        lines.extend(["", STOP_RULE, "", "#### Terminal mapping", ""])
         for name in sorted(loop["terminal_mapping"]):
-            lines.append(f"- **{name}:** {loop['terminal_mapping'][name]}")
+            condition = _markdown_literal(loop["terminal_mapping"][name])
+            lines.append(f"- **{name}:** {condition}")
         lines.extend(["", "#### Invariants", ""])
-        lines.extend(f"- {item}" for item in loop["invariants"])
+        lines.extend(
+            f"- {_markdown_literal(item)}" for item in loop["invariants"]
+        )
         lines.append("")
 
     lines.extend(["## Authority", ""])
@@ -146,19 +162,24 @@ def _adapter_source_map(compiled: CompileResult) -> dict[str, list[str]]:
             ],
             "SKILL.md#interface": ["/interface"],
             "SKILL.md#workflow": [
-                *[
-                    f"/loops/{index}/nodes"
-                    for index, _ in enumerate(execution["loops"])
-                ],
-                *[
-                    f"/loops/{index}/terminal_mapping"
-                    for index, _ in enumerate(execution["loops"])
-                ],
+                f"/loops/{index}/{field}"
+                for index, _ in enumerate(execution["loops"])
+                for field in (
+                    "id",
+                    "entrypoint",
+                    "nodes",
+                    "terminal_mapping",
+                    "invariants",
+                )
             ],
             "SKILL.md#authority": ["/authority"],
             "SKILL.md#capabilities": ["/capabilities"],
             "SKILL.md#invariants": [
                 f"/loops/{index}/invariants"
+                for index, _ in enumerate(execution["loops"])
+            ],
+            "SKILL.md#stop-rule": [
+                f"/loops/{index}/terminal_mapping"
                 for index, _ in enumerate(execution["loops"])
             ],
             "agents/openai.yaml#display_name": ["/identity/name"],
