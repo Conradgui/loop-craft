@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 from typing import Any
 
-from .adapters.codex_skill import render_codex_skill
+from .adapters.codex_skill import directory_digest, render_codex_skill
 from .compiler import compile_definition
 from .evidence.package import package_evidence
 from .validation import validate_definition
@@ -49,3 +49,24 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
         output_root / "evidence",
         evidence.manifest,
     )
+
+
+def verify_build(output_root: Path) -> dict[str, str]:
+    manifest_path = output_root / "evidence" / "build-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    artifact_root = output_root / "artifact"
+    artifact_dirs = (
+        [path for path in artifact_root.iterdir() if path.is_dir()]
+        if artifact_root.is_dir()
+        else []
+    )
+    if len(artifact_dirs) != 1:
+        raise ValueError("build must contain exactly one artifact directory")
+
+    expected_digest = manifest["artifact_digest"]
+    actual_digest = directory_digest(artifact_dirs[0])
+    return {
+        "status": "clean" if expected_digest == actual_digest else "drifted",
+        "expected_artifact_digest": expected_digest,
+        "actual_artifact_digest": actual_digest,
+    }
