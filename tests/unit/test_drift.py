@@ -107,3 +107,70 @@ def test_verify_build_rejects_extra_artifact_root_file_without_changes(
 
     assert file_snapshot(artifact_root) == artifact_before
     assert file_snapshot(result.evidence_dir) == evidence_before
+
+
+def test_verify_build_rejects_symlinked_output_root_without_changes(
+    tmp_path: Path,
+) -> None:
+    baseline = build_definition(FIXTURE, tmp_path / "baseline")
+    output_link = tmp_path / "output-link"
+    os.symlink(baseline.output_root, output_link, target_is_directory=True)
+    baseline_before = file_snapshot(baseline.output_root)
+
+    with pytest.raises(ValueError, match="symlink"):
+        verify_build(output_link)
+
+    assert output_link.is_symlink()
+    assert file_snapshot(baseline.output_root) == baseline_before
+
+
+def test_verify_build_rejects_symlinked_evidence_directory_without_changes(
+    tmp_path: Path,
+) -> None:
+    baseline = build_definition(FIXTURE, tmp_path / "baseline")
+    output = tmp_path / "symlinked-evidence-build"
+    artifact_dir = shutil.copytree(
+        baseline.artifact_dir,
+        output / "artifact" / baseline.artifact_dir.name,
+    )
+    evidence_link = output / "evidence"
+    os.symlink(baseline.evidence_dir, evidence_link, target_is_directory=True)
+    artifact_before = file_snapshot(artifact_dir)
+    evidence_before = file_snapshot(baseline.evidence_dir)
+
+    with pytest.raises(ValueError, match="symlink"):
+        verify_build(output)
+
+    assert evidence_link.is_symlink()
+    assert file_snapshot(artifact_dir) == artifact_before
+    assert file_snapshot(baseline.evidence_dir) == evidence_before
+
+
+def test_verify_build_rejects_symlinked_manifest_without_changes(
+    tmp_path: Path,
+) -> None:
+    baseline = build_definition(FIXTURE, tmp_path / "baseline")
+    output = tmp_path / "symlinked-manifest-build"
+    artifact_dir = shutil.copytree(
+        baseline.artifact_dir,
+        output / "artifact" / baseline.artifact_dir.name,
+    )
+    evidence_dir = shutil.copytree(
+        baseline.evidence_dir,
+        output / "evidence",
+        ignore=shutil.ignore_patterns("build-manifest.json"),
+    )
+    manifest_link = evidence_dir / "build-manifest.json"
+    os.symlink(
+        baseline.evidence_dir / "build-manifest.json",
+        manifest_link,
+    )
+    artifact_before = file_snapshot(artifact_dir)
+    evidence_before = file_snapshot(baseline.evidence_dir)
+
+    with pytest.raises(ValueError, match="symlink"):
+        verify_build(output)
+
+    assert manifest_link.is_symlink()
+    assert file_snapshot(artifact_dir) == artifact_before
+    assert file_snapshot(baseline.evidence_dir) == evidence_before

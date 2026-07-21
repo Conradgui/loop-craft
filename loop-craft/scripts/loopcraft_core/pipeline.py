@@ -52,7 +52,17 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
 
 
 def verify_build(output_root: Path) -> dict[str, str]:
-    manifest_path = output_root / "evidence" / "build-manifest.json"
+    if output_root.is_symlink():
+        raise ValueError("build output must not be a symlink")
+
+    evidence_root = output_root / "evidence"
+    if evidence_root.is_symlink():
+        raise ValueError("evidence directory must not be a symlink")
+
+    manifest_path = evidence_root / "build-manifest.json"
+    if manifest_path.is_symlink():
+        raise ValueError("build manifest must not be a symlink")
+
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     artifact_root = output_root / "artifact"
     if artifact_root.is_symlink():
