@@ -1,6 +1,8 @@
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -12,6 +14,26 @@ FIXTURE = (
     / "fixtures"
     / "accepted-definition.valid.json"
 )
+ROOT = Path(__file__).resolve().parents[2]
+CLI = ROOT / "loop-craft" / "scripts" / "build_loop.py"
+
+
+def run_cli(*arguments: str | Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(CLI), *(str(item) for item in arguments)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+@pytest.fixture
+def cli_build(tmp_path: Path) -> tuple[Path, subprocess.CompletedProcess[str]]:
+    output = tmp_path / "cli-build"
+    result = run_cli("build", FIXTURE, output)
+    assert result.returncode == 0, result.stderr
+    return output, result
 
 
 def file_snapshot(root: Path) -> dict[str, bytes]:
@@ -73,3 +95,49 @@ def test_dangling_output_symlink_is_treated_as_occupied(tmp_path: Path) -> None:
 
     assert output.is_symlink()
     assert not target.exists()
+
+
+def test_cli_build_returns_zero_and_prints_output_paths(
+    cli_build: tuple[Path, subprocess.CompletedProcess[str]],
+) -> None:
+    output, result = cli_build
+
+    assert "Artifact:" in result.stdout
+    assert "Evidence:" in result.stdout
+    assert len(list((output / "artifact").iterdir())) == 1
+    assert (output / "evidence" / "build-manifest.json").is_file()
+
+
+def test_cli_verify_clean_returns_zero_and_json(
+    cli_build: tuple[Path, subprocess.CompletedProcess[str]],
+) -> None:
+    output, _ = cli_build
+
+    result = run_cli("verify", output)
+
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    assert report["status"] == "clean"
+    assert report["expected_artifact_digest"] == (
+        report["actual_artifact_digest"]
+    )
+
+
+def test_cli_verify_drift_returns_one_without_rewriting_artifact(
+    cli_build: tuple[Path, subprocess.CompletedProcess[str]],
+) -> None:
+    output, _ = cli_build
+    artifact_dir = next((output / "artifact").iterdir())
+    skill_file = artifact_dir / "SKILL.md"
+    edited_content = skill_file.read_bytes() + b"manual edit\n"
+    skill_file.write_bytes(edited_content)
+
+    result = run_cli("verify", output)
+
+    assert result.returncode == 1, result.stderr
+    report = json.loads(result.stdout)
+    assert report["status"] == "drifted"
+    assert report["expected_artifact_digest"] != (
+        report["actual_artifact_digest"]
+    )
+    assert skill_file.read_bytes() == edited_content
