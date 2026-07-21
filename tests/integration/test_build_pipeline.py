@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -60,3 +61,15 @@ def test_adapter_failure_cleans_staging_output(
         pipeline.build_definition(FIXTURE, output)
 
     assert not output.exists()
+
+
+def test_dangling_output_symlink_is_treated_as_occupied(tmp_path: Path) -> None:
+    target = tmp_path / "missing-target"
+    output = tmp_path / "occupied-link"
+    os.symlink(target, output, target_is_directory=True)
+
+    with pytest.raises(FileExistsError):
+        build_definition(FIXTURE, output)
+
+    assert output.is_symlink()
+    assert not target.exists()

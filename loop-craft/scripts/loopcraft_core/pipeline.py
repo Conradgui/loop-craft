@@ -25,7 +25,7 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
     validate_definition(definition)
     compiled = compile_definition(definition)
 
-    if output_root.exists():
+    if output_root.exists() or output_root.is_symlink():
         raise FileExistsError(f"Output already exists: {output_root}")
     output_root.parent.mkdir(parents=True, exist_ok=True)
 
