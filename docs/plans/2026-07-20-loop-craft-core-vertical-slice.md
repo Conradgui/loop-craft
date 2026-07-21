@@ -984,12 +984,21 @@ git commit -m "feat: compile accepted definitions deterministically"
 
 ### Task 5: Codex Skill Adapter
 
+**Task 5 预检修订（执行门槛）：**
+
+- Adapter 只负责把 Final Execution IR 投影为目标 Codex Skill；产物限定为 `SKILL.md`、`agents/openai.yaml` 和 `references/final-execution-ir.json`。Evidence Package、Runtime、Loop Library 和 Library Edition 不属于本任务。
+- 所有进入 Markdown 正文的自由文本必须编码为单行 JSON string literal，使换行、标题、列表等内容保持为数据，不能改变 Markdown 结构。frontmatter description 仍单独执行 quoted YAML、`<`/`>` 移除和 1024 字符限制。JSON literal 保留 `<...>` 不等于通用 HTML sanitization。
+- `directory_digest` 必须按 POSIX 相对路径排序，并以 `8-byte big-endian path length + path bytes + 8-byte big-endian content length + content bytes` 更新 SHA-256；不得再用 NUL delimiter 作为边界。
+- coarse `SKILL.md#workflow` Source Map 必须覆盖每个 Loop 的 `id`、`entrypoint`、`nodes`、`terminal_mapping` 和 `invariants`，同时保留逐字段细粒度映射。
+- 生成的 Skill 必须明确 terminal stop rule：任一 terminal condition 满足时立即停止，terminal outcome 优先于任何 node 的 `Next` 转移。
+- 本任务验收矩阵固定为 8 个 Adapter 单元测试；Task 5 仍不得扩大为 Evidence、Pipeline 或阶段出口验收。
+
 **Files:**
 - Create: loop-craft/scripts/loopcraft_core/adapters/__init__.py
 - Create: loop-craft/scripts/loopcraft_core/adapters/codex_skill.py
 - Create: tests/unit/test_codex_skill_adapter.py
 
-- [ ] **Step 1: Write the failing adapter test**
+- [ ] **Step 1: Write the eight failing adapter tests**
 
 ~~~python
 # tests/unit/test_codex_skill_adapter.py
@@ -1070,6 +1079,17 @@ def test_adapter_quotes_and_preserves_rich_applicability_metadata(tmp_path: Path
     assert result.source_map["SKILL.md#invariants"] == ["/loops/0/invariants"]
 ~~~
 
+The eight-test matrix must cover:
+
+1. Only the three clean target Skill files are emitted; all projected fields and the terminal stop rule are present.
+2. Frontmatter is quoted/bounded while rich applicability text is preserved in the body.
+3. Multiline Markdown injection payloads remain single-line JSON literals and do not create headings or list items.
+4. Adapter Source Map deep-copies the compiler map and covers coarse plus fine-grained projections, including workflow `id`/`entrypoint`/`nodes`/`terminal_mapping`/`invariants`.
+5. Recursively reordered input objects produce byte-identical Skill files and the same artifact digest.
+6. Directory digest matches sorted POSIX relative paths and file bytes with length-prefixed framing.
+7. A fixture that collides under the old NUL-delimited framing does not collide under `directory_digest`.
+8. `agents/openai.yaml` contains only deterministic interface values.
+
 - [ ] **Step 2: Verify RED**
 
 Run:
@@ -1080,7 +1100,9 @@ python -m pytest tests/unit/test_codex_skill_adapter.py -v
 
 Expected: import failure because the adapter module does not exist.
 
-- [ ] **Step 3: Implement target Skill rendering**
+- [ ] **Step 3: Implement target Skill rendering and the hardened Adapter boundary**
+
+The implementation must satisfy the Task 5 preflight contract above. In particular, render body free text through a shared single-line JSON literal helper, generate coarse and fine Source Map entries, apply the explicit terminal stop rule, and frame directory digest inputs with 8-byte big-endian lengths. The code below is the initial structure; the eight-test matrix is authoritative where the initial structure is incomplete.
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/adapters/__init__.py
@@ -1109,11 +1131,18 @@ class SkillArtifact:
 
 def directory_digest(root: Path) -> str:
     hasher = hashlib.sha256()
-    for path in sorted(item for item in root.rglob("*") if item.is_file()):
-        hasher.update(path.relative_to(root).as_posix().encode("utf-8"))
-        hasher.update(b"\0")
-        hasher.update(path.read_bytes())
-        hasher.update(b"\0")
+    files = sorted(
+        (path.relative_to(root).as_posix(), path)
+        for path in root.rglob("*")
+        if path.is_file()
+    )
+    for relative_path, path in files:
+        path_bytes = relative_path.encode("utf-8")
+        content = path.read_bytes()
+        hasher.update(len(path_bytes).to_bytes(8, "big"))
+        hasher.update(path_bytes)
+        hasher.update(len(content).to_bytes(8, "big"))
+        hasher.update(content)
     return f"sha256:{hasher.hexdigest()}"
 
 
@@ -1121,6 +1150,10 @@ def _description(use_when: str) -> str:
     value = use_when.strip().rstrip(".")
     value = value if value.lower().startswith("use when ") else f"Use when {value}"
     return value.replace("<", "").replace(">", "")[:1024].rstrip()
+
+
+def _markdown_literal(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
 
 
 def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArtifact:
@@ -1136,10 +1169,20 @@ def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArt
     for loop in execution["loops"]:
         workflow.extend([f"## {loop['id']}", ""])
         for index, node in enumerate(loop["nodes"], start=1):
-            workflow.append(f"{index}. **{node['id'].title()}:** {node['instruction']}")
-        workflow.extend(["", "Stop according to these outcomes:"])
+            workflow.append(
+                f"{index}. **{node['id'].title()}:** "
+                + _markdown_literal(node["instruction"])
+            )
+        workflow.extend(
+            [
+                "",
+                "Stop immediately when any terminal condition is met; the terminal outcome takes precedence over every node's Next transition.",
+                "",
+                "Stop according to these outcomes:",
+            ]
+        )
         for name in sorted(loop["terminal_mapping"]):
-            condition = loop["terminal_mapping"][name]
+            condition = _markdown_literal(loop["terminal_mapping"][name])
             workflow.append(f"- **{name}:** {condition}")
         workflow.append("")
 
@@ -1234,14 +1277,15 @@ def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArt
                 ],
             ],
             "SKILL.md#workflow": [
-                *[
-                    f"/loops/{index}/nodes"
-                    for index, _ in enumerate(execution["loops"])
-                ],
-                *[
-                    f"/loops/{index}/terminal_mapping"
-                    for index, _ in enumerate(execution["loops"])
-                ],
+                f"/loops/{index}/{field}"
+                for index, _ in enumerate(execution["loops"])
+                for field in (
+                    "id",
+                    "entrypoint",
+                    "nodes",
+                    "terminal_mapping",
+                    "invariants",
+                )
             ],
             "SKILL.md#authority": ["/authority"],
             "SKILL.md#capabilities": ["/capabilities"],
@@ -1265,7 +1309,7 @@ Run:
 python -m pytest tests/unit/test_codex_skill_adapter.py -v
 ~~~
 
-Expected: 3 passed.
+Expected: 8 passed.
 
 - [ ] **Step 5: Run the official structural validator**
 

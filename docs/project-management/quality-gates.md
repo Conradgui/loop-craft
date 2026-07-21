@@ -6,8 +6,8 @@
 | Gate | 对应风险 | 必须满足 | 证据 | 当前状态 |
 |---|---|---|---|---|
 | G-01 执行前置 | R-005 | 获得 Git 初始化、隔离 branch/worktree、目录命名及依赖环境的批准；确认 Python、pytest、jsonschema 版本；不擅自安装、复制或移动资源。 | 用户已确认整份操作清单：保留 ASCII 路径 `C:\Users\Administrator\Documents\loopcraft`、项目显示名“Loopcraft开发”、创建隔离 worktree、使用现有依赖且不安装。`main` 跟踪 `origin/main`；feature worktree 已创建并跟踪 `origin/feature/core-vertical-slice`；版本已确认 | PASS（仅执行前置门槛） |
-| G-02 输入契约与范围 | R-001、R-002 | 在代码/Schema/证据中明确首条切片是 Accepted Definition 的受限子集；首条切片明确一个 Loop，或实现并测试空/多 Loop；不得宣称完整 Semantic IR、Runtime 或三入口已完成。 | G-02-T1 至 G-02-T4 已验证；Task 4 编译前复用 schema → canonical → semantic validation，并验证 Compiler/Source Map 子范围；Adapter 及后续范围仍未完成 | 部分验证（Task 1-4 已验证；后续范围 OPEN） |
-| G-03 编译与 Source Map | R-002、R-003 | 重复构建产生相同 IR、artifact 和摘要；每个关键生成字段、当前 Profile 的 Loop 和元数据都有可回溯映射；Manifest 明确 Semantic IR、Execution IR、Override/no-override、Compiler、Adapter、Profile、Artifact 摘要。 | Task 4 的 Compiler/语义 Source Map 子范围已验证；Adapter、Manifest、artifact 摘要和两次独立构建仍无执行证据 | 部分完成（Compiler 子范围；其余待执行） |
+| G-02 输入契约与范围 | R-001、R-002 | 在代码/Schema/证据中明确首条切片是 Accepted Definition 的受限子集；首条切片明确一个 Loop，或实现并测试空/多 Loop；不得宣称完整 Semantic IR、Runtime 或三入口已完成。 | G-02-T1 至 G-02-T5 已验证；Task 5 只投影干净目标 Skill，并明确排除 Evidence、Runtime、Library 与后续范围 | 部分验证（Task 1-5 已验证；后续范围 OPEN） |
+| G-03 编译与 Source Map | R-002、R-003 | 重复构建产生相同 IR、artifact 和摘要；每个关键生成字段、当前 Profile 的 Loop 和元数据都有可回溯映射；Manifest 明确 Semantic IR、Execution IR、Override/no-override、Compiler、Adapter、Profile、Artifact 摘要。 | Task 4 的 Compiler/语义 Source Map 与 Task 5 的 Codex Skill Adapter/Adapter Source Map 子范围已验证；Manifest、Evidence 绑定和两次独立构建仍无执行证据 | 部分完成（Compiler + Adapter 子范围；其余待执行） |
 | G-04 产物与证据隔离 | R-003、R-004 | artifact 与 evidence 为兄弟目录；证据绑定 artifact digest；Adapter/Evidence 任一中途失败不留下可被误用的部分输出；漂移验证不修改 artifact。 | Plan 勘误 `1b7fb10` 已要求 Task 6 digest 覆盖完整 core subset，并将 Task 8 预期修正为 4；尚无实现/执行证据 | 待执行验证 |
 | G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-20-core-vertical-slice-execution.md` 及 build evidence | OPEN |
 
@@ -42,6 +42,16 @@ Task 3 的“已验证”只覆盖当前 `core-slice-v0.1` 的语义校验与 ca
 | Task 4：Deterministic Compiler 与语义 Source Map | 递归字典键重排确定性、输入 `deepcopy` 隔离、invalid definition 先验证、Final Execution IR 核心字段投影和 Source Map 完整性；`compiler_version` 为生成元数据且不伪造语义映射 | `61e9bbc`；规格/代码质量审查均 `Approved`，无 Critical/Important；compiler 定向 `5 passed`、validation + canonical + compiler 组合 `30 passed`、全量 `30 passed`；Schema check 与 `git diff --check` 通过；feature worktree clean | 已验证（子任务） |
 
 Task 4 的“已验证”只覆盖 Compiler 与当前 `core-slice-v0.1` 的语义 Source Map。R-009 为不阻塞的 Minor；Adapter、Evidence、Manifest、重复构建、Runtime、Pipeline 和阶段出口仍未验证，因此全局 G-02 仍为部分验证，G-03、G-04、G-05 不提前关闭。
+
+### G-02-T5 子门槛
+
+| 子门槛 | 范围 | 证据 | 状态 |
+|---|---|---|---|
+| Task 5：Codex Skill Adapter | Final Execution IR 到干净目标 Skill 的确定性投影；单行 JSON literal Markdown 边界；8-byte big-endian 长度前缀目录摘要；coarse/fine Adapter Source Map；terminal stop precedence；不包含 Evidence、Runtime 或 Library | `db4e4b2` + `c282fc6`；规格/代码质量复审均 `Approved`，无 Critical/Important；主控 fresh Python 3.13 定向 `8 passed`、全量 `38 passed`，静态检查通过；feature worktree clean | 已验证（子任务） |
+
+官方 validator 的证据边界：主控在修复前的 rich fixture 上独立确认 `quick_validate.py` 输出 `Skill is valid!`；修复后的 hardened injection fixture validator 仅有实现 Agent 报告通过，主控随后重跑因自动审批服务并发错误被拒，因此不登记为主控独立验证。Task 5 的“已验证”以 fresh 定向/全量测试、静态检查和两项复审为依据；R-010 的 HTML rendering Minor 不阻塞当前 Markdown Adapter。
+
+Task 5 的“已验证”不关闭全局 G-02，也不提前关闭 G-03、G-04 或 G-05。Evidence Package、Build Manifest、跨目录隔离、双构建、drift 验证、Runtime、Library 和阶段出口仍需后续任务证据。
 
 ### Plan 勘误基线
 
