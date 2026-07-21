@@ -90,3 +90,20 @@ def test_verify_build_rejects_symlinked_artifact_file_without_changes(
     assert skill_link.is_symlink()
     assert file_snapshot(artifact_dir) == artifact_before
     assert file_snapshot(evidence_dir) == evidence_before
+
+
+def test_verify_build_rejects_extra_artifact_root_file_without_changes(
+    tmp_path: Path,
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    artifact_root = result.output_root / "artifact"
+    extra_file = artifact_root / "EXTRA.txt"
+    extra_file.write_text("unexpected", encoding="utf-8")
+    artifact_before = file_snapshot(artifact_root)
+    evidence_before = file_snapshot(result.evidence_dir)
+
+    with pytest.raises(ValueError, match="exactly one artifact directory"):
+        verify_build(result.output_root)
+
+    assert file_snapshot(artifact_root) == artifact_before
+    assert file_snapshot(result.evidence_dir) == evidence_before

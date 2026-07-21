@@ -65,8 +65,8 @@ def verify_build(output_root: Path) -> dict[str, str]:
         raise ValueError("artifact root must not contain symlinks")
 
     artifact_dirs = [path for path in artifact_entries if path.is_dir()]
-    if len(artifact_dirs) != 1:
-        raise ValueError("build must contain exactly one artifact directory")
+    if len(artifact_entries) != 1 or len(artifact_dirs) != 1:
+        raise ValueError("artifact root must contain exactly one artifact directory")
 
     expected_digest = manifest["artifact_digest"]
     actual_digest = directory_digest(artifact_dirs[0])
