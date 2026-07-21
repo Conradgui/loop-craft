@@ -25,10 +25,17 @@ class SkillArtifact:
 
 
 def directory_digest(root: Path) -> str:
+    if root.is_symlink():
+        raise ValueError("artifact directory must not be a symlink")
+
+    entries = list(root.rglob("*"))
+    if any(path.is_symlink() for path in entries):
+        raise ValueError("artifact directory must not contain symlinks")
+
     hasher = hashlib.sha256()
     files = sorted(
         (path.relative_to(root).as_posix(), path)
-        for path in root.rglob("*")
+        for path in entries
         if path.is_file()
     )
     for relative_path, path in files:

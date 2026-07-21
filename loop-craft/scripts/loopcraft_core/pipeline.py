@@ -55,11 +55,16 @@ def verify_build(output_root: Path) -> dict[str, str]:
     manifest_path = output_root / "evidence" / "build-manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     artifact_root = output_root / "artifact"
-    artifact_dirs = (
-        [path for path in artifact_root.iterdir() if path.is_dir()]
-        if artifact_root.is_dir()
-        else []
+    if artifact_root.is_symlink():
+        raise ValueError("artifact root must not be a symlink")
+
+    artifact_entries = (
+        list(artifact_root.iterdir()) if artifact_root.is_dir() else []
     )
+    if any(path.is_symlink() for path in artifact_entries):
+        raise ValueError("artifact root must not contain symlinks")
+
+    artifact_dirs = [path for path in artifact_entries if path.is_dir()]
     if len(artifact_dirs) != 1:
         raise ValueError("build must contain exactly one artifact directory")
 
