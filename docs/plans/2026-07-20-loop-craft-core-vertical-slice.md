@@ -1763,12 +1763,22 @@ Recorded commits: `8253c24` (`feat: build Skill and evidence in one deterministi
 
 ### Task 8: Build Drift Verification
 
+**Task 8 预检修订（执行门槛）：**
+
+- `verify_build` 只报告 `clean` / `drifted`，不得修改 artifact 或 Evidence，也不得提供自动修复。
+- `output_root`、Evidence 目录、Build Manifest、artifact root、唯一 Skill 目录及 artifact tree 内条目必须拒绝直接 symlink；相关拒绝必须发生在读取对应目标内容之前。
+- artifact root 必须恰好包含一个真实 Skill 目录；额外文件或目录属于结构漂移并必须拒绝。
+- CLI 必须用真实 subprocess 回归覆盖 `build=0`、clean `verify=0`、drifted `verify=1`、JSON 输出及不写回 artifact。
+- 本任务最终验收矩阵为 14 个 drift + pipeline/CLI 测试；原计划中的 4 个测试计数已被 Task 7 symlink 回归与本任务审查加固取代。
+
 **Files:**
+- Modify: loop-craft/scripts/loopcraft_core/adapters/codex_skill.py
 - Modify: loop-craft/scripts/loopcraft_core/pipeline.py
 - Replace: loop-craft/scripts/build_loop.py
 - Create: tests/unit/test_drift.py
+- Modify: tests/integration/test_build_pipeline.py
 
-- [ ] **Step 1: Write the failing drift test**
+- [x] **Step 1: Write the failing drift and boundary tests**
 
 ~~~python
 # tests/unit/test_drift.py
@@ -1792,7 +1802,7 @@ def test_drift_is_reported_without_overwriting_artifact(tmp_path: Path) -> None:
     assert skill_file.read_text(encoding="utf-8") == modified
 ~~~
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -1802,7 +1812,9 @@ python -m pytest tests/unit/test_drift.py -v
 
 Expected: import failure because verify_build does not exist.
 
-- [ ] **Step 3: Implement non-mutating drift verification**
+Recorded RED: initial `ImportError` because `verify_build` did not exist; artifact/evidence symlink and unexpected root-entry cases each failed with `DID NOT RAISE ValueError`. The CLI subprocess regression was proven by a temporary, uncommitted exit-code mutation that the new drift test rejected; the mutation was restored before commit.
+
+- [x] **Step 3: Implement hardened non-mutating drift verification**
 
 Append to pipeline.py:
 
@@ -1828,7 +1840,7 @@ def verify_build(output_root: Path) -> dict[str, str]:
     }
 ~~~
 
-- [ ] **Step 4: Replace the CLI with build and verify subcommands**
+- [x] **Step 4: Replace the CLI with build and verify subcommands**
 
 ~~~python
 from __future__ import annotations
@@ -1872,7 +1884,7 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ~~~
 
-- [ ] **Step 5: Update the Task 7 CLI invocation**
+- [x] **Step 5: Update the Task 7 CLI invocation**
 
 Use:
 
@@ -1880,7 +1892,7 @@ Use:
 python loop-craft/scripts/build_loop.py build tests/fixtures/accepted-definition.valid.json build/core-slice
 ~~~
 
-- [ ] **Step 6: Verify GREEN**
+- [x] **Step 6: Verify GREEN**
 
 Run:
 
@@ -1888,9 +1900,9 @@ Run:
 python -m pytest tests/unit/test_drift.py tests/integration/test_build_pipeline.py -v
 ~~~
 
-Expected: 4 passed (one drift test and the three pipeline tests).
+Expected: 14 passed (drift, pipeline, path-boundary, and real CLI subprocess tests).
 
-- [ ] **Step 7: Verify clean and drifted CLI behavior**
+- [x] **Step 7: Verify clean and drifted CLI behavior**
 
 Run:
 
@@ -1903,12 +1915,14 @@ python loop-craft/scripts/build_loop.py verify build/drift-check
 
 Expected: first verify exits 0 with status clean; second verify exits 1 with status drifted and leaves the modified file unchanged.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit implementation and review hardening**
 
 ~~~powershell
 git add loop-craft/scripts tests/unit/test_drift.py tests/integration/test_build_pipeline.py
 git commit -m "feat: report generated artifact drift"
 ~~~
+
+Recorded commits: `b5f4ebe` (`feat: report generated artifact drift`), `077a540` (`fix: reject symlinked artifact drift inputs`), `220669e` (`fix: reject unexpected artifact root entries`), `4474f48` (`fix: reject symlinked build evidence paths`), and `2ec976a` (`test: cover build and verify CLI`).
 
 ### Task 9: Package the Core Slice as Loop Craft
 
