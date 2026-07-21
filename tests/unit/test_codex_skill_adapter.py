@@ -1,0 +1,288 @@
+import copy
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+
+from loopcraft_core.adapters.codex_skill import (
+    directory_digest,
+    render_codex_skill,
+)
+from loopcraft_core.canonical import canonical_json_bytes
+from loopcraft_core.compiler import compile_definition
+
+
+FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures"
+    / "accepted-definition.valid.json"
+)
+
+
+def load_valid() -> dict[str, Any]:
+    return json.loads(FIXTURE.read_text(encoding="utf-8"))
+
+
+def reverse_mapping_order(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: reverse_mapping_order(item)
+            for key, item in reversed(tuple(value.items()))
+        }
+    if isinstance(value, list):
+        return [reverse_mapping_order(item) for item in value]
+    return value
+
+
+def file_snapshot(root: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+
+
+def parse_frontmatter(skill_text: str) -> tuple[dict[str, str], str]:
+    opening, frontmatter, body = skill_text.split("---\n", maxsplit=2)
+    assert opening == ""
+    fields: dict[str, str] = {}
+    for line in frontmatter.strip().splitlines():
+        key, value = line.split(": ", maxsplit=1)
+        fields[key] = value
+    return fields, body
+
+
+def expected_directory_digest(root: Path) -> str:
+    hasher = hashlib.sha256()
+    for relative_path, content in sorted(file_snapshot(root).items()):
+        hasher.update(relative_path.encode("utf-8"))
+        hasher.update(b"\0")
+        hasher.update(content)
+        hasher.update(b"\0")
+    return f"sha256:{hasher.hexdigest()}"
+
+
+def test_adapter_generates_only_a_clean_complete_target_skill(tmp_path: Path) -> None:
+    compiled = compile_definition(load_valid())
+    result = render_codex_skill(compiled, tmp_path)
+    execution = compiled.final_execution_ir
+
+    assert sorted(file_snapshot(result.skill_dir)) == [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "references/final-execution-ir.json",
+    ]
+
+    skill_text = (result.skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    frontmatter, body = parse_frontmatter(skill_text)
+    assert set(frontmatter) == {"name", "description"}
+    assert frontmatter["name"] == execution["identity"]["id"]
+    assert json.loads(frontmatter["description"]).startswith("Use when ")
+
+    expected_body_values = [
+        execution["identity"]["name"],
+        execution["identity"]["description"],
+        execution["purpose"]["outcome"],
+        *execution["applicability"]["use_when"],
+        *execution["applicability"]["do_not_use_when"],
+        *execution["interface"]["inputs"],
+        *execution["interface"]["outputs"],
+        *execution["authority"]["allowed"],
+        *execution["authority"]["approval_required"],
+        *execution["authority"]["forbidden"],
+        *execution["capabilities"]["required"],
+        *execution["capabilities"]["optional"],
+    ]
+    for loop in execution["loops"]:
+        expected_body_values.append(loop["id"])
+        for node in loop["nodes"]:
+            expected_body_values.extend(
+                (node["id"], node["instruction"], node["next"])
+            )
+        expected_body_values.extend(loop["terminal_mapping"].keys())
+        expected_body_values.extend(loop["terminal_mapping"].values())
+        expected_body_values.extend(loop["invariants"])
+
+    for value in expected_body_values:
+        assert value in body
+    assert "references/final-execution-ir.json" in body
+    assert "Loopy" not in skill_text
+    assert "Loop Library" not in skill_text
+
+    reference_bytes = (
+        result.skill_dir / "references" / "final-execution-ir.json"
+    ).read_bytes()
+    assert reference_bytes == canonical_json_bytes(execution) + b"\n"
+    assert not reference_bytes.endswith(b"\r\n")
+
+
+def test_adapter_quotes_frontmatter_and_preserves_rich_applicability(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    long_trigger = "an input: value <must> be checked " + "x" * 1100
+    use_when = [
+        long_trigger,
+        "Use when a second: trigger <also> applies.",
+    ]
+    do_not_use_when = [
+        "the request: is already <complete>",
+        "a deterministic edit is sufficient",
+    ]
+    definition["behavior_contract"]["applicability"] = {
+        "use_when": use_when,
+        "do_not_use_when": do_not_use_when,
+    }
+
+    result = render_codex_skill(
+        compile_definition(definition), tmp_path / "rich-applicability"
+    )
+    skill_text = (result.skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    frontmatter, body = parse_frontmatter(skill_text)
+    description = json.loads(frontmatter["description"])
+
+    assert description.startswith("Use when ")
+    assert len(description) <= 1024
+    assert "<" not in description
+    assert ">" not in description
+    for original in (*use_when, *do_not_use_when):
+        assert original in body
+
+    assert result.source_map["SKILL.md#description"] == [
+        "/applicability/use_when/0"
+    ]
+    assert result.source_map["SKILL.md#applicability"] == [
+        "/applicability/use_when/0",
+        "/applicability/use_when/1",
+        "/applicability/do_not_use_when/0",
+        "/applicability/do_not_use_when/1",
+    ]
+
+
+def test_adapter_source_map_copies_compiler_map_and_covers_every_projection(
+    tmp_path: Path,
+) -> None:
+    compiled = compile_definition(load_valid())
+    compiler_map_snapshot = copy.deepcopy(compiled.source_map)
+    result = render_codex_skill(compiled, tmp_path)
+    execution = compiled.final_execution_ir
+
+    assert result.source_map is not compiled.source_map
+    for key, pointers in compiler_map_snapshot.items():
+        assert result.source_map[key] == pointers
+        assert result.source_map[key] is not compiled.source_map[key]
+
+    expected = {
+        "SKILL.md#identity": ["/identity"],
+        "SKILL.md#identity/name": ["/identity/name"],
+        "SKILL.md#identity/description": ["/identity/description"],
+        "SKILL.md#purpose": ["/purpose/outcome"],
+        "SKILL.md#interface": ["/interface"],
+        "SKILL.md#authority": ["/authority"],
+        "SKILL.md#capabilities": ["/capabilities"],
+        "agents/openai.yaml#display_name": ["/identity/name"],
+        "agents/openai.yaml#short_description": ["/identity/description"],
+        "agents/openai.yaml#default_prompt": [
+            "/identity/id",
+            "/purpose/outcome",
+        ],
+    }
+    for category in ("inputs", "outputs"):
+        for index, _ in enumerate(execution["interface"][category]):
+            expected[f"SKILL.md#interface/{category}/{index}"] = [
+                f"/interface/{category}/{index}"
+            ]
+    for category in ("allowed", "approval_required", "forbidden"):
+        for index, _ in enumerate(execution["authority"][category]):
+            expected[f"SKILL.md#authority/{category}/{index}"] = [
+                f"/authority/{category}/{index}"
+            ]
+    for category in ("required", "optional"):
+        for index, _ in enumerate(execution["capabilities"][category]):
+            expected[f"SKILL.md#capabilities/{category}/{index}"] = [
+                f"/capabilities/{category}/{index}"
+            ]
+
+    for loop_index, loop in enumerate(execution["loops"]):
+        loop_path = f"/loops/{loop_index}"
+        expected[f"SKILL.md#loops/{loop_index}/id"] = [f"{loop_path}/id"]
+        for node_index, node in enumerate(loop["nodes"]):
+            for field in node:
+                expected[
+                    f"SKILL.md#loops/{loop_index}/nodes/{node_index}/{field}"
+                ] = [f"{loop_path}/nodes/{node_index}/{field}"]
+        for terminal_name in loop["terminal_mapping"]:
+            expected[
+                f"SKILL.md#loops/{loop_index}/terminal_mapping/{terminal_name}"
+            ] = [f"{loop_path}/terminal_mapping/{terminal_name}"]
+        for invariant_index, _ in enumerate(loop["invariants"]):
+            expected[
+                f"SKILL.md#loops/{loop_index}/invariants/{invariant_index}"
+            ] = [f"{loop_path}/invariants/{invariant_index}"]
+
+    for key, pointers in expected.items():
+        assert result.source_map[key] == pointers
+    assert result.source_map["SKILL.md#workflow"] == [
+        "/loops/0/nodes",
+        "/loops/0/terminal_mapping",
+    ]
+    assert result.source_map["SKILL.md#invariants"] == [
+        "/loops/0/invariants"
+    ]
+
+
+def test_adapter_is_deterministic_for_recursive_object_key_reordering(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    reordered = reverse_mapping_order(definition)
+
+    first = render_codex_skill(compile_definition(definition), tmp_path / "first")
+    second = render_codex_skill(
+        compile_definition(reordered), tmp_path / "second"
+    )
+
+    assert file_snapshot(first.skill_dir) == file_snapshot(second.skill_dir)
+    assert first.artifact_digest == second.artifact_digest
+    skill_text = (first.skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    terminal_positions = [
+        skill_text.index(f"**{name}:**")
+        for name in sorted(definition["loops"][0]["terminal_states"])
+    ]
+    assert terminal_positions == sorted(terminal_positions)
+
+
+def test_directory_digest_uses_sorted_posix_paths_and_file_bytes(
+    tmp_path: Path,
+) -> None:
+    compiled = compile_definition(load_valid())
+    result = render_codex_skill(compiled, tmp_path)
+
+    assert result.artifact_digest == expected_directory_digest(result.skill_dir)
+    assert directory_digest(result.skill_dir) == result.artifact_digest
+
+
+def test_openai_yaml_contains_only_deterministic_interface_values(
+    tmp_path: Path,
+) -> None:
+    compiled = compile_definition(load_valid())
+    execution = compiled.final_execution_ir
+    result = render_codex_skill(compiled, tmp_path)
+
+    openai_yaml = (result.skill_dir / "agents" / "openai.yaml").read_text(
+        encoding="utf-8"
+    )
+    expected_prompt = (
+        f"Use ${execution['identity']['id']} to "
+        f"{execution['purpose']['outcome']}."
+    )
+    assert openai_yaml.splitlines() == [
+        "interface:",
+        "  display_name: "
+        + json.dumps(execution["identity"]["name"], ensure_ascii=False),
+        "  short_description: "
+        + json.dumps(
+            execution["identity"]["description"][:64], ensure_ascii=False
+        ),
+        "  default_prompt: " + json.dumps(expected_prompt, ensure_ascii=False),
+    ]
