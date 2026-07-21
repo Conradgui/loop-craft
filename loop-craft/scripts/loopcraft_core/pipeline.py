@@ -1,0 +1,51 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+import json
+from pathlib import Path
+import tempfile
+from typing import Any
+
+from .adapters.codex_skill import render_codex_skill
+from .compiler import compile_definition
+from .evidence.package import package_evidence
+from .validation import validate_definition
+
+
+@dataclass(frozen=True)
+class BuildResult:
+    output_root: Path
+    artifact_dir: Path
+    evidence_dir: Path
+    manifest: dict[str, Any]
+
+
+def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
+    definition = json.loads(definition_path.read_text(encoding="utf-8"))
+    validate_definition(definition)
+    compiled = compile_definition(definition)
+
+    if output_root.exists():
+        raise FileExistsError(f"Output already exists: {output_root}")
+    output_root.parent.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(
+        dir=output_root.parent,
+        prefix=f".{output_root.name}.",
+    ) as temporary:
+        staging_root = Path(temporary) / "output"
+        artifact = render_codex_skill(compiled, staging_root / "artifact")
+        evidence = package_evidence(
+            definition=definition,
+            compiled=compiled,
+            artifact=artifact,
+            evidence_dir=staging_root / "evidence",
+        )
+        staging_root.replace(output_root)
+
+    return BuildResult(
+        output_root,
+        output_root / "artifact" / artifact.skill_dir.name,
+        output_root / "evidence",
+        evidence.manifest,
+    )
