@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-22T14:00:00+08:00",
+  "updated_at": "2026-07-22T14:18:00+08:00",
   "overall": {
     "label": "Demo 尚未完成",
     "tone": "blocked",
@@ -21,7 +21,8 @@
   "delivered": [
     {"title": "确定性 Core 构建链", "detail": "Accepted Definition → Compiler → Skill / Evidence / Drift", "state": "ready"},
     {"title": "入口候选资产已定位", "detail": "Loopy Craft、Skill Upgrade、Workflow Skill Creator 均有可迁移实现", "state": "ready"},
-    {"title": "项目控制规则已修正", "detail": "产品优先、复用优先、测试默认 0，1:2.5 只是绝对上限", "state": "ready"}
+    {"title": "项目控制规则已修正", "detail": "产品优先、复用优先、测试默认 0，1:2.5 只是绝对上限", "state": "ready"},
+    {"title": "实时项目看板已交付", "detail": "状态文件驱动、5 秒轮询、桌面与窄栏布局已检查", "state": "ready"}
   ],
   "next_steps": [
     {"id": "N1", "title": "迁移 From-scratch Craft", "detail": "复用 Loopy 访谈、Craft 和预检，不重写", "state": "active"},
@@ -37,6 +38,7 @@
   ],
   "activity": [
     {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
+    {"date": "2026-07-22", "title": "交付实时项目看板", "detail": "看板服务已启动，持续显示 Demo 状态、下一步、风险和活动。"},
     {"date": "2026-07-22", "title": "Core proof slice 完成", "detail": "后端构建链、Evidence 和 Drift 已验证，但不等同于产品 Demo。"},
     {"date": "2026-07-22", "title": "下一阶段重新定向", "detail": "停止重复审计，直接迁移已有 From-scratch 实现。"}
   ]
