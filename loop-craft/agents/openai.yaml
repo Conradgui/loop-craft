@@ -1,0 +1,4 @@
+interface:
+  display_name: "Loop Craft"
+  short_description: "Build accepted definitions and verify artifact drift"
+  default_prompt: "Use $loop-craft to build an accepted definition or verify an existing build for artifact drift."
