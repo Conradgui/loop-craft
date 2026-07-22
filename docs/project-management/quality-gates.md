@@ -77,6 +77,14 @@ Task 7 的 symlink Minor 已由回归测试和 `exists() or is_symlink()` 修复
 
 Task 8 的 drift 验证不写回 artifact/Evidence，也不提供自动修复。测试辅助快照只能证明内容未改变，不能单独证明从未读取或元数据未变；实现顺序已静态确认直接 symlink 在读取前拒绝。普通已有输出、Evidence 写入中途失败、强杀和非本地 FS 原子性仍未验证，因此 G-04 保持部分完成，G-05 保持 `OPEN`。
 
+### Task 9 子门槛
+
+| 子门槛 | 范围 | 证据 | 状态 |
+|---|---|---|---|
+| Task 9：Loop Craft 产品 Skill 包装 | `SKILL.md`、`agents/openai.yaml`、`references/core-build.md` 的真实边界；accepted Behavior Contract JSON build；existing build 的只读 drift verify；精确 metadata、相对 reference 链接、Skill cwd 命令和 drift CLI 合同 | `d6a3ebb` + `67b1d22` + `adbde41`；规格/代码质量复审均 `Approved`，无 Missing/Extra/Misinterpreted/越界/Critical/Important；主控 fresh Python 3.13 定向 `6 passed`、全量 `64 passed`；官方 `quick_validate.py`：`Skill is valid!`；`git diff --check` 通过；feature worktree clean | 已验证（子任务） |
+
+Task 9 子门只确认产品 Skill 的声明、安装目录内命令边界和现有 build drift 合同；不覆盖真实 forward behavioral test、Runtime、Library、三入口、发布/调度或阶段出口。Creator Pro authoring gates 已应用；官方 validator compatibility passed 只是兼容底线，不把 `quality_lint` 记为通过。G-05 继续保持 `OPEN`。
+
 ### Plan 勘误基线
 
 `main` 提交 `1b7fb10` 已更新后续验收：Task 3 在单 Loop Profile 下删除 duplicate 检查；Task 4/5 强化确定性、完整投影/Source Map 与 quoted safe frontmatter；Task 6 digest 覆盖完整 core subset。Task 8 的原始预期计数 4 已由最终 14 个 drift + pipeline/CLI 测试取代。这里只记录计划门槛，不代表未执行任务已实现。

@@ -99,9 +99,17 @@ Task 8 由功能提交 `b5f4ebe`（`feat: report generated artifact drift`）及
 
 TDD 证据包含初始 `verify_build` 导入失败、symlink 与额外根条目负例的 `DID NOT RAISE ValueError`，以及 CLI drift 退出码的临时未提交故障注入；最终提交不含故障注入。最终规格复审和代码质量复审均为 `Approved`，无 Critical 或 Important。主控 fresh Python 3.13 定向测试 `14 passed`、全量 `58 passed`，`git diff --check` 通过；验证快照时 feature HEAD 为 `2ec976a`，worktree clean，相对远端领先 5 个提交且尚未推送。`file_snapshot` 只能证明内容未改变，不能单独证明未读取或元数据未变；实现顺序已静态确认直接 symlink 在读取前拒绝，该 residual 不阻塞 Task 8。
 
+### D-015 Task 9 产品 Skill 包装边界
+
+Task 9 由 `d6a3ebb`、`67b1d22` 和 `adbde41` 共同构成：新增 `loop-craft/SKILL.md`、`agents/openai.yaml`、`references/core-build.md` 及产品集成测试，并用回归测试锁定精确 metadata、相对 reference 链接、文档化命令和 Skill 工作目录边界。产品 Skill 只覆盖 accepted Behavior Contract JSON 的 Core build，以及对 existing build 的 drift verify；Build、SKILL 与 reference 的边界保持真实，不宣称三入口、Runtime、Library、发布或调度。
+
+主控 fresh Python 3.13 运行 Task 9 集成测试得 `6 passed`；全量测试得 `64 passed`；官方 `quick_validate.py` 输出 `Skill is valid!`；`git diff --check` 通过。规格复审与代码质量复审均为 `Approved`，无 Missing、Extra、Misinterpreted、越界、Critical 或 Important。Creator Pro 行为合同、branch index、信息层级、可观察门和剪枝原则已应用；官方 validator 仅作为兼容底线，不将 `quality_lint` 记录为已通过。
+
+验证快照：feature HEAD 为 `adbde41`，worktree clean，相对 `origin/feature/core-vertical-slice` ahead 3，未 push。真实 forward behavioral test 按用户约束留到整条链路完成后；Task 9 通过不表示 Runtime、Library、三入口或阶段出口完成。
+
 ## 未决项
 
-- Accepted Definition 的 Schema/fixture 与 Core Pipeline 子范围已验证；产品 Skill 和执行记录仍需后续任务证据，见 `risk-register.md` 的 `R-001`。
+- Accepted Definition 的 Schema/fixture、Core Pipeline 与产品 Skill 子范围已验证；执行记录和阶段出口仍需 Task 10 证据，见 `risk-register.md` 的 `R-001`。
 - Task 3 的 semantic/canonical 顺序和 surrogate 错误边界已验证，R-008 已关闭；阶段出口仍需任务证据。
 - Task 4 的 Compiler 与语义 Source Map 子范围已验证；Runtime 和阶段出口仍需后续任务证据。
 - Task 6 的 Evidence/Manifest 子范围和远端同步已验证；Pipeline 与 drift 已覆盖正常提交、已测试失败路径和直接 symlink 边界，普通已有输出、Evidence 写入中途失败和阶段出口仍需后续任务证据。
