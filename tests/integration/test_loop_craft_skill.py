@@ -70,7 +70,7 @@ def test_core_build_reference_documents_exact_cli_commands() -> None:
     assert VERIFY_COMMAND in reference
 
 
-def test_product_skill_runs_build_and_clean_verify_from_skill_directory(
+def test_product_skill_runs_build_clean_and_drift_verify_from_skill_directory(
     tmp_path: Path,
 ) -> None:
     output = tmp_path / "core-build"
@@ -102,3 +102,23 @@ def test_product_skill_runs_build_and_clean_verify_from_skill_directory(
 
     assert verify.returncode == 0, verify.stderr
     assert json.loads(verify.stdout)["status"] == "clean"
+
+    artifact_entries = list((output / "artifact").iterdir())
+    assert len(artifact_entries) == 1
+    generated_skill = artifact_entries[0]
+    assert generated_skill.is_dir()
+    skill_file = generated_skill / "SKILL.md"
+    edited_content = skill_file.read_bytes() + b"manual edit\n"
+    skill_file.write_bytes(edited_content)
+
+    drift = subprocess.run(
+        [sys.executable, "scripts/build_loop.py", "verify", str(output)],
+        cwd=SKILL,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert drift.returncode == 1, drift.stderr
+    assert json.loads(drift.stdout)["status"] == "drifted"
+    assert skill_file.read_bytes() == edited_content
