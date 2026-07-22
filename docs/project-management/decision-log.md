@@ -152,4 +152,6 @@ Workflow Skill Creator 只复用“先总结已发生事实、让用户纠正、
 
 共享 Gate 不表示三入口交付相同。From-scratch 与 Conversation 的获批 0-loop Workflow 可以通过 `skill-package-v0.1` 生成普通 Skill；获批且兼容的 1-loop 定义也使用同一 profile。Existing Skill 的 `keep_as_skill` 仍是 Assessment only，不制造无意义的零 Loop 替代包；获批的单 Loop upgrade 仍走经过清单审阅的 source-preserving overlay。多 Loop 或任何不能无损表达的合同继续停在 Assessment only。
 
-Candidate Review 按分类显示不同 packet：0-loop 显示 Workflow steps、success evidence、failure or stop；1-loop 显示 Observe / Choose / Act / Verify / Record / Adapt cycle、反馈、terminal states 与 recovery。两类共同显示 authority、invariants、boundary 和 approval scope。Core、Schema、Packaging Adapter 均未因本决策修改。
+Candidate Review 按分类显示不同 packet：0-loop 显示 Workflow steps、success evidence、failure or stop，并审阅每项 must-preserve constraint 在现有 `authority`、`workflow.steps` 或 `workflow.failure_or_stop` 中的落点；1-loop 显示 Observe / Choose / Act / Verify / Record / Adapt cycle、反馈、terminal states、recovery 与 `loops[0].invariants`。两类共同显示 authority、boundary 和 approval scope；不为 0-loop 发明 Schema 不支持的独立 invariants 字段。
+
+Existing Skill Upgrade 在 compatibility gate 通过后，必须以 Decision Record 为输入调用同一 Candidate Review，复用已有答案而不重复提问。Candidate 显式批准后才可写 accepted definition 和 inventory；source mapping 与 manifest 仍需审阅批准后才 build。Core、Schema、Packaging Adapter 均未因本决策修改。

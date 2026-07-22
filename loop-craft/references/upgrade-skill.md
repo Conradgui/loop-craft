@@ -91,7 +91,9 @@ The current Core and Skill Packaging Adapter can safely build an upgrade only wh
 
 If any condition fails, stop at **Assessment only**. Return the Decision Record and the unsupported boundary. Do not flatten multiple or embedded Loops, drop critical resources, or claim that a generated replacement is a complete upgrade.
 
-If the gate passes, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Inventory the source package, show the mapping and reviewed manifest, then obtain approval before building.
+If the gate passes, use the Decision Record as input to the shared Candidate Review in [candidate-review.md](candidate-review.md). Reuse answers already established by the record and scoped evidence; do not ask them again. Do not write the accepted definition, inventory the source package, or build until the user explicitly approves the Candidate.
+
+After Candidate approval, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Inventory the source package, then show the definition mapping and reviewed manifest and obtain approval before building.
 
 ## 7. Perform the approved upgrade
 

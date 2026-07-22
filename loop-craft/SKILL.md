@@ -7,7 +7,7 @@ description: Use when a user wants to design one bounded feedback loop from a go
 
 Route the request into one of the supported paths below. Keep the interview and review conversational; use the deterministic Core only after the definition is accepted.
 
-All three design entries recover their own source-specific Candidate Behavior Contract, then apply the single shared [references/loopability-gate.md](references/loopability-gate.md) and [references/candidate-review.md](references/candidate-review.md). Do not duplicate or modify the seven Gate checks inside an entry. A Candidate becomes an accepted definition only after explicit approval of its behavior, authority, invariants, boundary, and deliverable.
+All three design entries recover their own source-specific Candidate Behavior Contract, then apply the single shared [references/loopability-gate.md](references/loopability-gate.md) and [references/candidate-review.md](references/candidate-review.md). Do not duplicate or modify the seven Gate checks inside an entry. A Candidate becomes an accepted definition only after explicit approval of its behavior, authority, representable must-preserve constraints, boundary, and deliverable; only a 1-loop definition has `loops[0].invariants`.
 
 ## From-scratch design
 
@@ -25,6 +25,7 @@ When the target is an existing Agent Skill, read [references/upgrade-skill.md](r
 
 - Assess the complete Skill contract before proposing a Loop architecture.
 - Return the Decision Record before requesting approval to modify anything.
+- Use the Decision Record as input to the shared Candidate Review, reuse existing answers, and obtain explicit Candidate approval before writing the accepted definition or inventorying the source package.
 - Build a one-Loop upgrade through the source-preserving Packaging route when the approved design passes the current compatibility gate. Inventory and review the complete source package before building; otherwise return the Assessment without compressing the design into the single-Loop profile.
 - The deliverable remains a complete discoverable Skill, not a standalone Loop fragment.
 

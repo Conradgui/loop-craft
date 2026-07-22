@@ -19,9 +19,10 @@ For a Candidate with no qualifying Loop, show:
 
 - ordered Workflow steps;
 - success evidence and its observable acceptance rule;
-- failure or stop behavior, including blocked and handoff conditions.
+- failure or stop behavior, including blocked and handoff conditions;
+- every must-preserve constraint and its concrete location in `authority`, `workflow.steps`, or `workflow.failure_or_stop`.
 
-Do not invent a feedback cycle for a fixed staged Workflow.
+Do not invent a feedback cycle or an `invariants` field for a fixed staged Workflow.
 
 ## 1-loop bounded Loop packet
 
@@ -29,7 +30,8 @@ For a Candidate with exactly one qualifying Loop, show:
 
 - the Observe → Choose → Act → Verify → Record → Adapt cycle;
 - fresh feedback and the acceptance rule;
-- terminal states and state / recovery behavior.
+- terminal states and state / recovery behavior;
+- `loops[0].invariants` that every pass must preserve.
 
 ## Shared review fields
 
@@ -38,11 +40,10 @@ Show these fields for both packet types:
 1. Outcome and use conditions, including the source entry and provenance boundary.
 2. Inputs and outputs.
 3. Authority: allowed, approval-required, and forbidden actions.
-4. Invariants that the Workflow or Loop must preserve.
-5. Success, stop, and handoff conditions.
-6. Inferred or proposed facts that still depend on user judgment.
-7. Current boundary, including unsupported Loop count or semantic loss, no Runtime, no installation, no publication, no scheduling, and no Library Edition coupling.
-8. Approval scope: writing the accepted definition and building the local artifact plus Evidence only.
+4. Success, stop, and handoff conditions.
+5. Inferred or proposed facts that still depend on user judgment.
+6. Current boundary, including unsupported Loop count or semantic loss, no Runtime, no installation, no publication, no scheduling, and no Library Edition coupling.
+7. Approval scope: writing the accepted definition and building the local artifact plus Evidence only.
 
 State whether the Candidate is ready, blocked by a named gap, or classified as a 0-loop Workflow or 1-loop bounded Loop. Ask for approval or one specific correction.
 

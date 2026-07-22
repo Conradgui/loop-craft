@@ -45,8 +45,7 @@ For both forms include:
 - `applicability`: use and non-use conditions;
 - `interface`: named inputs and outputs;
 - `authority`: allowed, approval-required, and forbidden actions;
-- `capabilities`: required and optional capabilities grounded in known tools;
-- the accepted boundary and invariants.
+- `capabilities`: required and optional capabilities grounded in known tools.
 
 For a 0-loop Workflow, set `loops` to an empty list and include:
 
@@ -54,13 +53,15 @@ For a 0-loop Workflow, set `loops` to an empty list and include:
 - `workflow.success_evidence`: observable acceptance evidence;
 - `workflow.failure_or_stop`: failure, blocked, approval, and handoff behavior.
 
-For a 1-loop bounded Loop, include:
+Map every must-preserve constraint for a 0-loop Workflow into an existing field: use `authority` for action boundaries, `workflow.steps` for required behavior, or `workflow.failure_or_stop` for stop and handoff constraints. Do not add an `invariants` field to a 0-loop definition.
+
+For a 1-loop bounded Loop, include the same shared fields plus:
 
 - `loops[0].cycle`: observe, choose, act, verify, record, adapt;
 - `loops[0].terminal_states`: success, clean no-op, blocked, stagnated, exhausted;
 - `loops[0].invariants`: facts and boundaries that every pass must preserve.
 
-Do not add unsupported fields or a second Loop.
+Only a 1-loop definition writes `loops[0].invariants`. Do not add unsupported fields or a second Loop.
 
 ## 5. Review before writing
 

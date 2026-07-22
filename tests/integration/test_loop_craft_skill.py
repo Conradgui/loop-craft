@@ -67,7 +67,7 @@ def test_product_skill_routes_supported_entries_and_requires_acceptance() -> Non
     assert "Loopy" not in text
 
 
-def test_entries_use_one_shared_loopability_gate_contract() -> None:
+def test_entries_use_shared_loopability_and_candidate_review_contracts() -> None:
     references = SKILL / "references"
     gate_path = references / "loopability-gate.md"
     assert gate_path.is_file()
@@ -83,6 +83,7 @@ def test_entries_use_one_shared_loopability_gate_contract() -> None:
     ):
         entry_text = (references / entry_name).read_text(encoding="utf-8")
         assert "[loopability-gate.md](loopability-gate.md)" in entry_text
+        assert "[candidate-review.md](candidate-review.md)" in entry_text
         assert not any(rule in entry_text for rule in gate_rules)
 
     zero_loop = markdown_section(gate_text, "0 qualifying Loops")
@@ -107,6 +108,15 @@ def test_from_scratch_routes_approved_workflows_and_loops_through_packaging() ->
     assert "Candidate Review" in text
     assert "explicit approval" in text
 
+    workflow_contract = markdown_section(
+        text, "4. Draft the Candidate Behavior Contract"
+    )
+    assert "0-loop Workflow" in workflow_contract
+    for field in ("authority", "workflow.steps", "workflow.failure_or_stop"):
+        assert field in workflow_contract
+    assert "only a 1-loop" in workflow_contract.lower()
+    assert "loops[0].invariants" in workflow_contract
+
 
 def test_candidate_review_distinguishes_workflow_and_loop_packets() -> None:
     text = (SKILL / "references" / "candidate-review.md").read_text(
@@ -116,12 +126,20 @@ def test_candidate_review_distinguishes_workflow_and_loop_packets() -> None:
     loop_packet = markdown_section(text, "1-loop bounded Loop packet")
     shared_packet = markdown_section(text, "Shared review fields")
 
-    for field in ("steps", "success evidence", "failure or stop"):
+    for field in (
+        "steps",
+        "success evidence",
+        "failure or stop",
+        "must-preserve constraint",
+        "authority",
+    ):
         assert field in workflow_packet.lower()
     for cycle_step in ("Observe", "Choose", "Act", "Verify", "Record", "Adapt"):
         assert cycle_step in loop_packet
-    for field in ("authority", "invariants", "boundary", "approval"):
+    assert "invariants" in loop_packet.lower()
+    for field in ("authority", "boundary", "approval"):
         assert field in shared_packet.lower()
+    assert "invariants" not in shared_packet.lower()
 
 
 def test_product_skill_metadata_matches_contract() -> None:
