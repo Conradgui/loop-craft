@@ -121,3 +121,11 @@ Task 9 由 `d6a3ebb`、`67b1d22` 和 `adbde41` 共同构成：新增 `loop-craft
 - Runtime、Override、Subloop、Registry、Library Edition、发布/调度和多平台 Adapter 仍按 Spec 分立计划推进。
 - 真实 forward behavioral experiment 按用户决定延后到完整链路完成后；当前只保留结构、逻辑、构建和证据链验证结论。
 - R-007、R-009、R-010、R-011、R-012 中的非阻塞 residual 继续跟踪，不改变本次 Core slice PASS。
+
+### D-017 Skill Upgrade 先开放完整 Assessment，再开放可证明无损的构建子集
+
+Phase 1 的四类判断全部保留：`keep_as_skill`、`embedded_loop`、`loop_first_skill`、`split_into_loops`。Assessment 可以完整判断架构，但当前 `core-slice-v0.1` 只接受一个 Loop，现有 Codex Skill Adapter 生成新 Skill，不能保留任意原 Skill 的 scripts、assets、references 或扩展 metadata。
+
+因此本阶段只有“单一 `loop_first_skill`、行为合同可被当前 schema 无损表达、没有关键外部资源依赖”的情况可以在批准后进入现有 Core build。其他情况返回带明确 unsupported boundary 的 `Assessment only`。产品上先获得真实可用的第二入口；工程上不伪造通用保真升级能力，也不为了扩大声明而改造已经稳定的 Core。
+
+下一次扩展既有 Skill 的完整升级能力时，应优先补充能保留原 Skill package 的 Packaging Adapter/输入模型，而不是继续增加 Core 内核测试或把多个 Loop 压入当前 profile。
