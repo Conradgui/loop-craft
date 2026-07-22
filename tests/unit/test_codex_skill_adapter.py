@@ -157,11 +157,29 @@ def test_adapter_rejects_frontmatter_description_over_limit(
         "use_when": use_when,
         "do_not_use_when": do_not_use_when,
     }
+    artifact_root = tmp_path / "rich-applicability"
 
     with pytest.raises(ValueError, match="1024"):
-        render_codex_skill(
-            compile_definition(definition), tmp_path / "rich-applicability"
-        )
+        render_codex_skill(compile_definition(definition), artifact_root)
+
+    assert not artifact_root.exists()
+
+
+@pytest.mark.parametrize("empty_trigger", [".", "<>", "Use when ."])
+def test_adapter_rejects_trigger_that_is_empty_after_cleaning_without_output(
+    tmp_path: Path,
+    empty_trigger: str,
+) -> None:
+    definition = load_valid()
+    definition["behavior_contract"]["applicability"]["use_when"] = [
+        empty_trigger
+    ]
+    artifact_root = tmp_path / "empty-trigger"
+
+    with pytest.raises(ValueError, match="empty after cleaning"):
+        render_codex_skill(compile_definition(definition), artifact_root)
+
+    assert not artifact_root.exists()
 
 
 def test_frontmatter_description_includes_all_use_when_triggers(

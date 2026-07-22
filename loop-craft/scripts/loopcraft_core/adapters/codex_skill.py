@@ -58,6 +58,8 @@ def _clean_trigger(use_when: str) -> str:
 
 def _frontmatter_description(use_when: list[str]) -> str:
     triggers = [_clean_trigger(value) for value in use_when]
+    if any(not trigger for trigger in triggers):
+        raise ValueError("frontmatter trigger is empty after cleaning")
     prefix = "Use when "
     separator = "; "
     description = prefix + separator.join(triggers)
@@ -308,12 +310,12 @@ def render_codex_skill(
     skill_dir = artifact_root / identity["id"]
     references = skill_dir / "references"
     agents = skill_dir / "agents"
-    references.mkdir(parents=True, exist_ok=False)
-    agents.mkdir(parents=True, exist_ok=False)
-
     description = _frontmatter_description(
         execution["applicability"]["use_when"]
     )
+    references.mkdir(parents=True, exist_ok=False)
+    agents.mkdir(parents=True, exist_ok=False)
+
     skill_text = "\n".join(
         [
             "---",
