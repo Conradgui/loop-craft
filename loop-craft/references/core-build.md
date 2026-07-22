@@ -2,6 +2,8 @@
 
 Use only the two commands below. Run them from the `loop-craft` directory.
 
+The runtime must provide Python and jsonschema; if either dependency is missing, stop and do not guess or install it.
+
 ## Build an accepted definition
 
 Require an existing, readable JSON definition that matches `scripts/loopcraft_core/kernel/schemas/accepted-definition.schema.json`. Require a new output path that does not already exist.

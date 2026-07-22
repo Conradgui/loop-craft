@@ -48,13 +48,49 @@ def directory_digest(root: Path) -> str:
     return f"sha256:{hasher.hexdigest()}"
 
 
-def _frontmatter_description(use_when: str) -> str:
+def _clean_trigger(use_when: str) -> str:
     trigger = use_when.strip().rstrip(".")
     prefix = "use when "
     if trigger.casefold().startswith(prefix):
         trigger = trigger[len(prefix) :].lstrip()
-    description = f"Use when {trigger}".replace("<", "").replace(">", "")
-    return description[:1024].rstrip()
+    return trigger.replace("<", "").replace(">", "")
+
+
+def _frontmatter_description(use_when: list[str]) -> str:
+    triggers = [_clean_trigger(value) for value in use_when]
+    prefix = "Use when "
+    separator = "; "
+    available = 1024 - len(prefix) - len(separator) * (len(triggers) - 1)
+    if available >= sum(len(trigger) for trigger in triggers):
+        return prefix + separator.join(triggers)
+
+    # Keep every trigger represented when the platform limit forces truncation.
+    initial_share = max(1, available // len(triggers))
+    lengths = [min(len(trigger), initial_share) for trigger in triggers]
+    remaining = max(0, available - sum(lengths))
+    for index, trigger in enumerate(triggers):
+        extra = min(len(trigger) - lengths[index], remaining)
+        lengths[index] += extra
+        remaining -= extra
+    shortened = [
+        trigger[: lengths[index]] for index, trigger in enumerate(triggers)
+    ]
+    return (prefix + separator.join(shortened))[:1024].rstrip()
+
+
+def _short_description(execution: dict[str, Any]) -> str:
+    identity = execution["identity"]
+    description = identity["description"].strip()
+    if len(description) >= 25:
+        return description[:64]
+
+    fallback = (
+        f"{identity['name'].strip()}: "
+        f"{execution['purpose']['outcome'].strip()}"
+    )
+    if len(fallback) >= 25:
+        return fallback[:64]
+    return f"Agent Skill for guided work: {identity['name'].strip()}"[:64]
 
 
 def _markdown_literal(value: str) -> str:
@@ -152,7 +188,10 @@ def _adapter_source_map(compiled: CompileResult) -> dict[str, list[str]]:
     adapter_map.update(
         {
             "SKILL.md#name": ["/identity/id"],
-            "SKILL.md#description": ["/applicability/use_when/0"],
+            "SKILL.md#description": [
+                f"/applicability/use_when/{index}"
+                for index, _ in enumerate(applicability["use_when"])
+            ],
             "SKILL.md#identity": ["/identity"],
             "SKILL.md#identity/name": ["/identity/name"],
             "SKILL.md#identity/description": ["/identity/description"],
@@ -270,7 +309,7 @@ def render_codex_skill(
     agents.mkdir(parents=True, exist_ok=False)
 
     description = _frontmatter_description(
-        execution["applicability"]["use_when"][0]
+        execution["applicability"]["use_when"]
     )
     skill_text = "\n".join(
         [
@@ -293,7 +332,7 @@ def render_codex_skill(
             "  display_name: "
             + json.dumps(identity["name"], ensure_ascii=False),
             "  short_description: "
-            + json.dumps(identity["description"][:64], ensure_ascii=False),
+            + json.dumps(_short_description(execution), ensure_ascii=False),
             "  default_prompt: "
             + json.dumps(default_prompt, ensure_ascii=False),
             "",

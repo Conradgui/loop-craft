@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import shutil
@@ -37,6 +38,60 @@ def test_verify_build_reports_drift_without_changing_artifact(
         verification["actual_artifact_digest"]
     )
     assert skill_file.read_bytes() == edited_content
+
+
+@pytest.mark.parametrize(
+    "missing_file",
+    [
+        "accepted-definition.json",
+        "final-execution-ir.json",
+        "source-map.json",
+        "validation-report.json",
+        "build-manifest.json",
+    ],
+)
+def test_verify_build_rejects_each_missing_evidence_file_without_reading_manifest(
+    tmp_path: Path,
+    missing_file: str,
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    (result.evidence_dir / missing_file).unlink()
+
+    with pytest.raises(ValueError, match="evidence"):
+        verify_build(result.output_root)
+
+
+def test_verify_build_rejects_empty_artifact_directory_without_changes(
+    tmp_path: Path,
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    empty_dir = result.artifact_dir / "empty"
+    empty_dir.mkdir()
+    artifact_before = file_snapshot(result.artifact_dir)
+
+    with pytest.raises(ValueError, match="empty"):
+        verify_build(result.output_root)
+
+    assert empty_dir.is_dir()
+    assert file_snapshot(result.artifact_dir) == artifact_before
+
+
+def test_verify_build_rejects_evidence_digest_mismatch_without_changes(
+    tmp_path: Path,
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    definition_path = result.evidence_dir / "accepted-definition.json"
+    definition = json.loads(definition_path.read_text(encoding="utf-8"))
+    definition["profile"] = "tampered-profile"
+    definition_path.write_text(json.dumps(definition), encoding="utf-8")
+    artifact_before = file_snapshot(result.artifact_dir)
+    evidence_before = file_snapshot(result.evidence_dir)
+
+    with pytest.raises(ValueError, match="digest"):
+        verify_build(result.output_root)
+
+    assert file_snapshot(result.artifact_dir) == artifact_before
+    assert file_snapshot(result.evidence_dir) == evidence_before
 
 
 def test_verify_build_rejects_symlinked_skill_directory_without_changes(

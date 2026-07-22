@@ -167,11 +167,13 @@ def test_adapter_quotes_frontmatter_and_preserves_rich_applicability(
     assert len(description) <= 1024
     assert "<" not in description
     assert ">" not in description
+    assert "a second: trigger also applies" in description
     for original in (*use_when, *do_not_use_when):
         assert markdown_literal(original) in body
 
     assert result.source_map["SKILL.md#description"] == [
-        "/applicability/use_when/0"
+        "/applicability/use_when/0",
+        "/applicability/use_when/1",
     ]
     assert result.source_map["SKILL.md#applicability"] == [
         "/applicability/use_when/0",
@@ -179,6 +181,56 @@ def test_adapter_quotes_frontmatter_and_preserves_rich_applicability(
         "/applicability/do_not_use_when/0",
         "/applicability/do_not_use_when/1",
     ]
+
+
+def test_frontmatter_description_includes_all_use_when_triggers(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    use_when = [
+        "the target needs a bounded repair",
+        "fresh evidence shows material drift <in scope>",
+    ]
+    definition["behavior_contract"]["applicability"]["use_when"] = use_when
+
+    result = render_codex_skill(
+        compile_definition(definition), tmp_path / "multi-trigger"
+    )
+    skill_text = (result.skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    frontmatter, _ = parse_frontmatter(skill_text)
+    description = json.loads(frontmatter["description"])
+
+    assert description.startswith("Use when ")
+    assert "the target needs a bounded repair" in description
+    assert "fresh evidence shows material drift in scope" in description
+    assert "<" not in description
+    assert ">" not in description
+    assert len(description) <= 1024
+    assert result.source_map["SKILL.md#description"] == [
+        "/applicability/use_when/0",
+        "/applicability/use_when/1",
+    ]
+
+
+def test_openai_yaml_uses_valid_semantic_fallback_for_short_description(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    contract = definition["behavior_contract"]
+    contract["identity"]["name"] = "X"
+    contract["identity"]["description"] = "Y"
+    contract["purpose"]["outcome"] = "Z"
+
+    result = render_codex_skill(
+        compile_definition(definition), tmp_path / "short-description"
+    )
+    openai_yaml = (result.skill_dir / "agents" / "openai.yaml").read_text(
+        encoding="utf-8"
+    )
+    short_description = json.loads(openai_yaml.splitlines()[2].split(": ", 1)[1])
+
+    assert short_description == "Agent Skill for guided work: X"
+    assert 25 <= len(short_description) <= 64
 
 
 def test_markdown_free_text_is_rendered_as_single_line_json_literals(

@@ -68,6 +68,10 @@ def test_core_build_reference_documents_exact_cli_commands() -> None:
 
     assert BUILD_COMMAND in reference
     assert VERIFY_COMMAND in reference
+    assert (
+        "The runtime must provide Python and jsonschema; if either dependency "
+        "is missing, stop and do not guess or install it."
+    ) in reference
 
 
 def test_product_skill_runs_build_clean_and_drift_verify_from_skill_directory(

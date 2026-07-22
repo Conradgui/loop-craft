@@ -9,7 +9,7 @@
 | G-02 输入契约与范围 | R-001、R-002 | 在代码/Schema/证据中明确首条切片是 Accepted Definition 的受限子集；首条切片明确一个 Loop，或实现并测试空/多 Loop；不得宣称完整 Semantic IR、Runtime 或三入口已完成。 | G-02-T1 至 G-02-T5 已验证；Task 5 只投影干净目标 Skill，并明确排除 Evidence、Runtime、Library 与后续范围 | 部分验证（Task 1-5 已验证；后续范围 OPEN） |
 | G-03 编译与 Source Map | R-002、R-003 | 重复构建产生相同 IR、artifact 和摘要；每个关键生成字段、当前 Profile 的 Loop 和元数据都有可回溯映射；Manifest 明确 Semantic IR、Execution IR、Override/no-override、Compiler、Adapter、Profile、Artifact 摘要。 | Task 4 Compiler、Task 5 Adapter、Task 6 Manifest、Task 7 deterministic dual-build 与 Task 8 clean/drift 摘要核对子范围已验证 | 部分完成（Compiler + Adapter + Manifest + 双构建 + drift 子范围） |
 | G-04 产物与证据隔离 | R-003、R-004 | artifact 与 evidence 为兄弟目录；证据绑定 artifact digest；Adapter/Evidence 任一中途失败不留下可被误用的部分输出；漂移验证不修改 artifact。 | Task 6 已验证隔离/摘要绑定/写入前拒绝；Task 7 已验证 staging 与部分失败路径；Task 8 已验证非破坏性 drift、唯一 artifact 根条目及直接 symlink 读取边界。普通已有输出、Evidence 写入中途失败、强杀与非本地 FS 仍无证据 | 部分完成（Task 6-8 子范围；不得关闭） |
-| G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-20-core-vertical-slice-execution.md` 及 build evidence | OPEN |
+| G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-22-core-vertical-slice-execution.md` 及 build evidence | OPEN |
 
 ### G-02-T1 子门槛
 
