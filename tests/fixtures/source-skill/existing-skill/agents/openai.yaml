@@ -1,0 +1,4 @@
+interface:
+  display_name: "Existing Skill"
+  short_description: "Repair an existing result with its original resources"
+  default_prompt: "Use $existing-skill to repair this result."

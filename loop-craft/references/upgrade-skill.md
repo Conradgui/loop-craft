@@ -92,21 +92,21 @@ Open decisions:
 
 ## 6. Apply the Core compatibility gate
 
-The current Core and Skill Adapter can safely build an upgrade only when all are true:
+The current Core and Skill Packaging Adapter can safely build an upgrade only when all are true:
 
 - the approved verdict is `loop_first_skill` with exactly one defining Loop;
 - the recovered behavior contract maps without semantic loss to the current accepted-definition schema;
-- the complete generated Skill can stand alone without preserving any critical existing scripts, assets, references, metadata extensions, or other external resources; and
+- the source package contains only reviewable standard Skill roots and can be inventoried without links or unresolved files; and
 - no approved finding requires unsupported behavior or a second Loop.
 
 If any condition fails, stop at **Assessment only**. Return the Decision Record and the unsupported boundary. Do not flatten multiple or embedded Loops, drop critical resources, or claim that a generated replacement is a complete upgrade.
 
-If the gate passes, map the approved contract to one accepted definition using profile `core-slice-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Show the mapping and target paths, then obtain approval before writing.
+If the gate passes, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Inventory the source package, show the mapping and reviewed manifest, then obtain approval before building.
 
 ## 7. Perform the approved upgrade
 
 After approval, re-read the target. If it changed materially or implementation requires a new finding, boundary, resource, or authority, stop for renewed approval.
 
-Build the replacement into a new output directory; do not edit or overwrite the source Skill. Follow [core-build.md](core-build.md) for the command and failure handling. The output must contain the complete generated Skill and its separate Evidence package.
+Build the replacement into a new output directory with both `--source-skill` and `--package-manifest`; do not edit or overwrite the source Skill. Follow [core-build.md](core-build.md) for the exact inventory/build commands and failure handling. The output must contain the complete source-preserving Skill and its separate source-bound Evidence package.
 
 Report the Decision Record, approved finding IDs, generated Skill path, Evidence path, preserved behavior, checks actually performed, and unresolved risks. Do not claim a complete upgrade when the Core compatibility gate did not pass.

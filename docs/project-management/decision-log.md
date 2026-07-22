@@ -137,3 +137,11 @@ Phase 1 的四类判断全部保留：`keep_as_skill`、`embedded_loop`、`loop_
 Workflow Skill Creator 只复用“先总结已发生事实、让用户纠正、逐步恢复严格/灵活步骤、依赖和错误行为、再显式批准”的抽取方法。其领域包、固定运行器、所有 I/O 必须 CLI、固定安装路径、API 限流和独立测试阶段不进入 Loop Craft 产品 Skill。
 
 当前路由完成不等于完整端到端第三入口：0-loop 普通 Skill 尚无对应 Packaging Adapter；入口 Workflow Model/澄清/批准记录只能作为 manifest-unbound 补充证据。下一主线应补这两个产品缺口，再开始真实用户任务验证。
+
+### D-019 Packaging 使用新 Profile 与显式 Source Package Manifest
+
+`core-slice-v0.1` 继续保持恰好一个 Loop；Packaging 新增 `skill-package-v0.1`，允许普通 Workflow（0 Loop）或一个 Loop，但禁止 workflow 与 Loop 同时存在。普通 Skill 由 workflow 合同生成；既有 Skill 升级通过获批 Source Package Manifest 保留资源并 overlay Loop。
+
+源路径是构建时参数，不进入 IR、Artifact 或 Evidence。Evidence 只记录规范化相对路径、逐文件摘要、动作和整个源包摘要；Build Manifest 绑定 Source Package Manifest digest。Adapter 同时记录 Compatibility/Conformance，Required unsupported 阻断，Optional unsupported 明确 degraded。
+
+该方案以一个额外 profile 和一个窄 source inventory 模块补齐真实用户交付，没有新建第二套 Compiler、Adapter Router 或 Entry Framework。剩余主线只有入口来源证据绑定；多 Loop、Runtime、Library Edition、发布和分布式/事务式源快照继续不进入当前阶段。

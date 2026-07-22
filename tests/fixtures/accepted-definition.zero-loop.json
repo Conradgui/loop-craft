@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1.0",
+  "profile": "skill-package-v0.1",
+  "behavior_contract": {
+    "identity": {
+      "id": "release-checklist",
+      "name": "Release Checklist",
+      "version": "0.1.0",
+      "description": "Prepare a release through an approved fixed workflow."
+    },
+    "purpose": {
+      "outcome": "produce a checked release handoff"
+    },
+    "applicability": {
+      "use_when": ["a fixed release handoff needs to be prepared"],
+      "do_not_use_when": ["fresh evidence must select a different next repair"]
+    },
+    "interface": {
+      "inputs": ["release_scope"],
+      "outputs": ["release_handoff"]
+    },
+    "authority": {
+      "allowed": ["read_release_scope", "write_handoff"],
+      "approval_required": ["publish_release"],
+      "forbidden": ["change_release_scope"]
+    },
+    "capabilities": {
+      "required": ["filesystem.read", "filesystem.write"],
+      "optional": []
+    },
+    "workflow": {
+      "steps": [
+        "Read the approved release scope.",
+        "Prepare the release handoff in the required order."
+      ],
+      "success_evidence": ["The handoff contains every approved release item."],
+      "failure_or_stop": ["Stop when the approved release scope is missing or contradictory."]
+    }
+  },
+  "loops": []
+}

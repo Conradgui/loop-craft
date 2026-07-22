@@ -7,7 +7,16 @@ import re
 import tempfile
 from typing import Any
 
-from .adapters.codex_skill import directory_digest, render_codex_skill
+from .adapters.codex_skill import (
+    directory_digest,
+    render_codex_skill,
+    validate_compatibility_contract,
+)
+from .adapters.source_skill import (
+    is_link_or_junction,
+    load_reviewed_manifest,
+    validate_source_manifest,
+)
 from .canonical import sha256_digest
 from .compiler import compile_definition
 from .evidence.package import package_evidence
@@ -25,12 +34,46 @@ class BuildResult:
     manifest: dict[str, Any]
 
 
-def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
+def _ensure_source_output_separate(
+    source_skill_dir: Path,
+    output_root: Path,
+) -> None:
+    source = source_skill_dir.resolve()
+    output = output_root.resolve()
+    if source == output or source in output.parents or output in source.parents:
+        raise ValueError("source Skill and build output must not overlap")
+
+
+def build_definition(
+    definition_path: Path,
+    output_root: Path,
+    *,
+    source_skill_dir: Path | None = None,
+    package_manifest_path: Path | None = None,
+) -> BuildResult:
+    if (source_skill_dir is None) != (package_manifest_path is None):
+        raise ValueError(
+            "source Skill and package manifest must be provided together"
+        )
     definition = json.loads(definition_path.read_text(encoding="utf-8"))
     validate_definition(definition)
     compiled = compile_definition(definition)
 
-    if output_root.exists() or output_root.is_symlink():
+    source_manifest: dict[str, Any] | None = None
+    if source_skill_dir is not None and package_manifest_path is not None:
+        if definition["profile"] != "skill-package-v0.1" or len(
+            definition["loops"]
+        ) != 1:
+            raise ValueError(
+                "source Skill builds require skill-package-v0.1 with exactly one Loop"
+            )
+        _ensure_source_output_separate(source_skill_dir, output_root)
+        source_manifest = load_reviewed_manifest(
+            source_skill_dir,
+            package_manifest_path,
+        )
+
+    if output_root.exists() or is_link_or_junction(output_root):
         raise FileExistsError(f"Output already exists: {output_root}")
     output_root.parent.mkdir(parents=True, exist_ok=True)
 
@@ -39,12 +82,18 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
         prefix=f".{output_root.name}.",
     ) as temporary:
         staging_root = Path(temporary) / "output"
-        artifact = render_codex_skill(compiled, staging_root / "artifact")
+        artifact = render_codex_skill(
+            compiled,
+            staging_root / "artifact",
+            source_skill_dir=source_skill_dir,
+            source_manifest=source_manifest,
+        )
         evidence = package_evidence(
             definition=definition,
             compiled=compiled,
             artifact=artifact,
             evidence_dir=staging_root / "evidence",
+            source_manifest=source_manifest,
         )
         staging_root.replace(output_root)
 
@@ -57,18 +106,18 @@ def build_definition(definition_path: Path, output_root: Path) -> BuildResult:
 
 
 def verify_build(output_root: Path) -> dict[str, str]:
-    if output_root.is_symlink():
-        raise ValueError("build output must not be a symlink")
+    if is_link_or_junction(output_root):
+        raise ValueError("build output must not be a link or junction")
     if not output_root.is_dir():
         raise ValueError("build output must be a directory")
 
     evidence_root = output_root / "evidence"
-    if evidence_root.is_symlink():
-        raise ValueError("evidence directory must not be a symlink")
+    if is_link_or_junction(evidence_root):
+        raise ValueError("evidence directory must not be a link or junction")
     if not evidence_root.is_dir():
         raise ValueError("evidence directory is missing")
 
-    expected_evidence_files = {
+    base_evidence_files = {
         "accepted-definition.json",
         "final-execution-ir.json",
         "source-map.json",
@@ -76,19 +125,14 @@ def verify_build(output_root: Path) -> dict[str, str]:
         "build-manifest.json",
     }
     evidence_entries = list(evidence_root.iterdir())
-    if any(path.is_symlink() for path in evidence_entries):
-        raise ValueError("evidence files must not be symlinks")
-    if (
-        {path.name for path in evidence_entries} != expected_evidence_files
-        or any(not path.is_file() for path in evidence_entries)
-    ):
-        raise ValueError(
-            "evidence directory must contain exactly the five required files"
-        )
+    if any(is_link_or_junction(path) for path in evidence_entries):
+        raise ValueError("evidence files must not be links or junctions")
+    if any(not path.is_file() for path in evidence_entries):
+        raise ValueError("evidence directory may contain only regular files")
 
     manifest_path = evidence_root / "build-manifest.json"
-    if manifest_path.is_symlink():
-        raise ValueError("build manifest must not be a symlink")
+    if is_link_or_junction(manifest_path):
+        raise ValueError("build manifest must not be a link or junction")
 
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -115,6 +159,23 @@ def verify_build(output_root: Path) -> dict[str, str]:
 
     if not isinstance(manifest, dict):
         raise ValueError("evidence manifest must be an object")
+    if "compatibility_report" not in manifest or "conformance" not in manifest:
+        raise ValueError("evidence manifest is missing adapter contracts")
+    source_binding_fields = {
+        "source_package_manifest_digest",
+        "source_skill_digest",
+    }
+    bound_source = source_binding_fields.issubset(manifest)
+    if bool(source_binding_fields & set(manifest)) != bound_source:
+        raise ValueError("evidence source package binding is incomplete")
+    expected_evidence_files = set(base_evidence_files)
+    if bound_source:
+        expected_evidence_files.add("source-package-manifest.json")
+    if {path.name for path in evidence_entries} != expected_evidence_files:
+        count = "six" if bound_source else "five"
+        raise ValueError(
+            f"evidence directory must contain exactly the {count} bound files"
+        )
     if not isinstance(accepted_definition, dict) or not isinstance(
         execution_ir, dict
     ):
@@ -153,6 +214,36 @@ def verify_build(output_root: Path) -> dict[str, str]:
         value = manifest[field]
         if not isinstance(value, str) or DIGEST_CONTRACT.fullmatch(value) is None:
             raise ValueError(f"evidence manifest {field} digest contract is invalid")
+    if bound_source:
+        for field in source_binding_fields:
+            value = manifest[field]
+            if (
+                not isinstance(value, str)
+                or DIGEST_CONTRACT.fullmatch(value) is None
+            ):
+                raise ValueError(
+                    f"evidence manifest {field} digest contract is invalid"
+                )
+        try:
+            source_manifest = json.loads(
+                (evidence_root / "source-package-manifest.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError("evidence source package manifest is invalid") from exc
+        validate_source_manifest(source_manifest)
+        if sha256_digest(source_manifest) != manifest[
+            "source_package_manifest_digest"
+        ]:
+            raise ValueError(
+                "evidence source package manifest digest does not match"
+            )
+        if (
+            source_manifest["source_skill_digest"]
+            != manifest["source_skill_digest"]
+        ):
+            raise ValueError("evidence source Skill digest does not match")
     try:
         semantic_payload = {
             "schema_version": accepted_definition["schema_version"],
@@ -181,16 +272,21 @@ def verify_build(output_root: Path) -> dict[str, str]:
         raise ValueError(
             "evidence execution IR definition does not match manifest"
         )
+    validate_compatibility_contract(
+        execution_ir,
+        manifest["compatibility_report"],
+        manifest["conformance"],
+    )
 
     artifact_root = output_root / "artifact"
-    if artifact_root.is_symlink():
-        raise ValueError("artifact root must not be a symlink")
+    if is_link_or_junction(artifact_root):
+        raise ValueError("artifact root must not be a link or junction")
     if not artifact_root.is_dir():
         raise ValueError("artifact root must be a directory")
 
     artifact_entries = list(artifact_root.iterdir())
-    if any(path.is_symlink() for path in artifact_entries):
-        raise ValueError("artifact root must not contain symlinks")
+    if any(is_link_or_junction(path) for path in artifact_entries):
+        raise ValueError("artifact root must not contain links or junctions")
 
     artifact_dirs = [path for path in artifact_entries if path.is_dir()]
     if len(artifact_entries) != 1 or len(artifact_dirs) != 1:

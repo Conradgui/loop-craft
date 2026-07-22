@@ -68,6 +68,20 @@ def test_evidence_package_is_separate_and_binds_the_complete_build(
         "profile_digest": sha256_digest(
             {"platform": "codex", "profile_version": "0.1.0"}
         ),
+        "compatibility_report": {
+            "schema_version": "codex-compatibility-v0.1",
+            "platform": "codex",
+            "overall": "native",
+            "required": [
+                {"capability": "filesystem.read", "status": "native"},
+                {"capability": "filesystem.write", "status": "native"},
+                {"capability": "validation.execute", "status": "native"},
+            ],
+            "optional": [
+                {"capability": "git.diff", "status": "native"}
+            ],
+        },
+        "conformance": "self_contained",
         "artifact_digest": artifact.artifact_digest,
     }
     assert result.manifest == expected_manifest

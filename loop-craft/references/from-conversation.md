@@ -73,7 +73,7 @@ Use the exact seven-item gate in [upgrade-skill.md](upgrade-skill.md), and do no
 
 Classify the recovered workflow as follows:
 
-- **0 qualifying Loops** — return a one-shot Workflow / Skill assessment. Do not invoke the Core.
+- **0 qualifying Loops** — preserve the one-shot Workflow and, after approval, package it as an ordinary Skill using `skill-package-v0.1` with `workflow.steps`, `success_evidence`, and `failure_or_stop`.
 - **More than 1 independent Loop, or a contract that cannot be expressed without semantic loss** — stop at Candidate/Assessment and state the unsupported multi-Loop boundary. Do not compress or call the Core.
 - **Exactly 1 defining Loop** — continue to the shared Candidate Review, then the current Core compatibility gate.
 
@@ -83,11 +83,11 @@ Supporting feedback inside a larger staged workflow does not become a defining L
 
 Read [candidate-review.md](candidate-review.md) and use its review packet and approval rules for every entry. Do not write an accepted definition or output directory before explicit approval.
 
-After approval, the candidate must pass the current `core-slice-v0.1` compatibility gate: one defining Loop, no semantic loss, and no critical external scripts, assets, references, metadata extensions, or unsupported behavior required by the contract. Then follow [core-build.md](core-build.md) for the real build command.
+After approval, route a zero-Loop Workflow to `skill-package-v0.1`, or route exactly one defining Loop to the compatible single-Loop build. Do not compress multi-Loop or unsupported behavior. Then follow [core-build.md](core-build.md) for the real build command.
 
-The deterministic Core currently binds the accepted definition to its compiled manifest and evidence. It does not bind Conversation-entry provenance. Do not claim otherwise.
+The deterministic Core binds the accepted definition and any reviewed source-package manifest to its compiled manifest and evidence. It does not yet bind Conversation-entry provenance. Do not claim otherwise.
 
-After a successful build, preserve the Workflow Model, source references, clarification answers, and approval record in a supplemental `entry-evidence.md` at the build output root, outside both `artifact/` and the deterministic `evidence/` directory. Label it **supplemental, manifest-unbound entry evidence**. Do not add files to the deterministic `evidence/` directory: the current verifier requires exactly its five Core-generated files.
+After a successful build, preserve the Workflow Model, source references, clarification answers, and approval record in a supplemental `entry-evidence.md` at the build output root, outside both `artifact/` and the deterministic `evidence/` directory. Label it **supplemental, manifest-unbound entry evidence**. Do not add entry provenance files to the deterministic `evidence/` directory; the verifier accepts exactly five generated files or six files when a source-package manifest is bound.
 
 ## 7. Artifact and evidence boundaries
 

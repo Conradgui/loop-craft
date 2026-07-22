@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.1.0",
+  "profile": "skill-package-v0.1",
+  "behavior_contract": {
+    "identity": {
+      "id": "existing-skill",
+      "name": "Existing Skill",
+      "version": "0.2.0",
+      "description": "Improve an existing result through a bounded feedback loop."
+    },
+    "purpose": {
+      "outcome": "repair the result until the approved check passes"
+    },
+    "applicability": {
+      "use_when": ["an existing result needs evidence-driven repair"],
+      "do_not_use_when": ["the result already passes the approved check"]
+    },
+    "interface": {
+      "inputs": ["target"],
+      "outputs": ["checked_target"]
+    },
+    "authority": {
+      "allowed": ["read_target", "edit_target", "run_check"],
+      "approval_required": ["publish_target"],
+      "forbidden": ["edit_unrelated_files"]
+    },
+    "capabilities": {
+      "required": ["filesystem.read", "filesystem.write"],
+      "optional": ["validation.execute"]
+    }
+  },
+  "loops": [
+    {
+      "id": "repair",
+      "cycle": {
+        "observe": "Read the target and latest check evidence.",
+        "choose": "Select one material failing check.",
+        "act": "Apply one bounded repair.",
+        "verify": "Run the approved check.",
+        "record": "Record the repair and check evidence.",
+        "adapt": "Use fresh evidence to continue or stop."
+      },
+      "terminal_states": {
+        "success": "The approved check passes.",
+        "clean_no_op": "The target already passes.",
+        "blocked": "Required evidence or authority is missing.",
+        "stagnated": "Fresh evidence no longer changes the next action.",
+        "exhausted": "The approved repair budget is exhausted."
+      },
+      "invariants": ["Preserve unrelated files.", "Do not publish without approval."]
+    }
+  ]
+}

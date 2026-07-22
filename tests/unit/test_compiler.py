@@ -14,6 +14,11 @@ FIXTURE = (
     / "fixtures"
     / "accepted-definition.valid.json"
 )
+ZERO_LOOP_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures"
+    / "accepted-definition.zero-loop.json"
+)
 CYCLE_ORDER = ("observe", "choose", "act", "verify", "record", "adapt")
 
 
@@ -134,3 +139,17 @@ def test_compiler_validates_before_projecting_the_definition() -> None:
 
     with pytest.raises(DefinitionValidationError):
         compile_definition(definition)
+
+
+def test_compiler_projects_optional_workflow_without_synthesizing_a_loop() -> None:
+    definition = json.loads(ZERO_LOOP_FIXTURE.read_text(encoding="utf-8"))
+
+    result = compile_definition(definition)
+
+    assert result.final_execution_ir["workflow"] == definition[
+        "behavior_contract"
+    ]["workflow"]
+    assert result.final_execution_ir["loops"] == []
+    assert result.source_map["/workflow/steps/0"] == [
+        "/behavior_contract/workflow/steps/0"
+    ]

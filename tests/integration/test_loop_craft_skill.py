@@ -8,10 +8,10 @@ ROOT = Path(__file__).resolve().parents[2]
 SKILL = ROOT / "loop-craft"
 FIXTURE = ROOT / "tests" / "fixtures" / "accepted-definition.valid.json"
 
-EXPECTED_SHORT_DESCRIPTION = "Build accepted definitions and verify artifact drift"
+EXPECTED_SHORT_DESCRIPTION = "Design, upgrade, and package bounded agent workflows"
 EXPECTED_DEFAULT_PROMPT = (
-    "Use $loop-craft to build an accepted definition or verify an existing "
-    "build for artifact drift."
+    "Use $loop-craft to design, distill, or upgrade a workflow and package "
+    "the approved result as a Skill with separate evidence."
 )
 EXPECTED_OPENAI_YAML = (
     "interface:\n"

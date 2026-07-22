@@ -23,7 +23,7 @@ When the target is an existing Agent Skill, read [references/upgrade-skill.md](r
 
 - Assess the complete Skill contract before proposing a Loop architecture.
 - Return the Decision Record before requesting approval to modify anything.
-- Build only when the approved design passes the current Core compatibility gate. Otherwise return the Assessment without compressing the design into the single-Loop profile.
+- Build a one-Loop upgrade through the source-preserving Packaging route when the approved design passes the current compatibility gate. Inventory and review the complete source package before building; otherwise return the Assessment without compressing the design into the single-Loop profile.
 - The deliverable remains a complete discoverable Skill, not a standalone Loop fragment.
 
 ## Conversation distillation
@@ -34,7 +34,7 @@ When the user wants to turn an authorized completed conversation, interaction, o
 - Recover an observed Workflow Model before proposing any Loop; keep observed, inferred, proposed, missing, and conflict facts separate.
 - Ask one high-value clarification question at a time, with the current understanding, evidence or gap, impact, and a proposed interpretation.
 - Reuse the same seven-item Loopability Gate and the shared [candidate-review.md](references/candidate-review.md) gate used by the other entries.
-- Build through the current Core only for exactly one defining Loop that fits `core-slice-v0.1` without semantic loss. A one-shot workflow or a multi-loop/unsupported workflow stops at assessment or Candidate and does not call the Core.
+- Build an approved one-shot workflow as an ordinary zero-Loop Skill through `skill-package-v0.1`. Build exactly one defining Loop when it maps without semantic loss. A multi-loop or otherwise unsupported workflow stops at assessment or Candidate and does not call the Core.
 - Keep the final Skill artifact separate from the original conversation and development record; preserve the Workflow Model, clarifications, and approval trail only in Evidence.
 
 ## Accepted definition build or drift verification
@@ -47,4 +47,4 @@ Read [references/core-build.md](references/core-build.md) before running a comma
 
 ## Current boundary
 
-This version supports From-scratch single-Loop design, existing-Skill assessment with a narrowly gated single-Loop upgrade, authorized Conversation Distillation with the same narrowly gated single-Loop build path, accepted-definition builds, and drift verification. Multi-Loop builds, Runtime, Override, Subloop, scheduling, publishing, installation, and Library Edition remain outside the current boundary. State that boundary when it affects the request instead of silently approximating support.
+This version supports From-scratch single-Loop design, ordinary zero-Loop Skill packaging, existing-Skill assessment with a source-preserving single-Loop upgrade, authorized Conversation Distillation into either an ordinary zero-Loop Skill or a compatible single-Loop Skill, accepted-definition builds, and drift verification. Multi-Loop builds, Runtime, Override, Subloop, scheduling, publishing, installation, and Library Edition remain outside the current boundary. State that boundary when it affects the request instead of silently approximating support.

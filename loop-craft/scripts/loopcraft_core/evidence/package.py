@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from ..adapters.codex_skill import SkillArtifact, directory_digest
+from ..adapters.source_skill import validate_source_manifest
 from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
 
@@ -68,6 +69,7 @@ def package_evidence(
     compiled: CompileResult,
     artifact: SkillArtifact,
     evidence_dir: Path,
+    source_manifest: dict[str, Any] | None = None,
 ) -> EvidenceResult:
     _validate_inputs(
         definition=definition,
@@ -75,13 +77,15 @@ def package_evidence(
         artifact=artifact,
         evidence_dir=evidence_dir,
     )
+    if source_manifest is not None:
+        validate_source_manifest(source_manifest)
     evidence_dir.mkdir(parents=True, exist_ok=False)
     validation_report = {
         "schema_validation": "passed",
         "semantic_validation": "passed",
         "accepted_definition": True,
     }
-    manifest = {
+    manifest: dict[str, Any] = {
         "schema_version": "0.1.0",
         "definition_digest": sha256_digest(definition),
         "semantic_ir_digest": sha256_digest(
@@ -99,12 +103,21 @@ def package_evidence(
         "override_digest": None,
         "compiler_version": compiled.final_execution_ir["compiler_version"],
         "adapter": "codex-skill",
-        "adapter_version": "0.1.0",
+        "adapter_version": "0.2.0" if source_manifest is not None else "0.1.0",
         "profile_digest": sha256_digest(
             {"platform": "codex", "profile_version": "0.1.0"}
         ),
+        "compatibility_report": artifact.compatibility_report,
+        "conformance": artifact.conformance,
         "artifact_digest": artifact.artifact_digest,
     }
+    if source_manifest is not None:
+        manifest["source_package_manifest_digest"] = sha256_digest(
+            source_manifest
+        )
+        manifest["source_skill_digest"] = source_manifest[
+            "source_skill_digest"
+        ]
 
     _write_json(evidence_dir / "accepted-definition.json", definition)
     _write_json(
@@ -113,5 +126,10 @@ def package_evidence(
     )
     _write_json(evidence_dir / "source-map.json", artifact.source_map)
     _write_json(evidence_dir / "validation-report.json", validation_report)
+    if source_manifest is not None:
+        _write_json(
+            evidence_dir / "source-package-manifest.json",
+            source_manifest,
+        )
     _write_json(evidence_dir / "build-manifest.json", manifest)
     return EvidenceResult(evidence_dir, manifest)

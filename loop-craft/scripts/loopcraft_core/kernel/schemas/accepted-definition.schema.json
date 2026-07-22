@@ -14,7 +14,9 @@
   "required": ["schema_version", "profile", "behavior_contract", "loops"],
   "properties": {
     "schema_version": {"const": "0.1.0"},
-    "profile": {"const": "core-slice-v0.1"},
+    "profile": {
+      "enum": ["core-slice-v0.1", "skill-package-v0.1"]
+    },
     "behavior_contract": {
       "type": "object",
       "additionalProperties": false,
@@ -119,12 +121,34 @@
               "uniqueItems": true
             }
           }
+        },
+        "workflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["steps", "success_evidence", "failure_or_stop"],
+          "properties": {
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/nonBlankString"}
+            },
+            "success_evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/nonBlankString"}
+            },
+            "failure_or_stop": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/nonBlankString"}
+            }
+          }
         }
       }
     },
     "loops": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "maxItems": 1,
       "items": {
         "type": "object",
@@ -169,5 +193,51 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"profile": {"const": "core-slice-v0.1"}},
+        "required": ["profile"]
+      },
+      "then": {
+        "properties": {
+          "behavior_contract": {
+            "properties": {"workflow": false}
+          },
+          "loops": {"minItems": 1, "maxItems": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "profile": {"const": "skill-package-v0.1"},
+          "loops": {"maxItems": 0}
+        },
+        "required": ["profile", "loops"]
+      },
+      "then": {
+        "properties": {
+          "behavior_contract": {"required": ["workflow"]}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "profile": {"const": "skill-package-v0.1"},
+          "loops": {"minItems": 1}
+        },
+        "required": ["profile", "loops"]
+      },
+      "then": {
+        "properties": {
+          "behavior_contract": {
+            "properties": {"workflow": false}
+          }
+        }
+      }
+    }
+  ]
 }

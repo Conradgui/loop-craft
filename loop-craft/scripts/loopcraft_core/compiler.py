@@ -34,6 +34,15 @@ def compile_definition(definition: dict[str, Any]) -> CompileResult:
         "/authority": ["/behavior_contract/authority"],
         "/capabilities": ["/behavior_contract/capabilities"],
     }
+    compiled_workflow: dict[str, list[str]] | None = None
+    if "workflow" in contract:
+        compiled_workflow = copy.deepcopy(contract["workflow"])
+        source_map["/workflow"] = ["/behavior_contract/workflow"]
+        for category in ("steps", "success_evidence", "failure_or_stop"):
+            for index, _ in enumerate(compiled_workflow[category]):
+                source_map[f"/workflow/{category}/{index}"] = [
+                    f"/behavior_contract/workflow/{category}/{index}"
+                ]
 
     for loop_index, loop in enumerate(snapshot["loops"]):
         nodes: list[dict[str, str]] = []
@@ -89,4 +98,6 @@ def compile_definition(definition: dict[str, Any]) -> CompileResult:
         "capabilities": contract["capabilities"],
         "loops": compiled_loops,
     }
+    if compiled_workflow is not None:
+        final_execution_ir["workflow"] = compiled_workflow
     return CompileResult(final_execution_ir, source_map)

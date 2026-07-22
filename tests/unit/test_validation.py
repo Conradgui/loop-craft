@@ -16,6 +16,11 @@ FIXTURE = (
     / "fixtures"
     / "accepted-definition.valid.json"
 )
+ZERO_LOOP_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures"
+    / "accepted-definition.zero-loop.json"
+)
 
 
 def load_valid() -> dict:
@@ -165,3 +170,26 @@ def test_core_slice_requires_exactly_one_loop(loop_count: int) -> None:
         validate_definition(candidate)
 
     assert any(issue.path == "/loops" for issue in captured.value.issues)
+
+
+def test_skill_package_accepts_zero_loop_only_with_complete_workflow() -> None:
+    candidate = json.loads(ZERO_LOOP_FIXTURE.read_text(encoding="utf-8"))
+    validate_definition(candidate)
+
+    candidate["behavior_contract"]["workflow"]["steps"] = []
+    with pytest.raises(DefinitionValidationError):
+        validate_definition(candidate)
+
+
+def test_skill_package_rejects_workflow_together_with_one_loop() -> None:
+    candidate = json.loads(ZERO_LOOP_FIXTURE.read_text(encoding="utf-8"))
+    candidate["loops"] = copy.deepcopy(load_valid()["loops"])
+
+    with pytest.raises(DefinitionValidationError) as captured:
+        validate_definition(candidate)
+
+    assert any(
+        issue.path == "/behavior_contract"
+        and "False schema" in issue.message
+        for issue in captured.value.issues
+    )

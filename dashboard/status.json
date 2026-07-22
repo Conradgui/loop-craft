@@ -1,16 +1,16 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-22T17:30:00+08:00",
+  "updated_at": "2026-07-22T19:10:00+08:00",
   "overall": {
-    "label": "三入口骨架已接通，Packaging 缺口进入主线",
+    "label": "Packaging 已完成，入口证据绑定进入主线",
     "tone": "ready",
-    "summary": "三个输入路由均已接通到公共 Gate / Review / Core；第三入口可恢复 Workflow Model，但普通 Skill 包装与入口证据绑定仍待补齐。"
+    "summary": "0-loop 普通 Skill 与既有 Skill 保真升级均可真实构建；下一步把 Workflow Model、澄清和批准记录绑定进 Evidence。"
   },
   "milestone": {
     "name": "M0 · 产品化纠偏",
     "state": "in_progress",
-    "progress": 76,
-    "next": "补齐普通/既有 Skill 的保真 Packaging Adapter 与入口证据绑定"
+    "progress": 86,
+    "next": "把三个入口的来源、澄清和批准记录纳入可校验 Evidence"
   },
   "metrics": [
     {"label": "用户可用 Demo", "value": "0 / 1", "tone": "neutral"},
@@ -25,11 +25,12 @@
     {"title": "实时项目看板已交付", "detail": "状态文件驱动、5 秒轮询、桌面与窄栏布局已检查", "state": "ready"},
     {"title": "From-scratch 入口已接通", "detail": "Loopy Craft 访谈 → Loopability → Candidate Review → Core build；首次真实调用待用户目标", "state": "ready"},
     {"title": "Skill Upgrade 入口已接通", "detail": "既有 Skill → 四类 Decision Record → Core compatibility gate → Skill + Evidence", "state": "ready"},
-    {"title": "Conversation Distiller 路由已接通", "detail": "授权记录 → Workflow Model → 公共 Loopability / Review → 兼容时 Core build", "state": "ready"}
+    {"title": "Conversation Distiller 路由已接通", "detail": "授权记录 → Workflow Model → 公共 Loopability / Review → 兼容时 Core build", "state": "ready"},
+    {"title": "Skill Packaging Adapter 已完成", "detail": "0-loop 普通 Skill；既有 metadata/references/scripts/assets 保真 overlay；Manifest 与 Compatibility 已绑定", "state": "ready"}
   ],
   "next_steps": [
-    {"id": "N1", "title": "补齐保真 Skill Packaging Adapter", "detail": "支持 0-loop 普通 Skill 和既有 Skill 的资源保留，不再只生成替代 Skill", "state": "active"},
-    {"id": "N2", "title": "绑定入口证据", "detail": "把 Workflow Model、澄清和批准记录纳入可校验 Evidence，而不是 manifest-unbound 补充文件", "state": "queued"},
+    {"id": "N1", "title": "补齐保真 Skill Packaging Adapter", "detail": "0-loop 普通 Skill 和既有 Skill 资源保留均已通过真实构建与官方 validator", "state": "ready"},
+    {"id": "N2", "title": "绑定入口证据", "detail": "把 Workflow Model、澄清和批准记录纳入可校验 Evidence，而不是 manifest-unbound 补充文件", "state": "active"},
     {"id": "N3", "title": "首次真实调用 Demo", "detail": "完整链路后使用用户真实目标/历史验证 Skill + Evidence", "state": "queued"}
   ],
   "work_lanes": {
@@ -37,12 +38,14 @@
       {"title": "首次 From-scratch Demo", "detail": "真实调用、确认、构建、检查 Skill + Evidence；等待用户提供真实目标", "state": "queued"},
       {"title": "Skill Upgrade 入口", "detail": "Phase 1 Assessment、四 verdict 和当前 Core compatibility gate 已接通", "state": "ready"},
       {"title": "Conversation Distiller 入口", "detail": "授权历史 → Workflow Model → 公共 Gate / Review / Core 路由已接通", "state": "ready"},
-      {"title": "Skill Packaging Adapter", "detail": "补齐普通 Skill 与既有资源包的保真生成能力", "state": "active"}
+      {"title": "Skill Packaging Adapter", "detail": "普通 Skill 与既有资源包保真生成、Compatibility 和 source manifest 已完成", "state": "ready"},
+      {"title": "入口证据绑定", "detail": "将 Workflow Model、澄清与批准记录绑定到 Build Manifest", "state": "active"}
     ]},
     "validation": {"label": "验证分支 · 只验证主线风险", "items": [
       {"title": "首次 Demo 的最小验收", "detail": "只检查用户是否能得到正确的 Skill + Evidence", "state": "queued"},
       {"title": "Skill Upgrade 最小验收", "detail": "四 verdict、审批门、单 Loop/完整 Skill 边界与官方 Skill validator 已通过", "state": "ready"},
-      {"title": "Conversation Distiller 最小验收", "detail": "来源标签、反问规则、公共 Gate/Review 复用和成品隔离已通过", "state": "ready"}
+      {"title": "Conversation Distiller 最小验收", "detail": "来源标签、反问规则、公共 Gate/Review 复用和成品隔离已通过", "state": "ready"},
+      {"title": "Packaging Adapter 定向验收", "detail": "0-loop/source-overlay 构建、官方 validator、clean verify 和 Compatibility 已通过", "state": "ready"}
     ]},
     "support": {"label": "支持 · 不抢主线", "items": [
       {"title": "看板与状态同步", "detail": "每个模块完成后更新 status.json", "state": "ready"},
@@ -51,12 +54,11 @@
   },
   "not_now": ["Runtime", "Override", "Subloop", "Library Edition", "发布与多平台 Adapter", "非阻塞边界测试"],
   "risks": [
-    {"level": "medium", "title": "现有 Skill 保真升级尚未支持", "detail": "当前 Adapter 生成新 Skill；本轮只开放可由单 Loop schema 表达且无关键外部资源依赖的子集。"},
     {"level": "medium", "title": "入口来源证据尚未绑定", "detail": "第三入口把 Workflow Model 保存在 manifest-unbound 补充记录中；不能宣称为 Core 可校验证据。"},
-    {"level": "medium", "title": "0-loop 普通 Skill 尚未包装", "detail": "第三入口可以判断普通 Workflow，但当前 Core 只构建恰好一个 Loop。"},
+    {"level": "low", "title": "源包并发变化窗口", "detail": "构建前重做 Inventory 并在复制前逐文件核对摘要；极窄的外部并发改动窗口不宣称为事务快照。"},
     {"level": "medium", "title": "首次 Demo 尚未体验", "detail": "From-scratch 入口已接通，仍需用户提供一次真实目标。"},
     {"level": "medium", "title": "0..n Loop 尚未扩展", "detail": "先保障单 Loop Demo，扩展前不把多 Loop 宣称为已支持。"},
-    {"level": "low", "title": "远端已同步", "detail": "Skill Upgrade 主线实现已提交并推送到 origin/main。"}
+    {"level": "low", "title": "远端同步待本阶段提交", "detail": "Packaging Adapter 已在本地完成，收尾提交后同步 origin/main。"}
   ],
   "activity": [
     {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
@@ -66,6 +68,7 @@
     {"date": "2026-07-22", "title": "Skill Upgrade 主线启动", "detail": "确认 Phase 1 四 verdict 可迁移；当前 Core 仅承诺单一 Loop-first、无关键外部资源依赖的构建子集。"},
     {"date": "2026-07-22", "title": "Skill Upgrade 入口已接通", "detail": "官方 Skill validator 与最小静态验收通过；质量 Agent 无阻塞发现。"},
     {"date": "2026-07-22", "title": "Conversation Distiller 主线启动", "detail": "复用已发生工作流的恢复与澄清；排除来源特定领域、CLI-first、固定运行器和安装路径假设。"},
-    {"date": "2026-07-22", "title": "Conversation Distiller 路由已接通", "detail": "三个入口均汇入公共 Gate / Review / Core；普通 Skill Packaging 和入口证据绑定仍明确待办。"}
+    {"date": "2026-07-22", "title": "Conversation Distiller 路由已接通", "detail": "三个入口均汇入公共 Gate / Review / Core；普通 Skill Packaging 和入口证据绑定仍明确待办。"},
+    {"date": "2026-07-22", "title": "Skill Packaging Adapter 已完成", "detail": "新增 skill-package-v0.1、source inventory/overlay、5/6 文件 Evidence、Compatibility/Conformance 与 junction 防护。"}
   ]
 }
