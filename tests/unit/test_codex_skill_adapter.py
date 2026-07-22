@@ -165,7 +165,10 @@ def test_adapter_rejects_frontmatter_description_over_limit(
     assert not artifact_root.exists()
 
 
-@pytest.mark.parametrize("empty_trigger", [".", "<>", "Use when ."])
+@pytest.mark.parametrize(
+    "empty_trigger",
+    [".", "<>", "Use when .", "< >", "<  >", "Use when < >."],
+)
 def test_adapter_rejects_trigger_that_is_empty_after_cleaning_without_output(
     tmp_path: Path,
     empty_trigger: str,

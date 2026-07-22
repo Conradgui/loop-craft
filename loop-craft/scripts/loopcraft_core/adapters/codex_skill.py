@@ -53,7 +53,7 @@ def _clean_trigger(use_when: str) -> str:
     prefix = "use when "
     if trigger.casefold().startswith(prefix):
         trigger = trigger[len(prefix) :].lstrip()
-    return trigger.replace("<", "").replace(">", "")
+    return trigger.replace("<", "").replace(">", "").strip()
 
 
 def _frontmatter_description(use_when: list[str]) -> str:
