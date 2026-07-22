@@ -23,7 +23,7 @@
 - [x] Use exactly seven root fields: `schema_version`, `entry_type`, `definition_digest`, `source_summary`, `clarifications`, `candidate_review`, and `approval`.
 - [x] Define `source_summary` as `kind` (`design_interview`, `skill_assessment`, or `workflow_model`), a non-empty safe `source_ids` list, a bounded `summary`, and provenance-labelled `facts`; require entry type and summary kind to match.
 - [x] Allow `clarifications: []`; each present record contains only bounded `question_summary`, `answer_summary`, and `resolution: resolved`.
-- [x] Define Candidate Review classification as `zero_loop_workflow` or `one_loop_bounded_loop` and require it to match the accepted definition's 0/1 Loop count.
+- [x] Define Candidate Review as a bounded `summary` plus classification `zero_loop_workflow` or `one_loop_bounded_loop`, and require the classification to match the accepted definition's 0/1 Loop count.
 - [x] Keep approval to `status: approved` and fixed `scope: local_artifact_and_evidence_build`; do not add identity or time fields. The root definition digest binds the record to the approved definition but is not identity authentication.
 - [x] Reject extra/raw source payload fields, absolute Windows/POSIX/UNC paths, malformed digests, unapproved records, and definition digest mismatch. State explicitly that structural validation cannot prove summary truth or complete de-identification; do not add PII scanning.
 

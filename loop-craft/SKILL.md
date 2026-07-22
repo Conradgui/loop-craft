@@ -38,7 +38,7 @@ When the user wants to turn an authorized completed conversation, interaction, o
 - Ask one high-value clarification question at a time, with the current understanding, evidence or gap, impact, and a proposed interpretation.
 - Reuse the shared Loopability Gate and Candidate Review used by the other entries.
 - Build an approved one-shot workflow as an ordinary zero-Loop Skill through `skill-package-v0.1`. Build exactly one defining Loop when it maps without semantic loss. A multi-loop or otherwise unsupported workflow stops at assessment or Candidate and does not call the Core.
-- Keep the final Skill artifact separate from the original conversation and development record; preserve only structured source summaries, safe source IDs, clarifications, Candidate Review classification, and approval in Entry Evidence.
+- Keep the final Skill artifact separate from the original conversation and development record; preserve only structured source summaries, safe source IDs, clarifications, a bounded Candidate Review summary and classification, and approval in Entry Evidence.
 
 ## Accepted definition build or drift verification
 

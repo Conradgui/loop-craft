@@ -200,6 +200,7 @@ def test_approved_entries_bind_structured_entry_evidence() -> None:
         "approval",
     ):
         assert f"`{field}`" in core_text
+    assert "`candidate_review` contains exactly a bounded `summary`" in core_text
     combined = "\n".join(
         [
             skill_text,

@@ -24,11 +24,11 @@ ENTRY_SUMMARY_KINDS = {
     "conversation": "workflow_model",
 }
 LOCAL_ABSOLUTE_PATH = re.compile(
-    r"(?i)(?:^|[\s\"'(])(?:"
-    r"[a-z]:[\\/]"
+    r"(?i)(?:"
+    r"(?<![a-z0-9])[a-z]:[\\/]"
     r"|\\\\(?:\?\\)?[^\\/\s]+[\\/][^\\/\s]+"
-    r"|/(?![\s/])"
-    r"|file:(?://)?/"
+    r"|(?<![a-z0-9:/])/(?![\s/])"
+    r"|(?<![a-z0-9])file:(?://)?/"
     r")"
 )
 

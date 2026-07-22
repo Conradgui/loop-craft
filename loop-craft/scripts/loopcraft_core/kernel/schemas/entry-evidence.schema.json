@@ -87,11 +87,12 @@
     "candidate_review": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["classification"],
+      "required": ["classification", "summary"],
       "properties": {
         "classification": {
           "enum": ["zero_loop_workflow", "one_loop_bounded_loop"]
-        }
+        },
+        "summary": {"$ref": "#/$defs/summary"}
       }
     },
     "approval": {

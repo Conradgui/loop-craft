@@ -71,13 +71,13 @@ Read [candidate-review.md](candidate-review.md) and use its review packet and ap
 
 After approval, route a zero-Loop Workflow to `skill-package-v0.1`, or route exactly one defining Loop to the compatible single-Loop build. Do not compress multi-Loop or unsupported behavior. Create the reviewed `entry-evidence-v0.1` record described in [core-build.md](core-build.md), using `entry_type: conversation` and `source_summary.kind: workflow_model`, then build with `--entry-evidence <reviewed-entry-evidence.json>`.
 
-Entry Evidence retains only safe source IDs, a bounded Workflow Model summary, provenance-labelled fact summaries, resolved clarification summaries, Candidate Review classification, and the fixed local-build approval. Never place raw conversation, absolute paths, private source material, or development records in Entry Evidence or Artifact.
+Entry Evidence retains only safe source IDs, a bounded Workflow Model summary, provenance-labelled fact summaries, resolved clarification summaries, a bounded Candidate Review summary and classification, and the fixed local-build approval. Never place raw conversation, absolute paths, private source material, or development records in Entry Evidence or Artifact.
 
 ## 7. Artifact and evidence boundaries
 
 Deliver two separate results when a build occurs:
 
 - **Artifact** — a clean, discoverable Skill containing reusable behavior and approved dependencies. It must not contain raw conversation, private development notes, or unapproved provenance.
-- **Evidence Package** — the Core-generated `evidence/` directory. Its canonical `entry-evidence.json` retains the structured Workflow Model summary, safe source IDs, provenance labels, clarification summaries, Candidate Review classification, and approval; `build-manifest.json` binds its digest and entry type alongside the accepted definition and compiled build evidence.
+- **Evidence Package** — the Core-generated `evidence/` directory. Its canonical `entry-evidence.json` retains the structured Workflow Model summary, safe source IDs, provenance labels, clarification summaries, bounded Candidate Review summary and classification, and approval; `build-manifest.json` binds its digest and entry type alongside the accepted definition and compiled build evidence.
 
 Do not run, install, publish, schedule, or connect the result to an external catalog service. Runtime, Override, Subloop, multi-platform adapters, fixed install locations, and Library Edition remain out of scope unless separately authorized.

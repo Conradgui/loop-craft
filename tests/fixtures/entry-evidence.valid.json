@@ -25,7 +25,8 @@
     }
   ],
   "candidate_review": {
-    "classification": "one_loop_bounded_loop"
+    "classification": "one_loop_bounded_loop",
+    "summary": "The reviewed candidate is one bounded Loop with local-build-only authority."
   },
   "approval": {
     "status": "approved",

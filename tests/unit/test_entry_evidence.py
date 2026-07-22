@@ -53,6 +53,9 @@ def test_accepts_zero_loop_classification_and_empty_clarifications() -> None:
     evidence["definition_digest"] = sha256_digest(definition)
     evidence["clarifications"] = []
     evidence["candidate_review"]["classification"] = "zero_loop_workflow"
+    evidence["candidate_review"]["summary"] = (
+        "The reviewed zero-Loop Workflow may cite https://example.com/path."
+    )
 
     validate_entry_evidence(evidence, definition)
 
@@ -165,7 +168,7 @@ def test_rejects_absolute_local_paths_anywhere_in_the_record(
     definition = load_json(ONE_LOOP_DEFINITION)
     evidence = valid_entry()
     evidence["source_summary"]["facts"][0]["summary"] = (
-        f"Source was read from {unsafe_value}"
+        f"source={unsafe_value}"
     )
 
     with pytest.raises(EntryEvidenceValidationError, match="absolute local path"):

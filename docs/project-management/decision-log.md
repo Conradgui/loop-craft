@@ -158,7 +158,7 @@ Existing Skill Upgrade 在 compatibility gate 通过后，必须以 Decision Rec
 
 ### D-021 Entry Evidence 是 Manifest-bound 批准摘要，不是第二套 IR
 
-三个入口统一输出一个 `entry-evidence-v0.1` 批准摘要，并通过可选 `--entry-evidence` 进入同一构建链。合同根对象固定为七个字段，入口类型与来源摘要类型一一对应；Candidate Review 的 0/1 Loop 分类必须与 accepted definition 一致，批准状态和 scope 固定为本地 Artifact + Evidence 构建，根 `definition_digest` 精确绑定 canonical accepted definition。
+三个入口统一输出一个 `entry-evidence-v0.1` 批准摘要，并通过可选 `--entry-evidence` 进入同一构建链。合同根对象固定为七个字段，入口类型与来源摘要类型一一对应；Candidate Review 保留 bounded summary，0/1 Loop 分类必须与 accepted definition 一致，批准状态和 scope 固定为本地 Artifact + Evidence 构建，根 `definition_digest` 精确绑定 canonical accepted definition。
 
 Entry Evidence 只保留受控 source IDs、结构化摘要、provenance-labelled facts、已解决澄清、分类和批准，不保存 raw conversation、raw Skill payload、绝对路径、私有源材料或开发记录。该验证只能证明结构、固定 scope、0/1 分类和 digest binding；不能证明摘要真实、完整去敏，也不做 PII 扫描或批准者身份认证。现有入口负责生成和审阅该 JSON，Core 不新增自动抽取器或第二套 Semantic/Execution IR。
 
