@@ -29,9 +29,9 @@
     {"title": "Skill Packaging Adapter 已完成", "detail": "0-loop 普通 Skill；既有 metadata/references/scripts/assets 保真 overlay；Manifest 与 Compatibility 已绑定", "state": "ready"}
   ],
   "next_steps": [
-    {"id": "N1", "title": "补齐保真 Skill Packaging Adapter", "detail": "0-loop 普通 Skill 和既有 Skill 资源保留均已通过真实构建与官方 validator", "state": "ready"},
-    {"id": "N2", "title": "绑定入口证据", "detail": "把 Workflow Model、澄清和批准记录纳入可校验 Evidence，而不是 manifest-unbound 补充文件", "state": "active"},
-    {"id": "N3", "title": "首次真实调用 Demo", "detail": "完整链路后使用用户真实目标/历史验证 Skill + Evidence", "state": "queued"}
+    {"id": "N1", "title": "绑定入口证据", "detail": "把 Workflow Model、澄清和批准记录纳入可校验 Evidence，而不是 manifest-unbound 补充文件", "state": "active"},
+    {"id": "N2", "title": "首次真实调用 Demo", "detail": "完整链路后使用用户真实目标/历史验证 Skill + Evidence", "state": "queued"},
+    {"id": "N3", "title": "阶段出口复核", "detail": "真实 Demo 后核对三个入口、Packaging、Evidence 与成品洁净度", "state": "queued"}
   ],
   "work_lanes": {
     "mainline": {"label": "主线 · 用户能力", "items": [
