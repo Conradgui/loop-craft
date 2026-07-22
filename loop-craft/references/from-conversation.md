@@ -59,23 +59,9 @@ After material gaps are resolved, translate the model into a Candidate Behavior 
 
 Keep the contract labeled as proposed until the user approves the shared Candidate Review.
 
-## 5. Reuse the existing seven-item Loopability Gate
+## 5. Classify with the shared Loopability Gate
 
-Use the exact seven-item gate in [upgrade-skill.md](upgrade-skill.md), and do not create a second Conversation-specific gate:
-
-1. A pass produces fresh evidence or changed state.
-2. That feedback can change the next selected action.
-3. An observable, repeatable check judges progress or acceptance.
-4. Each pass takes one bounded action without widening authority.
-5. Relevant success, clean no-op, blocked, approval-required, and no-progress states are distinguishable.
-6. Iteration adds value beyond a one-shot or fixed staged workflow.
-7. State needed by the next pass can be recorded, with explicit recovery or handoff after interruption or side effects.
-
-Classify the recovered workflow as follows:
-
-- **0 qualifying Loops** — preserve the one-shot Workflow and, after approval, package it as an ordinary Skill using `skill-package-v0.1` with `workflow.steps`, `success_evidence`, and `failure_or_stop`.
-- **More than 1 independent Loop, or a contract that cannot be expressed without semantic loss** — stop at Candidate/Assessment and state the unsupported multi-Loop boundary. Do not compress or call the Core.
-- **Exactly 1 defining Loop** — continue to the shared Candidate Review, then the current Core compatibility gate.
+Apply [loopability-gate.md](loopability-gate.md) to the recovered Workflow Model. Do not redefine the Gate in this entry. Use its 0 / 1 / unsupported result to choose the review and build route below while preserving all Conversation-specific source labels and provenance boundaries.
 
 Supporting feedback inside a larger staged workflow does not become a defining Loop automatically. Preserve it as workflow behavior unless the same gate and review establish that it is the central bounded capability.
 

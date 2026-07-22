@@ -19,19 +19,9 @@ Label recurrence evidence precisely:
 
 Do not infer recurrence from a multi-step checklist. Do not invent tools, validators, permissions, state, or evidence to make the Skill loopable.
 
-## 3. Apply the complete Loopability Gate
+## 3. Apply the shared Loopability Gate
 
-A candidate is a Loop only when all are true:
-
-1. A pass produces fresh evidence or changed state.
-2. That feedback can change the next selected action.
-3. An observable, repeatable check judges progress or acceptance.
-4. Each pass takes one bounded action without widening authority.
-5. Success, clean no-op, blocked, approval-required, and no-progress states are distinguishable when relevant.
-6. Iteration adds value beyond a one-shot or fixed staged workflow.
-7. State needed by the next pass can be recorded, with explicit recovery or handoff after interruption or side effects.
-
-Record a missing material verifier or evidence source as a blocked finding; do not substitute model confidence.
+Apply [loopability-gate.md](loopability-gate.md) to each candidate cycle. Do not redefine the Gate in this entry. Record entry-specific recurrence evidence and blocked findings in the Decision Record.
 
 ## 4. Choose one architecture verdict
 

@@ -145,3 +145,11 @@ Workflow Skill Creator 只复用“先总结已发生事实、让用户纠正、
 源路径是构建时参数，不进入 IR、Artifact 或 Evidence。Evidence 只记录规范化相对路径、逐文件摘要、动作和整个源包摘要；Build Manifest 绑定 Source Package Manifest digest。Adapter 同时记录 Compatibility/Conformance，Required unsupported 阻断，Optional unsupported 明确 degraded。
 
 该方案以一个额外 profile 和一个窄 source inventory 模块补齐真实用户交付，没有新建第二套 Compiler、Adapter Router 或 Entry Framework。剩余主线只有入口来源证据绑定；多 Loop、Runtime、Library Edition、发布和分布式/事务式源快照继续不进入当前阶段。
+
+### D-020 单一 Loopability Gate owner 与入口特定交付并存
+
+`loop-craft/references/loopability-gate.md` 是七项 Loopability Gate 和 0 / 1 / unsupported 分类的唯一 owner。From-scratch、Existing Skill Upgrade 和 Conversation Distillation 都直接链接它，不复制七项正文；三个入口继续各自负责来源证据恢复、架构 verdict、兼容性判断和映射。这样共享判断标准而不抹平产品语义，避免规则漂移，也避免为了形式统一而制造错误产物。
+
+共享 Gate 不表示三入口交付相同。From-scratch 与 Conversation 的获批 0-loop Workflow 可以通过 `skill-package-v0.1` 生成普通 Skill；获批且兼容的 1-loop 定义也使用同一 profile。Existing Skill 的 `keep_as_skill` 仍是 Assessment only，不制造无意义的零 Loop 替代包；获批的单 Loop upgrade 仍走经过清单审阅的 source-preserving overlay。多 Loop 或任何不能无损表达的合同继续停在 Assessment only。
+
+Candidate Review 按分类显示不同 packet：0-loop 显示 Workflow steps、success evidence、failure or stop；1-loop 显示 Observe / Choose / Act / Verify / Record / Adapt cycle、反馈、terminal states 与 recovery。两类共同显示 authority、invariants、boundary 和 approval scope。Core、Schema、Packaging Adapter 均未因本决策修改。

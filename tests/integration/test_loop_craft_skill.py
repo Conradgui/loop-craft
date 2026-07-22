@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -36,12 +37,91 @@ def test_loop_craft_contains_core_and_no_dev_docs() -> None:
     assert not (SKILL / "tests").exists()
 
 
-def test_product_skill_does_not_claim_unimplemented_entries() -> None:
+def markdown_section(text: str, heading: str) -> str:
+    match = re.search(
+        rf"^##+ {re.escape(heading)}\s*$\n(?P<body>.*?)(?=^##+ |\Z)",
+        text,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert match is not None, f"missing Markdown section: {heading}"
+    return match.group("body")
+
+
+def test_product_skill_routes_supported_entries_and_requires_acceptance() -> None:
     text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-    assert "accepted Behavior Contract" in text
+
+    for reference in (
+        "references/from-scratch.md",
+        "references/upgrade-skill.md",
+        "references/from-conversation.md",
+        "references/loopability-gate.md",
+        "references/core-build.md",
+    ):
+        assert f"]({reference})" in text
+        assert (SKILL / reference).is_file()
+    assert "explicit approval" in text
+    assert "Candidate Behavior Contract" in text
+    assert "accepted definition" in text
     assert "conversation history" not in text
     assert "Loop Library" not in text
     assert "Loopy" not in text
+
+
+def test_entries_use_one_shared_loopability_gate_contract() -> None:
+    references = SKILL / "references"
+    gate_path = references / "loopability-gate.md"
+    assert gate_path.is_file()
+
+    gate_text = gate_path.read_text(encoding="utf-8")
+    gate_rules = re.findall(r"^\d+\. .+$", gate_text, flags=re.MULTILINE)
+    assert len(gate_rules) == 7
+
+    for entry_name in (
+        "from-scratch.md",
+        "upgrade-skill.md",
+        "from-conversation.md",
+    ):
+        entry_text = (references / entry_name).read_text(encoding="utf-8")
+        assert "[loopability-gate.md](loopability-gate.md)" in entry_text
+        assert not any(rule in entry_text for rule in gate_rules)
+
+    zero_loop = markdown_section(gate_text, "0 qualifying Loops")
+    one_loop = markdown_section(gate_text, "Exactly 1 qualifying Loop")
+    unsupported = markdown_section(
+        gate_text, "More than 1 qualifying Loop or semantic loss"
+    )
+    assert "skill-package-v0.1" in zero_loop
+    assert "skill-package-v0.1" in one_loop
+    assert "Assessment only" in unsupported
+
+
+def test_from_scratch_routes_approved_workflows_and_loops_through_packaging() -> None:
+    text = (SKILL / "references" / "from-scratch.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "core-slice-v0.1" not in text
+    assert "0-loop Workflow" in text
+    assert "1-loop bounded Loop" in text
+    assert "skill-package-v0.1" in text
+    assert "Candidate Review" in text
+    assert "explicit approval" in text
+
+
+def test_candidate_review_distinguishes_workflow_and_loop_packets() -> None:
+    text = (SKILL / "references" / "candidate-review.md").read_text(
+        encoding="utf-8"
+    )
+    workflow_packet = markdown_section(text, "0-loop Workflow packet")
+    loop_packet = markdown_section(text, "1-loop bounded Loop packet")
+    shared_packet = markdown_section(text, "Shared review fields")
+
+    for field in ("steps", "success evidence", "failure or stop"):
+        assert field in workflow_packet.lower()
+    for cycle_step in ("Observe", "Choose", "Act", "Verify", "Record", "Adapt"):
+        assert cycle_step in loop_packet
+    for field in ("authority", "invariants", "boundary", "approval"):
+        assert field in shared_packet.lower()
 
 
 def test_product_skill_metadata_matches_contract() -> None:

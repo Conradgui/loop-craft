@@ -28,22 +28,17 @@ Start with the highest-value unanswered question. Use everyday language.
 
 Do not ask all six when the answer is already known. Each question must include the current understanding and why the missing answer changes the design. Stop asking when remaining uncertainty would not materially change the loop.
 
-## 3. Decide whether a Loop adds value
+## 3. Classify with the shared Loopability Gate
 
-Require all of the following:
+Apply [loopability-gate.md](loopability-gate.md) to the recovered goal. Do not redefine the Gate in this entry.
 
-- each pass observes fresh evidence or state;
-- that evidence can change the next action;
-- verification is observable and repeatable;
-- one pass makes one bounded action;
-- success, clean no-op, blocked, stagnated, and exhausted can be distinguished;
-- the next pass can resume from recorded state.
+Preserve a result with no qualifying Loop as a 0-loop Workflow. Preserve exactly one qualifying cycle as a 1-loop bounded Loop. If the result contains multiple independent qualifying Loops or cannot be represented without semantic loss, return the assessment and unsupported boundary without calling the Core.
 
-If feedback cannot change a later action, return a one-shot Workflow and do not call the Core. If the goal contains multiple independent first-class feedback outcomes, explain that the current Demo profile cannot build them without distortion and stop before acceptance.
+## 4. Draft the Candidate Behavior Contract
 
-## 4. Draft the current single-Loop definition
+Map the answers to `scripts/loopcraft_core/kernel/schemas/accepted-definition.schema.json` using profile `skill-package-v0.1`.
 
-Map the answers to `scripts/loopcraft_core/kernel/schemas/accepted-definition.schema.json`:
+For both forms include:
 
 - `identity`: stable kebab-case id, readable name, version `0.1.0`, concise description;
 - `purpose.outcome`: the user-visible result;
@@ -51,15 +46,25 @@ Map the answers to `scripts/loopcraft_core/kernel/schemas/accepted-definition.sc
 - `interface`: named inputs and outputs;
 - `authority`: allowed, approval-required, and forbidden actions;
 - `capabilities`: required and optional capabilities grounded in known tools;
+- the accepted boundary and invariants.
+
+For a 0-loop Workflow, set `loops` to an empty list and include:
+
+- `workflow.steps`: the bounded ordered behavior;
+- `workflow.success_evidence`: observable acceptance evidence;
+- `workflow.failure_or_stop`: failure, blocked, approval, and handoff behavior.
+
+For a 1-loop bounded Loop, include:
+
 - `loops[0].cycle`: observe, choose, act, verify, record, adapt;
 - `loops[0].terminal_states`: success, clean no-op, blocked, stagnated, exhausted;
 - `loops[0].invariants`: facts and boundaries that every pass must preserve.
 
-Use profile `core-slice-v0.1`. Do not add unsupported fields or a second Loop.
+Do not add unsupported fields or a second Loop.
 
 ## 5. Review before writing
 
-Read [candidate-review.md](candidate-review.md). Resolve material missing or conflict items, then show the compact review packet. Do not write the accepted definition or create an output directory until the user approves the candidate.
+Use the shared Candidate Review in [candidate-review.md](candidate-review.md). Resolve material missing or conflict items, then show the packet for the selected 0-loop Workflow or 1-loop bounded Loop. Do not write the accepted definition or create an output directory until the user gives explicit approval.
 
 ## 6. Build after approval
 
@@ -68,7 +73,7 @@ Ask for or propose paths inside the authorized workspace for:
 - the accepted definition JSON;
 - a new output directory that does not exist.
 
-Write the approved definition as UTF-8 JSON. From the `loop-craft` directory run:
+Write the approved `skill-package-v0.1` definition as UTF-8 JSON. Both an approved 0-loop Workflow and an approved 1-loop bounded Loop use the same build command from the `loop-craft` directory:
 
 ```powershell
 python scripts/build_loop.py build <accepted-definition.json> <new-output-directory>
