@@ -219,6 +219,38 @@ def test_openai_yaml_uses_valid_semantic_fallback_for_short_description(
     ]
 
 
+def test_short_description_fallback_preserves_long_name_and_outcome(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    contract = definition["behavior_contract"]
+    contract["identity"]["name"] = "N" * 200
+    contract["identity"]["description"] = "Y"
+    contract["purpose"]["outcome"] = "Z" * 200
+
+    descriptions = []
+    for output_name in ("first", "second"):
+        result = render_codex_skill(
+            compile_definition(definition), tmp_path / output_name
+        )
+        openai_yaml = (result.skill_dir / "agents" / "openai.yaml").read_text(
+            encoding="utf-8"
+        )
+        descriptions.append(
+            json.loads(openai_yaml.splitlines()[2].split(": ", 1)[1])
+        )
+        assert result.source_map["agents/openai.yaml#short_description"] == [
+            "/identity/name",
+            "/purpose/outcome",
+        ]
+
+    assert descriptions[0] == descriptions[1]
+    assert descriptions[0].startswith("Loop Craft Skill for ")
+    assert "N" in descriptions[0]
+    assert "Z" in descriptions[0]
+    assert 25 <= len(descriptions[0]) <= 64
+
+
 def test_markdown_free_text_is_rendered_as_single_line_json_literals(
     tmp_path: Path,
 ) -> None:

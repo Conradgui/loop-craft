@@ -76,6 +76,63 @@ def test_verify_build_rejects_empty_artifact_directory_without_changes(
     assert file_snapshot(result.artifact_dir) == artifact_before
 
 
+def test_verify_build_rejects_empty_artifact_skill_root_without_changes(
+    tmp_path: Path,
+) -> None:
+    baseline = build_definition(FIXTURE, tmp_path / "baseline")
+    output = tmp_path / "empty-skill-build"
+    skill_dir = output / "artifact" / baseline.artifact_dir.name
+    skill_dir.mkdir(parents=True)
+    evidence_dir = shutil.copytree(baseline.evidence_dir, output / "evidence")
+    evidence_before = file_snapshot(evidence_dir)
+
+    with pytest.raises(ValueError, match="empty"):
+        verify_build(output)
+
+    assert skill_dir.is_dir()
+    assert list(skill_dir.iterdir()) == []
+    assert file_snapshot(evidence_dir) == evidence_before
+
+
+@pytest.mark.parametrize(
+    "digest_field",
+    [
+        "definition_digest",
+        "semantic_ir_digest",
+        "execution_ir_digest",
+        "source_map_digest",
+        "validation_report_digest",
+        "artifact_digest",
+    ],
+)
+@pytest.mark.parametrize(
+    "invalid_digest",
+    [
+        123,
+        "not-a-sha256-digest",
+        "sha256:" + "A" * 64,
+    ],
+)
+def test_verify_build_rejects_malformed_manifest_digest_contracts_deterministically(
+    tmp_path: Path,
+    digest_field: str,
+    invalid_digest: object,
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    manifest_path = result.evidence_dir / "build-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest[digest_field] = invalid_digest
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    messages = []
+    for _ in range(2):
+        with pytest.raises(ValueError, match="digest contract") as exc_info:
+            verify_build(result.output_root)
+        messages.append(str(exc_info.value))
+
+    assert messages[0] == messages[1]
+
+
 def test_verify_build_rejects_evidence_digest_mismatch_without_changes(
     tmp_path: Path,
 ) -> None:

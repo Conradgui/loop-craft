@@ -76,12 +76,22 @@ def _short_description_projection(
     if len(description) >= 25:
         return description[:64], ["/identity/description"]
 
+    prefix = "Loop Craft Skill for "
+    separator = ": "
+    name = identity["name"].strip()
+    outcome = execution["purpose"]["outcome"].strip()
+    content_budget = 64 - len(prefix) - len(separator)
+    name_budget = min(len(name), (content_budget + 1) // 2)
+    outcome_budget = min(len(outcome), content_budget - name_budget)
+    remaining = content_budget - name_budget - outcome_budget
+    name_budget += min(remaining, len(name) - name_budget)
+    remaining = content_budget - name_budget - outcome_budget
+    outcome_budget += min(remaining, len(outcome) - outcome_budget)
     fallback = (
-        f"Loop Craft Skill for {identity['name'].strip()}: "
-        f"{execution['purpose']['outcome'].strip()}"
+        f"{prefix}{name[:name_budget]}{separator}{outcome[:outcome_budget]}"
     )
     return (
-        fallback[:64],
+        fallback,
         ["/identity/name", "/purpose/outcome"],
     )
 

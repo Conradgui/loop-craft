@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 from pathlib import Path
+import re
 import tempfile
 from typing import Any
 
@@ -11,6 +12,9 @@ from .canonical import sha256_digest
 from .compiler import compile_definition
 from .evidence.package import package_evidence
 from .validation import validate_definition
+
+
+DIGEST_CONTRACT = re.compile(r"sha256:[0-9a-f]{64}")
 
 
 @dataclass(frozen=True)
@@ -135,16 +139,20 @@ def verify_build(output_root: Path) -> dict[str, str]:
     ):
         raise ValueError("evidence validation report does not record success")
 
-    required_manifest_fields = {
+    required_manifest_fields = (
         "definition_digest",
         "semantic_ir_digest",
         "execution_ir_digest",
         "source_map_digest",
         "validation_report_digest",
         "artifact_digest",
-    }
-    if not required_manifest_fields.issubset(manifest):
+    )
+    if not set(required_manifest_fields).issubset(manifest):
         raise ValueError("evidence manifest is missing digest contracts")
+    for field in required_manifest_fields:
+        value = manifest[field]
+        if not isinstance(value, str) or DIGEST_CONTRACT.fullmatch(value) is None:
+            raise ValueError(f"evidence manifest {field} digest contract is invalid")
     try:
         semantic_payload = {
             "schema_version": accepted_definition["schema_version"],
@@ -187,6 +195,8 @@ def verify_build(output_root: Path) -> dict[str, str]:
     artifact_dirs = [path for path in artifact_entries if path.is_dir()]
     if len(artifact_entries) != 1 or len(artifact_dirs) != 1:
         raise ValueError("artifact root must contain exactly one artifact directory")
+    if not any(artifact_dirs[0].iterdir()):
+        raise ValueError("artifact directory must not be empty")
     if any(
         path.is_dir() and not any(path.iterdir())
         for path in artifact_dirs[0].rglob("*")
