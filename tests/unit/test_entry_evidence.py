@@ -159,6 +159,7 @@ def test_rejects_empty_unresolved_or_unapproved_records(mutate: Any) -> None:
         r"C:\Users\Conrad\private.txt",
         "C:/Users/Conrad/private.txt",
         "/home/conrad/private.txt",
+        "path:/home/conrad/private.txt",
         r"\\server\share\private.txt",
     ],
 )
