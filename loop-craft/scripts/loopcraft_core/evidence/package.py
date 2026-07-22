@@ -76,6 +76,11 @@ def package_evidence(
         evidence_dir=evidence_dir,
     )
     evidence_dir.mkdir(parents=True, exist_ok=False)
+    validation_report = {
+        "schema_validation": "passed",
+        "semantic_validation": "passed",
+        "accepted_definition": True,
+    }
     manifest = {
         "schema_version": "0.1.0",
         "definition_digest": sha256_digest(definition),
@@ -88,6 +93,8 @@ def package_evidence(
             }
         ),
         "execution_ir_digest": sha256_digest(compiled.final_execution_ir),
+        "source_map_digest": sha256_digest(artifact.source_map),
+        "validation_report_digest": sha256_digest(validation_report),
         "override_mode": "none",
         "override_digest": None,
         "compiler_version": compiled.final_execution_ir["compiler_version"],
@@ -97,11 +104,6 @@ def package_evidence(
             {"platform": "codex", "profile_version": "0.1.0"}
         ),
         "artifact_digest": artifact.artifact_digest,
-    }
-    validation_report = {
-        "schema_validation": "passed",
-        "semantic_validation": "passed",
-        "accepted_definition": True,
     }
 
     _write_json(evidence_dir / "accepted-definition.json", definition)

@@ -60,37 +60,30 @@ def _frontmatter_description(use_when: list[str]) -> str:
     triggers = [_clean_trigger(value) for value in use_when]
     prefix = "Use when "
     separator = "; "
-    available = 1024 - len(prefix) - len(separator) * (len(triggers) - 1)
-    if available >= sum(len(trigger) for trigger in triggers):
-        return prefix + separator.join(triggers)
-
-    # Keep every trigger represented when the platform limit forces truncation.
-    initial_share = max(1, available // len(triggers))
-    lengths = [min(len(trigger), initial_share) for trigger in triggers]
-    remaining = max(0, available - sum(lengths))
-    for index, trigger in enumerate(triggers):
-        extra = min(len(trigger) - lengths[index], remaining)
-        lengths[index] += extra
-        remaining -= extra
-    shortened = [
-        trigger[: lengths[index]] for index, trigger in enumerate(triggers)
-    ]
-    return (prefix + separator.join(shortened))[:1024].rstrip()
+    description = prefix + separator.join(triggers)
+    if len(description) > 1024:
+        raise ValueError(
+            "frontmatter description exceeds the 1024-character limit"
+        )
+    return description
 
 
-def _short_description(execution: dict[str, Any]) -> str:
+def _short_description_projection(
+    execution: dict[str, Any],
+) -> tuple[str, list[str]]:
     identity = execution["identity"]
     description = identity["description"].strip()
     if len(description) >= 25:
-        return description[:64]
+        return description[:64], ["/identity/description"]
 
     fallback = (
-        f"{identity['name'].strip()}: "
+        f"Loop Craft Skill for {identity['name'].strip()}: "
         f"{execution['purpose']['outcome'].strip()}"
     )
-    if len(fallback) >= 25:
-        return fallback[:64]
-    return f"Agent Skill for guided work: {identity['name'].strip()}"[:64]
+    return (
+        fallback[:64],
+        ["/identity/name", "/purpose/outcome"],
+    )
 
 
 def _markdown_literal(value: str) -> str:
@@ -229,9 +222,9 @@ def _adapter_source_map(compiled: CompileResult) -> dict[str, list[str]]:
                 for index, _ in enumerate(execution["loops"])
             ],
             "agents/openai.yaml#display_name": ["/identity/name"],
-            "agents/openai.yaml#short_description": [
-                "/identity/description"
-            ],
+            "agents/openai.yaml#short_description": (
+                _short_description_projection(execution)[1]
+            ),
             "agents/openai.yaml#default_prompt": [
                 "/identity/id",
                 "/purpose/outcome",
@@ -332,7 +325,10 @@ def render_codex_skill(
             "  display_name: "
             + json.dumps(identity["name"], ensure_ascii=False),
             "  short_description: "
-            + json.dumps(_short_description(execution), ensure_ascii=False),
+            + json.dumps(
+                _short_description_projection(execution)[0],
+                ensure_ascii=False,
+            ),
             "  default_prompt: "
             + json.dumps(default_prompt, ensure_ascii=False),
             "",

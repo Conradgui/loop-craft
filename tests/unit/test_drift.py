@@ -94,6 +94,62 @@ def test_verify_build_rejects_evidence_digest_mismatch_without_changes(
     assert file_snapshot(result.evidence_dir) == evidence_before
 
 
+@pytest.mark.parametrize(
+    ("filename", "payload"),
+    [
+        ("source-map.json", {}),
+        ("validation-report.json", {}),
+        (
+            "validation-report.json",
+            {
+                "schema_validation": "failed",
+                "semantic_validation": "passed",
+                "accepted_definition": True,
+            },
+        ),
+    ],
+)
+def test_verify_build_rejects_invalid_evidence_contracts(
+    tmp_path: Path,
+    filename: str,
+    payload: dict[str, object],
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    evidence_path = result.evidence_dir / filename
+    evidence_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="evidence"):
+        verify_build(result.output_root)
+
+
+@pytest.mark.parametrize(
+    ("filename", "payload"),
+    [
+        ("source-map.json", {"SKILL.md#name": ["/identity/name"]}),
+        (
+            "validation-report.json",
+            {
+                "schema_validation": "passed",
+                "semantic_validation": "passed",
+                "accepted_definition": True,
+                "tampered": True,
+            },
+        ),
+    ],
+)
+def test_verify_build_rejects_valid_shaped_evidence_digest_mismatch(
+    tmp_path: Path,
+    filename: str,
+    payload: dict[str, object],
+) -> None:
+    result = build_definition(FIXTURE, tmp_path / "build")
+    evidence_path = result.evidence_dir / filename
+    evidence_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="digest"):
+        verify_build(result.output_root)
+
+
 def test_verify_build_rejects_symlinked_skill_directory_without_changes(
     tmp_path: Path,
 ) -> None:

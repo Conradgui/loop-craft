@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from loopcraft_core.adapters.codex_skill import (
     directory_digest,
     render_codex_skill,
@@ -138,7 +140,7 @@ def test_adapter_generates_only_a_clean_complete_target_skill(tmp_path: Path) ->
     assert not reference_bytes.endswith(b"\r\n")
 
 
-def test_adapter_quotes_frontmatter_and_preserves_rich_applicability(
+def test_adapter_rejects_frontmatter_description_over_limit(
     tmp_path: Path,
 ) -> None:
     definition = load_valid()
@@ -156,31 +158,10 @@ def test_adapter_quotes_frontmatter_and_preserves_rich_applicability(
         "do_not_use_when": do_not_use_when,
     }
 
-    result = render_codex_skill(
-        compile_definition(definition), tmp_path / "rich-applicability"
-    )
-    skill_text = (result.skill_dir / "SKILL.md").read_text(encoding="utf-8")
-    frontmatter, body = parse_frontmatter(skill_text)
-    description = json.loads(frontmatter["description"])
-
-    assert description.startswith("Use when ")
-    assert len(description) <= 1024
-    assert "<" not in description
-    assert ">" not in description
-    assert "a second: trigger also applies" in description
-    for original in (*use_when, *do_not_use_when):
-        assert markdown_literal(original) in body
-
-    assert result.source_map["SKILL.md#description"] == [
-        "/applicability/use_when/0",
-        "/applicability/use_when/1",
-    ]
-    assert result.source_map["SKILL.md#applicability"] == [
-        "/applicability/use_when/0",
-        "/applicability/use_when/1",
-        "/applicability/do_not_use_when/0",
-        "/applicability/do_not_use_when/1",
-    ]
+    with pytest.raises(ValueError, match="1024"):
+        render_codex_skill(
+            compile_definition(definition), tmp_path / "rich-applicability"
+        )
 
 
 def test_frontmatter_description_includes_all_use_when_triggers(
@@ -200,9 +181,10 @@ def test_frontmatter_description_includes_all_use_when_triggers(
     frontmatter, _ = parse_frontmatter(skill_text)
     description = json.loads(frontmatter["description"])
 
-    assert description.startswith("Use when ")
-    assert "the target needs a bounded repair" in description
-    assert "fresh evidence shows material drift in scope" in description
+    assert description == (
+        "Use when the target needs a bounded repair; "
+        "fresh evidence shows material drift in scope"
+    )
     assert "<" not in description
     assert ">" not in description
     assert len(description) <= 1024
@@ -229,8 +211,12 @@ def test_openai_yaml_uses_valid_semantic_fallback_for_short_description(
     )
     short_description = json.loads(openai_yaml.splitlines()[2].split(": ", 1)[1])
 
-    assert short_description == "Agent Skill for guided work: X"
+    assert short_description == "Loop Craft Skill for X: Z"
     assert 25 <= len(short_description) <= 64
+    assert result.source_map["agents/openai.yaml#short_description"] == [
+        "/identity/name",
+        "/purpose/outcome",
+    ]
 
 
 def test_markdown_free_text_is_rendered_as_single_line_json_literals(
@@ -417,4 +403,21 @@ def test_openai_yaml_contains_only_deterministic_interface_values(
             execution["identity"]["description"][:64], ensure_ascii=False
         ),
         "  default_prompt: " + json.dumps(expected_prompt, ensure_ascii=False),
+    ]
+
+
+def test_long_identity_description_maps_short_description_to_description(
+    tmp_path: Path,
+) -> None:
+    definition = load_valid()
+    definition["behavior_contract"]["identity"]["description"] = (
+        "A sufficiently long identity description for the generated skill."
+    )
+
+    result = render_codex_skill(
+        compile_definition(definition), tmp_path / "long-description"
+    )
+
+    assert result.source_map["agents/openai.yaml#short_description"] == [
+        "/identity/description",
     ]

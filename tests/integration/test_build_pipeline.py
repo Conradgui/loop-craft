@@ -85,6 +85,50 @@ def test_adapter_failure_cleans_staging_output(
     assert not output.exists()
 
 
+@pytest.mark.parametrize("fail_at_write", [2, 3, 4, 5])
+def test_evidence_failure_cleans_partial_staging_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    fail_at_write: int,
+) -> None:
+    import loopcraft_core.evidence.package as evidence_package
+
+    original_write_json = evidence_package._write_json
+    write_count = 0
+
+    def fail_after_partial_write(path: Path, value: object) -> None:
+        nonlocal write_count
+        write_count += 1
+        original_write_json(path, value)
+        if write_count == fail_at_write:
+            raise RuntimeError("evidence write failed")
+
+    monkeypatch.setattr(evidence_package, "_write_json", fail_after_partial_write)
+    output = tmp_path / "evidence-failure"
+
+    with pytest.raises(RuntimeError, match="evidence write failed"):
+        build_definition(FIXTURE, output)
+
+    assert not output.exists()
+    assert not list(tmp_path.glob(f".{output.name}.*"))
+
+
+def test_existing_output_is_rejected_without_modification(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "existing-output"
+    output.mkdir()
+    existing_file = output / "keep.txt"
+    existing_file.write_bytes(b"preserve me")
+    before = file_snapshot(output)
+
+    with pytest.raises(FileExistsError):
+        build_definition(FIXTURE, output)
+
+    assert file_snapshot(output) == before
+    assert not list(tmp_path.glob(f".{output.name}.*"))
+
+
 def test_dangling_output_symlink_is_treated_as_occupied(tmp_path: Path) -> None:
     target = tmp_path / "missing-target"
     output = tmp_path / "occupied-link"

@@ -98,10 +98,10 @@ def verify_build(output_root: Path) -> dict[str, str]:
                 encoding="utf-8"
             )
         )
-        json.loads(
+        source_map = json.loads(
             (evidence_root / "source-map.json").read_text(encoding="utf-8")
         )
-        json.loads(
+        validation_report = json.loads(
             (evidence_root / "validation-report.json").read_text(
                 encoding="utf-8"
             )
@@ -115,11 +115,32 @@ def verify_build(output_root: Path) -> dict[str, str]:
         execution_ir, dict
     ):
         raise ValueError("evidence JSON contracts must be objects")
+    if (
+        not isinstance(source_map, dict)
+        or not source_map
+        or any(
+            not isinstance(artifact_path, str)
+            or not artifact_path
+            or not isinstance(source_pointers, list)
+            or not source_pointers
+            or any(not isinstance(pointer, str) for pointer in source_pointers)
+            for artifact_path, source_pointers in source_map.items()
+        )
+    ):
+        raise ValueError("evidence source map contract is invalid")
+    if not isinstance(validation_report, dict) or (
+        validation_report.get("schema_validation") != "passed"
+        or validation_report.get("semantic_validation") != "passed"
+        or validation_report.get("accepted_definition") is not True
+    ):
+        raise ValueError("evidence validation report does not record success")
 
     required_manifest_fields = {
         "definition_digest",
         "semantic_ir_digest",
         "execution_ir_digest",
+        "source_map_digest",
+        "validation_report_digest",
         "artifact_digest",
     }
     if not required_manifest_fields.issubset(manifest):
@@ -139,6 +160,15 @@ def verify_build(output_root: Path) -> dict[str, str]:
         raise ValueError("evidence semantic digest does not match manifest")
     if sha256_digest(execution_ir) != manifest["execution_ir_digest"]:
         raise ValueError("evidence execution IR digest does not match manifest")
+    if sha256_digest(source_map) != manifest["source_map_digest"]:
+        raise ValueError("evidence source map digest does not match manifest")
+    if (
+        sha256_digest(validation_report)
+        != manifest["validation_report_digest"]
+    ):
+        raise ValueError(
+            "evidence validation report digest does not match manifest"
+        )
     if execution_ir.get("definition_digest") != manifest["definition_digest"]:
         raise ValueError(
             "evidence execution IR definition does not match manifest"

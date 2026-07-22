@@ -48,11 +48,18 @@ def test_evidence_package_is_separate_and_binds_the_complete_build(
         "behavior_contract": definition["behavior_contract"],
         "loops": definition["loops"],
     }
+    validation_report = {
+        "schema_validation": "passed",
+        "semantic_validation": "passed",
+        "accepted_definition": True,
+    }
     expected_manifest = {
         "schema_version": "0.1.0",
         "definition_digest": sha256_digest(definition),
         "semantic_ir_digest": sha256_digest(semantic_ir),
         "execution_ir_digest": sha256_digest(compiled.final_execution_ir),
+        "source_map_digest": sha256_digest(artifact.source_map),
+        "validation_report_digest": sha256_digest(validation_report),
         "override_mode": "none",
         "override_digest": None,
         "compiler_version": compiled.final_execution_ir["compiler_version"],
@@ -72,11 +79,7 @@ def test_evidence_package_is_separate_and_binds_the_complete_build(
         "accepted-definition.json": definition,
         "final-execution-ir.json": compiled.final_execution_ir,
         "source-map.json": artifact.source_map,
-        "validation-report.json": {
-            "schema_validation": "passed",
-            "semantic_validation": "passed",
-            "accepted_definition": True,
-        },
+        "validation-report.json": validation_report,
         "build-manifest.json": expected_manifest,
     }
     assert {path.name for path in result.evidence_dir.iterdir()} == set(
