@@ -129,3 +129,11 @@ Phase 1 的四类判断全部保留：`keep_as_skill`、`embedded_loop`、`loop_
 因此本阶段只有“单一 `loop_first_skill`、行为合同可被当前 schema 无损表达、没有关键外部资源依赖”的情况可以在批准后进入现有 Core build。其他情况返回带明确 unsupported boundary 的 `Assessment only`。产品上先获得真实可用的第二入口；工程上不伪造通用保真升级能力，也不为了扩大声明而改造已经稳定的 Core。
 
 下一次扩展既有 Skill 的完整升级能力时，应优先补充能保留原 Skill package 的 Packaging Adapter/输入模型，而不是继续增加 Core 内核测试或把多个 Loop 压入当前 profile。
+
+### D-018 第三入口止于 Candidate，不成为第二套端到端生成器
+
+第三入口只负责从用户授权的已发生对话或工作记录恢复 Observed Workflow Model，并通过渐进澄清形成 Candidate Behavior Contract。工作流是否需要 Loop、如何 Review、何时接受以及如何构建，继续由现有公共 Gate、Review、Compiler、Evidence 和 Adapter 路径负责。
+
+Workflow Skill Creator 只复用“先总结已发生事实、让用户纠正、逐步恢复严格/灵活步骤、依赖和错误行为、再显式批准”的抽取方法。其领域包、固定运行器、所有 I/O 必须 CLI、固定安装路径、API 限流和独立测试阶段不进入 Loop Craft 产品 Skill。
+
+当前路由完成不等于完整端到端第三入口：0-loop 普通 Skill 尚无对应 Packaging Adapter；入口 Workflow Model/澄清/批准记录只能作为 manifest-unbound 补充证据。下一主线应补这两个产品缺口，再开始真实用户任务验证。

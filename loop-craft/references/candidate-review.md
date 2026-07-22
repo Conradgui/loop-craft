@@ -1,6 +1,6 @@
 # Candidate Review Gate
 
-Use this gate immediately before a From-scratch Candidate becomes an accepted definition.
+Use this gate immediately before a Candidate from any Loop Craft entry becomes an accepted definition.
 
 ## Resolve only material gaps
 
@@ -17,14 +17,14 @@ Never ask a blank question and never fabricate an answer.
 
 Show a compact review with these sections:
 
-1. Outcome and use conditions.
+1. Outcome and use conditions, including the source entry and provenance boundary.
 2. Inputs and outputs.
 3. Observe → Choose → Act → Verify → Record → Adapt.
 4. Success and stop conditions.
 5. Allowed, approval-required, and forbidden actions.
 6. Invariants.
 7. Inferred or proposed facts that still depend on user judgment.
-8. Current boundary: one Loop, no Runtime, no installation, no publication.
+8. Current boundary: one Loop, no Runtime, no installation, no publication, no scheduling, and no Library Edition coupling.
 
 State whether the Candidate is ready, blocked by a named gap, or better represented as a one-shot Workflow. Ask for approval or one specific correction.
 
