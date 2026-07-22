@@ -1,28 +1,28 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-22T20:30:00+08:00",
+  "updated_at": "2026-07-22T20:25:10+08:00",
   "overall": {
-    "label": "阶段复核未通过，公共入口链进入修正",
+    "label": "公共 Gate 已统一，入口证据绑定进入主线",
     "tone": "blocked",
-    "summary": "Core 与 Packaging 子链可用，但三入口尚未共用同一 Gate，入口证据未绑定，真实 Demo 与公共仓库交付仍未完成。"
+    "summary": "三个入口现已共用唯一七项 Gate 和 Candidate Review；下一步把来源、澄清和批准记录绑定进可校验 Evidence。"
   },
   "milestone": {
     "name": "M1 · 完整用户链路",
     "state": "in_progress",
-    "progress": 20,
-    "progress_label": "1 / 5 gates",
-    "next": "统一三入口 Loopability Gate，并把 From-scratch 0-loop 接入 Packaging"
+    "progress": 40,
+    "progress_label": "2 / 5 gates",
+    "next": "定义最薄 Entry Evidence Contract，并把三个入口的来源与批准记录绑定到 Build Manifest"
   },
   "metrics": [
     {"label": "用户可用 Demo", "value": "0 / 1", "tone": "neutral"},
-    {"label": "公共 Gate 对齐", "value": "2 / 3", "tone": "blocked"},
+    {"label": "公共 Gate 对齐", "value": "3 / 3", "tone": "ready"},
     {"label": "入口证据绑定", "value": "0 / 3", "tone": "blocked"},
     {"label": "阶段出口", "value": "Not approved", "tone": "blocked"}
   ],
   "issues": [
-    {"priority": "P0-01", "level": "high", "state": "active", "title": "三入口 Gate 不一致", "fact": "Existing Skill 与 Conversation 使用七项 Gate；From-scratch 仍维护六项版本，0-loop 也不进入现有 Packaging。", "action": "让 From-scratch 直接复用唯一公共 Gate，并把普通 Workflow 路由到 skill-package-v0.1。", "done_when": "三个入口引用同一 Gate；0-loop/1-loop 都进入同一 Review、Compiler、Packaging 路径。"},
-    {"priority": "P0-02", "level": "high", "state": "queued", "title": "入口证据未绑定", "fact": "Workflow Model、澄清和批准记录仍是 manifest-unbound 补充文件，verify 无法校验。", "action": "定义最薄 Entry Evidence Contract，将摘要和 digest 写入 Build Manifest，并由 verify 校验。", "done_when": "三个入口的来源、澄清、Review 与批准都有结构化 Evidence 和 Manifest binding。"},
-    {"priority": "P1-01", "level": "medium", "state": "queued", "title": "测试合同失同步", "fact": "Fresh 回归为 115 passed / 6 failed；5 项是 link/junction 错误文案不匹配，1 项是 Skill 合同短语断言失效。", "action": "随公共入口修正一起更新过时断言，只运行直接相关测试。", "done_when": "入口、Skill 合同和 drift 定向测试通过，且断言检查行为而非偶然措辞。"},
+    {"priority": "P0-01", "level": "high", "state": "ready", "title": "三入口 Gate 已统一", "fact": "唯一七项 Gate owner 已建立；三个入口均直接引用共享 Gate 与 Candidate Review。", "action": "保持入口只负责来源特定抽取与分类，不复制 Gate 规则。", "done_when": "已满足：From-scratch 0/1-loop 走现有 Packaging；Existing Skill 保留 Assessment/source-overlay 边界。"},
+    {"priority": "P0-02", "level": "high", "state": "active", "title": "入口证据未绑定", "fact": "Workflow Model、澄清和批准记录仍是 manifest-unbound 补充文件，verify 无法校验。", "action": "定义最薄 Entry Evidence Contract，将摘要和 digest 写入 Build Manifest，并由 verify 校验。", "done_when": "三个入口的来源、澄清、Review 与批准都有结构化 Evidence 和 Manifest binding。"},
+    {"priority": "P1-01", "level": "medium", "state": "queued", "title": "剩余 drift 测试文案失同步", "fact": "入口合同已 9/9 通过；先前 6 个失败中的合同失败已关闭，仍有 5 个 link/junction 错误文案断言待同步。", "action": "在入口 Evidence 完成后只修正 5 个过时错误文案断言。", "done_when": "Drift 定向测试通过，且断言检查拒绝行为而非偶然词语。"},
     {"priority": "P1-02", "level": "medium", "state": "queued", "title": "公共仓库交付不完整", "fact": "根目录缺少 README；公开远端无 License/NOTICE、描述和 CI；当前治理文档仍主要覆盖 Core slice。", "action": "按参考项目的信息架构补 README，明确许可证选择，并更新当前 Plan、Risk Register 与 Quality Gates。", "done_when": "新访客能理解、安装和使用；公开授权状态明确；文档树与真实实现一致。"},
     {"priority": "P1-03", "level": "medium", "state": "queued", "title": "首次真实 Demo 未完成", "fact": "三个入口只有 walking skeleton，尚无用户真实任务完成 Skill + Evidence 全链路。", "action": "前四项闭合后，用一个真实目标执行调用、澄清、批准、构建与交付。", "done_when": "用户获得可调用 Skill 和独立 Evidence，构建 verify clean，且产物不含私密来源材料。"}
   ],
@@ -35,22 +35,24 @@
     {"title": "Skill Upgrade skeleton 已接通", "detail": "既有 Skill → 四类 Decision Record → 当前兼容范围内的 Skill + Evidence", "state": "ready"},
     {"title": "Conversation Distiller skeleton 已接通", "detail": "授权记录 → Workflow Model → 七项 Gate / Review → 当前兼容范围内构建", "state": "ready"},
     {"title": "Skill Packaging Adapter 已完成", "detail": "0-loop 普通 Skill；既有 metadata/references/scripts/assets 保真 overlay；Manifest 与 Compatibility 已绑定", "state": "ready"}
+    ,{"title": "三入口公共 Gate 已统一", "detail": "唯一七项 Gate owner + 共享 Candidate Review；From-scratch 0/1-loop 已接入 skill-package-v0.1", "state": "ready"}
   ],
   "next_steps": [
-    {"id": "N1", "title": "统一公共 Gate 与 0-loop 路由", "detail": "消除 From-scratch 的独立六项判断，让三个入口共用七项 Gate 和 Packaging 路径", "state": "active"},
-    {"id": "N2", "title": "绑定入口证据", "detail": "把来源摘要、澄清和批准记录纳入可校验 Evidence", "state": "queued"},
-    {"id": "N3", "title": "同步失效合同测试", "detail": "修正 6 个过时断言，只跑入口、Skill 合同与 drift 相关测试", "state": "queued"},
+    {"id": "N1", "title": "统一公共 Gate 与 0-loop 路由", "detail": "三个入口现已共用唯一七项 Gate 与 Candidate Review；来源特定输出边界保持不变", "state": "ready"},
+    {"id": "N2", "title": "绑定入口证据", "detail": "把来源摘要、澄清和批准记录纳入可校验 Evidence", "state": "active"},
+    {"id": "N3", "title": "同步剩余 drift 测试", "detail": "修正 5 个 link/junction 过时文案断言，只跑 drift 相关测试", "state": "queued"},
     {"id": "N4", "title": "补齐仓库交付文档", "detail": "README、许可证决策、项目描述、当前 Plan/Risk/Gate 与真实目录对齐", "state": "queued"},
     {"id": "N5", "title": "首次真实调用 Demo", "detail": "使用用户真实目标完成 Skill + Evidence 并进行阶段出口复核", "state": "queued"}
   ],
   "work_lanes": {
     "mainline": {"label": "主线 · 用户能力", "items": [
-      {"title": "统一公共 Gate 与 From-scratch Packaging", "detail": "当前唯一 active 主线；完成后三个入口才真正共享判断和 0/1-loop 输出路径", "state": "active"},
-      {"title": "入口证据绑定", "detail": "下一步将来源摘要、澄清与批准记录绑定到 Build Manifest", "state": "queued"},
+      {"title": "统一公共 Gate 与 From-scratch Packaging", "detail": "唯一 Gate owner、共享 Review 与来源特定 Packaging 边界已完成", "state": "ready"},
+      {"title": "入口证据绑定", "detail": "当前唯一 active 主线：将来源摘要、澄清与批准记录绑定到 Build Manifest", "state": "active"},
       {"title": "首次真实 Demo", "detail": "只在入口与 Evidence 链闭合后执行一个真实用户任务", "state": "queued"}
     ]},
     "validation": {"label": "验证分支 · 只验证主线风险", "items": [
-      {"title": "入口与 drift 合同修复", "detail": "当前 6 个失败为已知失同步断言；随对应开发一次修复和定向验证", "state": "queued"},
+      {"title": "入口合同验证", "detail": "共享 Gate / Review、From-scratch 0/1-loop 路由和真实 zero-loop build 已通过", "state": "ready"},
+      {"title": "剩余 drift 文案修复", "detail": "5 个 link/junction 断言留在入口 Evidence 之后定向处理", "state": "queued"},
       {"title": "Packaging Adapter 定向验收", "detail": "0-loop/source-overlay 构建、官方 validator、clean verify 和 Compatibility 已通过", "state": "ready"},
       {"title": "真实 Demo 最小验收", "detail": "只检查正确 Skill、独立 Evidence、clean verify 与来源洁净度", "state": "queued"}
     ]},
@@ -62,15 +64,14 @@
   },
   "not_now": ["Runtime", "Override", "Subloop", "Library Edition", "多 Loop 构建", "Compact Prompt Adapter", "非阻塞边界测试"],
   "risks": [
-    {"level": "high", "title": "入口判断可能分叉", "detail": "From-scratch 与另外两个入口使用不同 Gate，同一候选可能得到不同结论。"},
     {"level": "high", "title": "入口证据无法 verify", "detail": "来源、澄清与批准没有 Manifest binding，不能作为确定性 Evidence 声明。"},
-    {"level": "medium", "title": "当前 HEAD 验证非全绿", "detail": "Fresh 回归为 115 passed / 6 failed；已定位为合同与错误文案断言失同步。"},
+    {"level": "medium", "title": "剩余 drift 断言待同步", "detail": "入口合同 9/9 已通过；仍有 5 个 link/junction 错误文案断言未处理。"},
     {"level": "medium", "title": "公共仓库不可完整自助使用", "detail": "README、许可证决策、项目描述和当前阶段治理入口尚未完成。"}
   ],
   "phase_gates": [
     {"title": "Core + Packaging slice 可用", "state": "ready"},
-    {"title": "三入口共用 Gate 与 Packaging", "state": "active"},
-    {"title": "入口 Evidence 绑定", "state": "queued"},
+    {"title": "三入口共用 Gate 与 Packaging", "state": "ready"},
+    {"title": "入口 Evidence 绑定", "state": "active"},
     {"title": "仓库与治理文档闭合", "state": "queued"},
     {"title": "真实 Demo 与阶段出口", "state": "queued"}
   ],
@@ -90,6 +91,7 @@
     {"date": "2026-07-22", "title": "Skill Packaging Adapter 已完成", "detail": "新增 skill-package-v0.1、source inventory/overlay、5/6 文件 Evidence、Compatibility/Conformance 与 junction 防护。"},
     {"date": "2026-07-22", "title": "阶段独立复核未批准", "detail": "确认公共 Gate 分叉、入口 Evidence 未绑定、6 个失同步测试、公共仓库文档缺口与真实 Demo 未完成。"},
     {"date": "2026-07-22", "title": "远端状态已核对", "detail": "main 与 origin/main 同步至 84abc21；该事实已从 Risks 移至 Activity。"},
-    {"date": "2026-07-22", "title": "问题解决看板已重构", "detail": "用五个可追溯 Gate 替代无依据百分比，并增加问题、行动和 Done-when 台账。"}
+    {"date": "2026-07-22", "title": "问题解决看板已重构", "detail": "用五个可追溯 Gate 替代无依据百分比，并增加问题、行动和 Done-when 台账。"},
+    {"date": "2026-07-22", "title": "三入口公共 Gate 完成", "detail": "入口合同 9/9、真实 zero-loop Packaging 1/1、官方 Skill validator 通过；质量复核 Approved。"}
   ]
 }
