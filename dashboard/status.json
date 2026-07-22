@@ -27,9 +27,9 @@
     {"title": "Skill Upgrade 入口已接通", "detail": "既有 Skill → 四类 Decision Record → Core compatibility gate → Skill + Evidence", "state": "ready"}
   ],
   "next_steps": [
-    {"id": "N1", "title": "接入 Skill Upgrade", "detail": "复用 Phase 1 的 Loopability Gate 和四类 verdict；单 Loop 可构建，其余明确 Assessment only", "state": "ready"},
+    {"id": "N1", "title": "确认后接入 Conversation Distiller", "detail": "本地化 Workflow Skill Creator 的历史工作流抽取，并复用同一 Review Bridge", "state": "active"},
     {"id": "N2", "title": "首次真实调用 Demo", "detail": "用户完成一次 From-scratch 访谈并拿到 Skill + Evidence", "state": "queued"},
-    {"id": "N3", "title": "接入 Conversation Distiller", "detail": "本地化 Workflow Skill Creator，复用同一 Review Bridge", "state": "queued"}
+    {"id": "N3", "title": "补齐保真 Skill Packaging Adapter", "detail": "在第三入口之后处理任意既有 Skill 的资源保留与替代边界", "state": "queued"}
   ],
   "work_lanes": {
     "mainline": {"label": "主线 · 用户能力", "items": [
@@ -51,7 +51,7 @@
     {"level": "medium", "title": "现有 Skill 保真升级尚未支持", "detail": "当前 Adapter 生成新 Skill；本轮只开放可由单 Loop schema 表达且无关键外部资源依赖的子集。"},
     {"level": "medium", "title": "首次 Demo 尚未体验", "detail": "From-scratch 入口已接通，仍需用户提供一次真实目标。"},
     {"level": "medium", "title": "0..n Loop 尚未扩展", "detail": "先保障单 Loop Demo，扩展前不把多 Loop 宣称为已支持。"},
-    {"level": "low", "title": "远端已同步", "detail": "Skill Upgrade 主线实现已提交并推送到 origin/main（f7103aa）。"}
+    {"level": "low", "title": "远端已同步", "detail": "Skill Upgrade 主线实现已提交并推送到 origin/main。"}
   ],
   "activity": [
     {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
