@@ -1932,7 +1932,7 @@ Recorded commits: `b5f4ebe` (`feat: report generated artifact drift`), `077a540`
 - Create: loop-craft/references/core-build.md
 - Create: tests/integration/test_loop_craft_skill.py
 
-- [ ] **Step 1: Write the failing product Skill tests**
+- [x] **Step 1: Write the failing product Skill tests**
 
 ~~~python
 # tests/integration/test_loop_craft_skill.py
@@ -1960,7 +1960,7 @@ def test_product_skill_does_not_claim_unimplemented_entries() -> None:
     assert "Loopy" not in text
 ~~~
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -1970,7 +1970,7 @@ python -m pytest tests/integration/test_loop_craft_skill.py -v
 
 Expected: tests fail because product Skill metadata does not exist.
 
-- [ ] **Step 3: Create the minimal truthful SKILL.md**
+- [x] **Step 3: Create the minimal truthful SKILL.md**
 
 ~~~markdown
 ---
@@ -1989,7 +1989,7 @@ Read references/core-build.md, then use scripts/build_loop.py to validate, build
 Do not claim support for conversational entry routes, Runtime execution, publication, or scheduling until those capabilities are implemented and tested.
 ~~~
 
-- [ ] **Step 4: Create agents/openai.yaml**
+- [x] **Step 4: Create agents/openai.yaml**
 
 ~~~yaml
 interface:
@@ -1998,7 +1998,7 @@ interface:
   default_prompt: "Use $loop-craft to compile an accepted Loop definition into a target Skill and evidence package."
 ~~~
 
-- [ ] **Step 5: Create references/core-build.md**
+- [x] **Step 5: Create references/core-build.md**
 
 ~~~~markdown
 # Core Build
@@ -2025,7 +2025,7 @@ python scripts/build_loop.py verify <output-directory>
 A clean build exits 0. A drifted artifact exits 1 and remains unchanged.
 ~~~~
 
-- [ ] **Step 6: Run product tests and official validation**
+- [x] **Step 6: Run product tests and official validation**
 
 Run:
 
@@ -2034,14 +2034,18 @@ python -m pytest tests/integration/test_loop_craft_skill.py -v
 python "$env:USERPROFILE\.codex\skills\.system\skill-creator\scripts\quick_validate.py" loop-craft
 ~~~
 
-Expected: 2 tests pass and the validator exits 0.
+Actual: six integration tests pass; the official validator reports `Skill is valid!`.
 
-- [ ] **Step 7: Commit**
+The tests lock exact metadata, the relative `references/core-build.md` link, the documented CLI commands, and build/clean-verify/drift-verify behavior from the Skill directory. The drift regression confirms JSON `drifted`, exit code `1`, and no write-back to `SKILL.md`.
+
+- [x] **Step 7: Commit**
 
 ~~~powershell
 git add loop-craft/SKILL.md loop-craft/agents/openai.yaml loop-craft/references/core-build.md tests/integration/test_loop_craft_skill.py
 git commit -m "feat: package the core slice as Loop Craft"
 ~~~
+
+Recorded commits: `d6a3ebb` (`feat: package the core slice as Loop Craft`), `67b1d22` (`test: lock Loop Craft product contracts`), and `adbde41` (`test: cover product drift CLI contract`).
 
 ### Task 10: Full Verification and Execution Record
 
