@@ -50,6 +50,15 @@
     .metric-value.ready { color: var(--ready); }
     .metric-value.neutral { color: var(--ink); }
     .list { display: grid; gap: 0; }
+    .lane-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 16px; }
+    .lane { border-top: 3px solid var(--line); padding-top: 12px; }
+    .lane.mainline { border-color: var(--accent); }
+    .lane.validation { border-color: #d2a447; }
+    .lane.support { border-color: var(--ready); }
+    .lane h3 { margin: 0 0 13px; font-size: 13px; }
+    .lane-item { padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .lane-item strong { display: block; font-size: 13px; }
+    .lane-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
     .row { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 13px; align-items: start; padding: 17px 0; border-bottom: 1px solid var(--line); }
     .row-mark { width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--line); }
     .row-mark.ready, .row-mark.active { background: var(--ready); }
@@ -79,6 +88,7 @@
     @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
     .error { color: #ffb2a3; font-size: 12px; }
     @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } aside { padding: 24px; } main { padding: 26px 22px 42px; } }
+    @media (max-width: 1000px) { .lane-grid { grid-template-columns: 1fr; gap: 18px; } }
     @media (max-width: 620px) { .metric-row { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(2) { border-right: 0; } .metric:nth-child(3), .metric:nth-child(4) { border-top: 1px solid var(--line); } }
   </style>
 </head>
@@ -100,6 +110,11 @@
       <section class="section" aria-labelledby="metrics-title">
         <div class="section-head"><h2 id="metrics-title">Product signal</h2><small>user value first</small></div>
         <div class="metric-row" id="metrics"></div>
+      </section>
+
+      <section class="section" aria-labelledby="lanes-title">
+        <div class="section-head"><h2 id="lanes-title">Work lanes</h2><small>priority is not uniform</small></div>
+        <div class="lane-grid" id="lanes"></div>
       </section>
 
       <section class="section" aria-labelledby="delivered-title">
@@ -157,6 +172,7 @@
       state("progress-bar").style.width = `${data.milestone.progress}%`;
       state("milestone-next").textContent = data.milestone.next;
       state("metrics").innerHTML = data.metrics.map(item => `<div class="metric"><div class="metric-label">${safe(item.label)}</div><div class="metric-value ${safe(item.tone)}">${safe(item.value)}</div></div>`).join("");
+      state("lanes").innerHTML = Object.entries(data.work_lanes).map(([key, lane]) => `<div class="lane ${key}"><h3>${safe(lane.label)}</h3>${lane.items.map(item => `<div class="lane-item"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("")}</div>`).join("");
       const row = (item, stateText) => `<div class="row"><i class="row-mark ${safe(item.state)}"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.detail)}</div></div><span class="state ${safe(item.state)}">${safe(stateText || titleCase(item.state))}</span></div>`;
       state("delivered").innerHTML = data.delivered.map(item => row(item, "ready")).join("");
       state("next-steps").innerHTML = data.next_steps.map(item => row(item, item.state === "active" ? "now" : "queued")).join("");

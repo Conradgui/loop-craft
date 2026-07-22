@@ -1,20 +1,20 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-22T14:18:00+08:00",
+  "updated_at": "2026-07-22T14:32:00+08:00",
   "overall": {
-    "label": "Demo 尚未完成",
-    "tone": "blocked",
-    "summary": "确定性 Core 后端已完成，但用户还不能通过 Loop Craft 直接完成一条从零设计到 Skill 产出的路径。"
+    "label": "Demo 路径已接通，体验验证待执行",
+    "tone": "ready",
+    "summary": "From-scratch 访谈、Loopability、Candidate Review 和真实 Core 构建路由已接通；下一步是首次真实调用。"
   },
   "milestone": {
     "name": "M0 · 产品化纠偏",
     "state": "in_progress",
-    "progress": 18,
-    "next": "接通 From-scratch 入口，交付第一条真实可用 Demo"
+    "progress": 42,
+    "next": "首次调用 From-scratch，确认用户能得到 Skill + Evidence"
   },
   "metrics": [
-    {"label": "用户可用 Demo", "value": "0 / 1", "tone": "blocked"},
-    {"label": "入口已接通", "value": "0 / 3", "tone": "blocked"},
+    {"label": "用户可用 Demo", "value": "0 / 1", "tone": "neutral"},
+    {"label": "入口已接通", "value": "1 / 3", "tone": "ready"},
     {"label": "Core 后端", "value": "可复用", "tone": "ready"},
     {"label": "测试策略", "value": "按风险触发", "tone": "neutral"}
   ],
@@ -22,17 +22,32 @@
     {"title": "确定性 Core 构建链", "detail": "Accepted Definition → Compiler → Skill / Evidence / Drift", "state": "ready"},
     {"title": "入口候选资产已定位", "detail": "Loopy Craft、Skill Upgrade、Workflow Skill Creator 均有可迁移实现", "state": "ready"},
     {"title": "项目控制规则已修正", "detail": "产品优先、复用优先、测试默认 0，1:2.5 只是绝对上限", "state": "ready"},
-    {"title": "实时项目看板已交付", "detail": "状态文件驱动、5 秒轮询、桌面与窄栏布局已检查", "state": "ready"}
+    {"title": "实时项目看板已交付", "detail": "状态文件驱动、5 秒轮询、桌面与窄栏布局已检查", "state": "ready"},
+    {"title": "From-scratch 入口已接通", "detail": "Loopy Craft 访谈 → Loopability → Candidate Review → Core build", "state": "ready"}
   ],
   "next_steps": [
-    {"id": "N1", "title": "迁移 From-scratch Craft", "detail": "复用 Loopy 访谈、Craft 和预检，不重写", "state": "active"},
-    {"id": "N2", "title": "接入最小 Review Bridge", "detail": "只补 Candidate → 用户确认 → Accepted Definition 的连接", "state": "queued"},
-    {"id": "N3", "title": "交付第一条 Demo", "detail": "用户直接调用 Skill，得到一个可检查的最终 Skill 和 Evidence", "state": "queued"},
-    {"id": "N4", "title": "接入 Skill Upgrade", "detail": "复用 Phase 1 的 Loopability Gate 和四类 verdict", "state": "queued"},
-    {"id": "N5", "title": "接入 Conversation Distiller", "detail": "本地化 Workflow Skill Creator，复用同一 Review Bridge", "state": "queued"}
+    {"id": "N1", "title": "首次真实调用 Demo", "detail": "用户完成一次 From-scratch 访谈并拿到 Skill + Evidence", "state": "active"},
+    {"id": "N2", "title": "接入 Skill Upgrade", "detail": "复用 Phase 1 的 Loopability Gate 和四类 verdict", "state": "queued"},
+    {"id": "N3", "title": "接入 Conversation Distiller", "detail": "本地化 Workflow Skill Creator，复用同一 Review Bridge", "state": "queued"}
   ],
+  "work_lanes": {
+    "mainline": {"label": "主线 · 用户能力", "items": [
+      {"title": "首次 From-scratch Demo", "detail": "真实调用、确认、构建、检查 Skill + Evidence", "state": "active"},
+      {"title": "Skill Upgrade 入口", "detail": "把既有 Phase 1 实现接到同一 Review Bridge", "state": "queued"},
+      {"title": "Conversation Distiller 入口", "detail": "接入 Workflow Skill Creator 的历史工作流抽取", "state": "queued"}
+    ]},
+    "validation": {"label": "验证分支 · 只验证主线风险", "items": [
+      {"title": "首次 Demo 的最小验收", "detail": "只检查用户是否能得到正确的 Skill + Evidence", "state": "queued"},
+      {"title": "共享连接层回归", "detail": "只有 Review Bridge 被两个入口复用后才增加", "state": "queued"}
+    ]},
+    "support": {"label": "支持 · 不抢主线", "items": [
+      {"title": "看板与状态同步", "detail": "每个模块完成后更新 status.json", "state": "ready"},
+      {"title": "治理与来源记录", "detail": "只记录改变决策或复现所需的内容", "state": "queued"}
+    ]}
+  },
+  "not_now": ["Runtime", "Override", "Subloop", "Library Edition", "发布与多平台 Adapter", "非阻塞边界测试"],
   "risks": [
-    {"level": "high", "title": "用户还没有可用 Demo", "detail": "当前首要目标不是增加 Core 测试，而是打通真实入口。"},
+    {"level": "medium", "title": "首次 Demo 尚未体验", "detail": "入口已接通，仍需一次真实调用确认用户体验。"},
     {"level": "medium", "title": "0..n Loop 尚未扩展", "detail": "先保障单 Loop Demo，扩展前不把多 Loop 宣称为已支持。"},
     {"level": "low", "title": "远端已同步", "detail": "main 与 feature 当前同步到 cec9bf3。"}
   ],
@@ -40,6 +55,6 @@
     {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
     {"date": "2026-07-22", "title": "交付实时项目看板", "detail": "看板服务已启动，持续显示 Demo 状态、下一步、风险和活动。"},
     {"date": "2026-07-22", "title": "Core proof slice 完成", "detail": "后端构建链、Evidence 和 Drift 已验证，但不等同于产品 Demo。"},
-    {"date": "2026-07-22", "title": "下一阶段重新定向", "detail": "停止重复审计，直接迁移已有 From-scratch 实现。"}
+    {"date": "2026-07-22", "title": "From-scratch 入口已接通", "detail": "复用 Loopy 访谈、Loopability、Candidate Review 和真实 Core build。"}
   ]
 }
