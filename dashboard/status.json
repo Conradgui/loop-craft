@@ -58,7 +58,7 @@
     {"level": "low", "title": "源包并发变化窗口", "detail": "构建前重做 Inventory 并在复制前逐文件核对摘要；极窄的外部并发改动窗口不宣称为事务快照。"},
     {"level": "medium", "title": "首次 Demo 尚未体验", "detail": "From-scratch 入口已接通，仍需用户提供一次真实目标。"},
     {"level": "medium", "title": "0..n Loop 尚未扩展", "detail": "先保障单 Loop Demo，扩展前不把多 Loop 宣称为已支持。"},
-    {"level": "low", "title": "远端同步待本阶段提交", "detail": "Packaging Adapter 已在本地完成，收尾提交后同步 origin/main。"}
+    {"level": "low", "title": "远端已同步", "detail": "Packaging Adapter 已提交并推送到 origin/main（6e0a98a）。"}
   ],
   "activity": [
     {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
