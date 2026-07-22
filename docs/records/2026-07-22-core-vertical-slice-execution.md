@@ -15,7 +15,7 @@
 6. Official validator `py -3.13 C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_validate.py build/final-a/artifact/skill-polish-loop` -> `Skill is valid!` (exit 0).
 7. `py -3.13 loop-craft/scripts/build_loop.py verify build/final-a` -> `status: clean`, actual and expected artifact digest both `sha256:23ac2315e146fcb6b278b004fed44e9a4473425147449b348ffefee21939f357` (exit 0).
 8. `py -3.13 loop-craft/scripts/build_loop.py verify build/final-b` -> `status: clean`, actual and expected artifact digest both `sha256:23ac2315e146fcb6b278b004fed44e9a4473425147449b348ffefee21939f357` (exit 0).
-9. Python 3.13 SHA-256 snapshot over every relative file path and raw bytes in `build/final-a` and `build/final-b` -> 8 files each; both snapshot digests `1ab976140496cc81535a195c83ac77d6e0e0654788d37ab44c6d773e0cd1cebc`; `byte_identical=True`.
+9. Python 3.13 snapshot mapping each relative POSIX path to `SHA-256(file raw bytes)` in `build/final-a` and `build/final-b` -> 8 files each; relative paths and every per-file digest matched; `byte_identical=True`.
 10. `rg -n -i "loopy|loop library" loop-craft build/final-a/artifact` -> no matches (exit 1 is the expected no-match result).
 11. `git diff --check` -> no output (exit 0); `git status --short` -> no output before this record.
 
