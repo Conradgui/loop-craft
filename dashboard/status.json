@@ -1,0 +1,43 @@
+{
+  "project": "Loop Craft",
+  "updated_at": "2026-07-22T14:00:00+08:00",
+  "overall": {
+    "label": "Demo 尚未完成",
+    "tone": "blocked",
+    "summary": "确定性 Core 后端已完成，但用户还不能通过 Loop Craft 直接完成一条从零设计到 Skill 产出的路径。"
+  },
+  "milestone": {
+    "name": "M0 · 产品化纠偏",
+    "state": "in_progress",
+    "progress": 18,
+    "next": "接通 From-scratch 入口，交付第一条真实可用 Demo"
+  },
+  "metrics": [
+    {"label": "用户可用 Demo", "value": "0 / 1", "tone": "blocked"},
+    {"label": "入口已接通", "value": "0 / 3", "tone": "blocked"},
+    {"label": "Core 后端", "value": "可复用", "tone": "ready"},
+    {"label": "测试策略", "value": "按风险触发", "tone": "neutral"}
+  ],
+  "delivered": [
+    {"title": "确定性 Core 构建链", "detail": "Accepted Definition → Compiler → Skill / Evidence / Drift", "state": "ready"},
+    {"title": "入口候选资产已定位", "detail": "Loopy Craft、Skill Upgrade、Workflow Skill Creator 均有可迁移实现", "state": "ready"},
+    {"title": "项目控制规则已修正", "detail": "产品优先、复用优先、测试默认 0，1:2.5 只是绝对上限", "state": "ready"}
+  ],
+  "next_steps": [
+    {"id": "N1", "title": "迁移 From-scratch Craft", "detail": "复用 Loopy 访谈、Craft 和预检，不重写", "state": "active"},
+    {"id": "N2", "title": "接入最小 Review Bridge", "detail": "只补 Candidate → 用户确认 → Accepted Definition 的连接", "state": "queued"},
+    {"id": "N3", "title": "交付第一条 Demo", "detail": "用户直接调用 Skill，得到一个可检查的最终 Skill 和 Evidence", "state": "queued"},
+    {"id": "N4", "title": "接入 Skill Upgrade", "detail": "复用 Phase 1 的 Loopability Gate 和四类 verdict", "state": "queued"},
+    {"id": "N5", "title": "接入 Conversation Distiller", "detail": "本地化 Workflow Skill Creator，复用同一 Review Bridge", "state": "queued"}
+  ],
+  "risks": [
+    {"level": "high", "title": "用户还没有可用 Demo", "detail": "当前首要目标不是增加 Core 测试，而是打通真实入口。"},
+    {"level": "medium", "title": "0..n Loop 尚未扩展", "detail": "先保障单 Loop Demo，扩展前不把多 Loop 宣称为已支持。"},
+    {"level": "low", "title": "远端已同步", "detail": "main 与 feature 当前同步到 cec9bf3。"}
+  ],
+  "activity": [
+    {"date": "2026-07-22", "title": "建立产品优先 Agent 规则", "detail": "AGENTS.md 已加入 walking skeleton、复用优先、按风险测试和停止规则。"},
+    {"date": "2026-07-22", "title": "Core proof slice 完成", "detail": "后端构建链、Evidence 和 Drift 已验证，但不等同于产品 Demo。"},
+    {"date": "2026-07-22", "title": "下一阶段重新定向", "detail": "停止重复审计，直接迁移已有 From-scratch 实现。"}
+  ]
+}

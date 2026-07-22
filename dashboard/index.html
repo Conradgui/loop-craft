@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loop Craft · Project Console</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #66727d;
+      --line: #d8dee3;
+      --paper: #f6f8f9;
+      --surface: #ffffff;
+      --accent: #c6532f;
+      --accent-soft: #f8e4dc;
+      --ready: #27745c;
+      --ready-soft: #e3f2eb;
+      --blocked: #a83e35;
+      --blocked-soft: #f8e3e0;
+      --neutral-soft: #e8edf0;
+      --shadow: 0 18px 44px rgba(23, 33, 43, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
+    main { min-width: 0; padding: 34px 42px 56px; }
+    aside { background: var(--ink); color: #eef3f5; padding: 30px 24px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { max-width: 780px; margin: 9px 0 10px; font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.04em; line-height: .98; }
+    h2 { margin: 0; font-size: 15px; letter-spacing: .02em; }
+    p { color: var(--muted); line-height: 1.65; }
+    .lead { max-width: 760px; margin: 0 0 28px; font-size: 16px; }
+    .status-line { display: flex; align-items: center; gap: 11px; margin: 20px 0 28px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blocked); box-shadow: 0 0 0 5px var(--blocked-soft); }
+    .status-line strong { font-size: 15px; }
+    .status-line span { color: var(--muted); font-size: 13px; }
+    .section { margin-top: 34px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 11px; }
+    .section-head small { color: var(--muted); font-size: 12px; }
+    .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+    .metric { padding: 18px 16px 17px 0; border-right: 1px solid var(--line); }
+    .metric:not(:first-child) { padding-left: 16px; }
+    .metric:last-child { border-right: 0; }
+    .metric-label { color: var(--muted); font-size: 12px; }
+    .metric-value { margin-top: 7px; font-size: 20px; font-weight: 750; letter-spacing: -.02em; }
+    .metric-value.blocked { color: var(--blocked); }
+    .metric-value.ready { color: var(--ready); }
+    .metric-value.neutral { color: var(--ink); }
+    .list { display: grid; gap: 0; }
+    .row { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 13px; align-items: start; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .row-mark { width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--line); }
+    .row-mark.ready, .row-mark.active { background: var(--ready); }
+    .row-mark.blocked { background: var(--blocked); }
+    .row-title { font-size: 14px; font-weight: 750; }
+    .row-detail { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .state { align-self: start; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .state.active { color: var(--accent); }
+    .state.ready { color: var(--ready); }
+    .state.blocked { color: var(--blocked); }
+    .progress { height: 7px; margin-top: 16px; background: #dce2e5; overflow: hidden; }
+    .progress > span { display: block; height: 100%; width: 18%; background: var(--accent); transition: width .5s ease; }
+    .milestone-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 9px; color: var(--muted); font-size: 12px; }
+    aside h2 { margin-bottom: 8px; color: #fff; }
+    aside p { color: #b9c4cb; font-size: 13px; }
+    .side-block { padding: 20px 0; border-top: 1px solid rgba(255,255,255,.16); }
+    .side-block:first-of-type { border-top: 0; }
+    .side-list { display: grid; gap: 13px; margin-top: 15px; }
+    .side-item { padding-left: 14px; border-left: 2px solid #40505b; }
+    .side-item.high { border-color: #f07c63; }
+    .side-item.medium { border-color: #e0b158; }
+    .side-item.low { border-color: #6cc39c; }
+    .side-item strong { display: block; font-size: 13px; }
+    .side-item span { display: block; margin-top: 4px; color: #b9c4cb; font-size: 12px; line-height: 1.5; }
+    .updated { position: sticky; top: 0; padding: 10px 0 20px; background: var(--ink); color: #aebbc3; font-size: 11px; }
+    .pulse { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #6cc39c; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+    .error { color: #ffb2a3; font-size: 12px; }
+    @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } aside { padding: 24px; } main { padding: 26px 22px 42px; } }
+    @media (max-width: 620px) { .metric-row { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(2) { border-right: 0; } .metric:nth-child(3), .metric:nth-child(4) { border-top: 1px solid var(--line); } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main>
+      <div class="eyebrow">Loop Craft · Project Console</div>
+      <h1 id="project">Loading project state…</h1>
+      <p class="lead" id="summary"></p>
+      <div class="status-line"><i class="dot" id="status-dot"></i><strong id="overall"></strong><span id="updated-main"></span></div>
+
+      <section class="section" aria-labelledby="milestone-title">
+        <div class="section-head"><h2 id="milestone-title">Current milestone</h2><small id="milestone-state"></small></div>
+        <div class="milestone-meta"><strong id="milestone-name"></strong><span id="milestone-progress"></span></div>
+        <div class="progress"><span id="progress-bar"></span></div>
+        <div class="milestone-meta"><span>Next</span><strong id="milestone-next"></strong></div>
+      </section>
+
+      <section class="section" aria-labelledby="metrics-title">
+        <div class="section-head"><h2 id="metrics-title">Product signal</h2><small>user value first</small></div>
+        <div class="metric-row" id="metrics"></div>
+      </section>
+
+      <section class="section" aria-labelledby="delivered-title">
+        <div class="section-head"><h2 id="delivered-title">Delivered</h2><small>already real</small></div>
+        <div class="list" id="delivered"></div>
+      </section>
+
+      <section class="section" aria-labelledby="next-title">
+        <div class="section-head"><h2 id="next-title">Next actions</h2><small>ordered path</small></div>
+        <div class="list" id="next-steps"></div>
+      </section>
+
+      <section class="section" aria-labelledby="activity-title">
+        <div class="section-head"><h2 id="activity-title">Activity</h2><small>latest updates</small></div>
+        <div class="list" id="activity"></div>
+      </section>
+    </main>
+
+    <aside>
+      <div class="updated"><span class="pulse"></span>Live state · <span id="updated-side">—</span></div>
+      <div class="side-block">
+        <h2>What this means</h2>
+        <p>The deterministic Core is reusable infrastructure. The current objective is a real From-scratch Demo that a user can invoke.</p>
+      </div>
+      <div class="side-block">
+        <h2>Risks</h2>
+        <div class="side-list" id="risks"></div>
+      </div>
+      <div class="side-block">
+        <h2>Operating rules</h2>
+        <p>Reuse before build. Test only when a concrete risk justifies it. The 1:2.5 ratio is an upper bound, not a quota.</p>
+      </div>
+      <div class="side-block">
+        <h2>Refresh</h2>
+        <p>State refreshes every 5 seconds from <code>status.json</code>.</p>
+        <div class="error" id="error" hidden></div>
+      </div>
+    </aside>
+  </div>
+  <script>
+    const state = (id) => document.getElementById(id);
+    const safe = (value) => String(value ?? "");
+    const titleCase = (value) => safe(value).replaceAll("_", " ");
+    function render(data) {
+      state("project").textContent = data.project;
+      state("summary").textContent = data.overall.summary;
+      state("overall").textContent = data.overall.label;
+      state("status-dot").style.background = data.overall.tone === "blocked" ? "var(--blocked)" : "var(--ready)";
+      const updated = new Date(data.updated_at).toLocaleString("zh-CN", {hour12: false});
+      state("updated-main").textContent = `状态更新 ${updated}`;
+      state("updated-side").textContent = updated;
+      state("milestone-state").textContent = titleCase(data.milestone.state);
+      state("milestone-name").textContent = data.milestone.name;
+      state("milestone-progress").textContent = `${data.milestone.progress}%`;
+      state("progress-bar").style.width = `${data.milestone.progress}%`;
+      state("milestone-next").textContent = data.milestone.next;
+      state("metrics").innerHTML = data.metrics.map(item => `<div class="metric"><div class="metric-label">${safe(item.label)}</div><div class="metric-value ${safe(item.tone)}">${safe(item.value)}</div></div>`).join("");
+      const row = (item, stateText) => `<div class="row"><i class="row-mark ${safe(item.state)}"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.detail)}</div></div><span class="state ${safe(item.state)}">${safe(stateText || titleCase(item.state))}</span></div>`;
+      state("delivered").innerHTML = data.delivered.map(item => row(item, "ready")).join("");
+      state("next-steps").innerHTML = data.next_steps.map(item => row(item, item.state === "active" ? "now" : "queued")).join("");
+      state("activity").innerHTML = data.activity.map(item => `<div class="row"><i class="row-mark ready"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.date)} · ${safe(item.detail)}</div></div></div>`).join("");
+      state("risks").innerHTML = data.risks.map(item => `<div class="side-item ${safe(item.level)}"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("");
+      state("error").hidden = true;
+    }
+    async function refresh() {
+      try {
+        const response = await fetch(`status.json?ts=${Date.now()}`, {cache: "no-store"});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        render(await response.json());
+      } catch (error) {
+        state("error").hidden = false;
+        state("error").textContent = `状态读取失败：${error.message}`;
+      }
+    }
+    refresh();
+    setInterval(refresh, 5000);
+  </script>
+</body>
+</html>
