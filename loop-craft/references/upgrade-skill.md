@@ -93,12 +93,12 @@ If any condition fails, stop at **Assessment only**. Return the Decision Record 
 
 If the gate passes, use the Decision Record as input to the shared Candidate Review in [candidate-review.md](candidate-review.md). Reuse answers already established by the record and scoped evidence; do not ask them again. Do not write the accepted definition, inventory the source package, or build until the user explicitly approves the Candidate.
 
-After Candidate approval, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Inventory the source package, then show the definition mapping and reviewed manifest and obtain approval before building.
+After Candidate approval, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Create a reviewed `entry-evidence-v0.1` record with `entry_type: existing_skill`, `source_summary.kind: skill_assessment`, safe source IDs, structured fact summaries, resolved clarifications, the Candidate Review classification, and the fixed local-build approval. Inventory the source package, then show the definition mapping, reviewed Entry Evidence, and reviewed source-package manifest and obtain approval before building.
 
 ## 7. Perform the approved upgrade
 
 After approval, re-read the target. If it changed materially or implementation requires a new finding, boundary, resource, or authority, stop for renewed approval.
 
-Build the replacement into a new output directory with both `--source-skill` and `--package-manifest`; do not edit or overwrite the source Skill. Follow [core-build.md](core-build.md) for the exact inventory/build commands and failure handling. The output must contain the complete source-preserving Skill and its separate source-bound Evidence package.
+Build the replacement into a new output directory with `--source-skill`, `--package-manifest`, and `--entry-evidence`; do not edit or overwrite the source Skill. Follow [core-build.md](core-build.md) for the exact inventory/build commands and failure handling. The source-package binding proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. Neither record replaces or copies the other. Entry Evidence contains no raw Skill payload, absolute paths, private source material, or development record. The output must contain the complete source-preserving Skill and its separate source-bound and entry-bound Evidence package.
 
 Report the Decision Record, approved finding IDs, generated Skill path, Evidence path, preserved behavior, checks actually performed, and unresolved risks. Do not claim a complete upgrade when the Core compatibility gate did not pass.

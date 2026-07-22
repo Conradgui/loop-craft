@@ -19,6 +19,7 @@ def parse_args() -> argparse.Namespace:
     build.add_argument("output", type=Path)
     build.add_argument("--source-skill", type=Path)
     build.add_argument("--package-manifest", type=Path)
+    build.add_argument("--entry-evidence", type=Path)
 
     inventory = subcommands.add_parser("inventory")
     inventory.add_argument("source_skill_dir", type=Path)
@@ -44,6 +45,7 @@ def main() -> int:
             args.output,
             source_skill_dir=args.source_skill,
             package_manifest_path=args.package_manifest,
+            entry_evidence_path=args.entry_evidence,
         )
         print(f"Artifact: {result.artifact_dir}")
         print(f"Evidence: {result.evidence_dir}")

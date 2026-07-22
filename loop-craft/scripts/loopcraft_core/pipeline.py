@@ -19,6 +19,7 @@ from .adapters.source_skill import (
 )
 from .canonical import sha256_digest
 from .compiler import compile_definition
+from .evidence.entry import load_entry_evidence, validate_entry_evidence
 from .evidence.package import package_evidence
 from .validation import validate_definition
 
@@ -50,6 +51,7 @@ def build_definition(
     *,
     source_skill_dir: Path | None = None,
     package_manifest_path: Path | None = None,
+    entry_evidence_path: Path | None = None,
 ) -> BuildResult:
     if (source_skill_dir is None) != (package_manifest_path is None):
         raise ValueError(
@@ -58,6 +60,10 @@ def build_definition(
     definition = json.loads(definition_path.read_text(encoding="utf-8"))
     validate_definition(definition)
     compiled = compile_definition(definition)
+
+    entry_evidence: dict[str, Any] | None = None
+    if entry_evidence_path is not None:
+        entry_evidence = load_entry_evidence(entry_evidence_path, definition)
 
     source_manifest: dict[str, Any] | None = None
     if source_skill_dir is not None and package_manifest_path is not None:
@@ -94,6 +100,7 @@ def build_definition(
             artifact=artifact,
             evidence_dir=staging_root / "evidence",
             source_manifest=source_manifest,
+            entry_evidence=entry_evidence,
         )
         staging_root.replace(output_root)
 
@@ -165,17 +172,34 @@ def verify_build(output_root: Path) -> dict[str, str]:
         "source_package_manifest_digest",
         "source_skill_digest",
     }
-    bound_source = source_binding_fields.issubset(manifest)
-    if bool(source_binding_fields & set(manifest)) != bound_source:
-        raise ValueError("evidence source package binding is incomplete")
+    entry_binding_fields = {"entry_evidence_digest", "entry_type"}
+    binding_specs = (
+        (
+            "source package",
+            source_binding_fields,
+            "source-package-manifest.json",
+        ),
+        (
+            "entry evidence",
+            entry_binding_fields,
+            "entry-evidence.json",
+        ),
+    )
     expected_evidence_files = set(base_evidence_files)
-    if bound_source:
-        expected_evidence_files.add("source-package-manifest.json")
+    bound_contracts: set[str] = set()
+    for label, fields, filename in binding_specs:
+        present = fields & set(manifest)
+        if present and present != fields:
+            raise ValueError(f"evidence {label} binding is incomplete")
+        if present:
+            bound_contracts.add(label)
+            expected_evidence_files.add(filename)
     if {path.name for path in evidence_entries} != expected_evidence_files:
-        count = "six" if bound_source else "five"
         raise ValueError(
-            f"evidence directory must contain exactly the {count} bound files"
+            "evidence directory files do not match manifest bindings"
         )
+    bound_source = "source package" in bound_contracts
+    bound_entry = "entry evidence" in bound_contracts
     if not isinstance(accepted_definition, dict) or not isinstance(
         execution_ir, dict
     ):
@@ -244,6 +268,36 @@ def verify_build(output_root: Path) -> dict[str, str]:
             != manifest["source_skill_digest"]
         ):
             raise ValueError("evidence source Skill digest does not match")
+    if bound_entry:
+        entry_digest = manifest["entry_evidence_digest"]
+        if (
+            not isinstance(entry_digest, str)
+            or DIGEST_CONTRACT.fullmatch(entry_digest) is None
+        ):
+            raise ValueError(
+                "evidence manifest entry_evidence_digest contract is invalid"
+            )
+        if manifest["entry_type"] not in {
+            "from_scratch",
+            "existing_skill",
+            "conversation",
+        }:
+            raise ValueError("evidence manifest entry_type contract is invalid")
+        try:
+            entry_evidence = json.loads(
+                (evidence_root / "entry-evidence.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError("evidence entry evidence is invalid") from exc
+        if not isinstance(entry_evidence, dict):
+            raise ValueError("evidence entry evidence must be an object")
+        validate_entry_evidence(entry_evidence, accepted_definition)
+        if sha256_digest(entry_evidence) != entry_digest:
+            raise ValueError("evidence entry evidence digest does not match")
+        if entry_evidence["entry_type"] != manifest["entry_type"]:
+            raise ValueError("evidence entry type does not match manifest")
     try:
         semantic_payload = {
             "schema_version": accepted_definition["schema_version"],

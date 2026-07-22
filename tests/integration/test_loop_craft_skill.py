@@ -24,6 +24,10 @@ BUILD_COMMAND = (
     "python scripts/build_loop.py build <accepted-definition.json> "
     "<new-output-directory>"
 )
+ENTRY_BUILD_COMMAND = (
+    "python scripts/build_loop.py build <accepted-definition.json> "
+    "<new-output-directory> --entry-evidence <reviewed-entry-evidence.json>"
+)
 VERIFY_COMMAND = "python scripts/build_loop.py verify <existing-output-directory>"
 
 
@@ -170,6 +174,44 @@ def test_core_build_reference_documents_exact_cli_commands() -> None:
         "The runtime must provide Python and jsonschema; if either dependency "
         "is missing, stop and do not guess or install it."
     ) in reference
+
+
+def test_approved_entries_bind_structured_entry_evidence() -> None:
+    references = SKILL / "references"
+    skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    core_text = (references / "core-build.md").read_text(encoding="utf-8")
+
+    assert "--entry-evidence" in skill_text
+    for entry_name in (
+        "from-scratch.md",
+        "upgrade-skill.md",
+        "from-conversation.md",
+    ):
+        entry_text = (references / entry_name).read_text(encoding="utf-8")
+        assert "--entry-evidence" in entry_text
+    assert ENTRY_BUILD_COMMAND in core_text
+    for field in (
+        "schema_version",
+        "entry_type",
+        "definition_digest",
+        "source_summary",
+        "clarifications",
+        "candidate_review",
+        "approval",
+    ):
+        assert f"`{field}`" in core_text
+    combined = "\n".join(
+        [
+            skill_text,
+            core_text,
+            *(path.read_text(encoding="utf-8") for path in references.glob("*.md")),
+        ]
+    )
+    assert "manifest-unbound" not in combined
+    assert "raw conversation" in combined
+    assert "absolute paths" in combined
+    assert "PII" in core_text
+    assert "identity authentication" in core_text
 
 
 def test_product_skill_runs_build_clean_and_drift_verify_from_skill_directory(

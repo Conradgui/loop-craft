@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loopcraft.local/schemas/entry-evidence.schema.json",
+  "title": "Loop Craft Entry Evidence",
+  "$defs": {
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "\\S"
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9]+(?:[._:-][a-z0-9]+)*$"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "entry_type",
+    "definition_digest",
+    "source_summary",
+    "clarifications",
+    "candidate_review",
+    "approval"
+  ],
+  "properties": {
+    "schema_version": {"const": "entry-evidence-v0.1"},
+    "entry_type": {
+      "enum": ["from_scratch", "existing_skill", "conversation"]
+    },
+    "definition_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "source_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_ids", "summary", "facts"],
+      "properties": {
+        "kind": {
+          "enum": ["design_interview", "skill_assessment", "workflow_model"]
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/sourceId"}
+        },
+        "summary": {"$ref": "#/$defs/summary"},
+        "facts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["provenance", "summary"],
+            "properties": {
+              "provenance": {
+                "enum": ["preserved", "normalized", "observed", "inferred", "proposed"]
+              },
+              "summary": {"$ref": "#/$defs/summary"}
+            }
+          }
+        }
+      }
+    },
+    "clarifications": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question_summary", "answer_summary", "resolution"],
+        "properties": {
+          "question_summary": {"$ref": "#/$defs/summary"},
+          "answer_summary": {"$ref": "#/$defs/summary"},
+          "resolution": {"const": "resolved"}
+        }
+      }
+    },
+    "candidate_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification"],
+      "properties": {
+        "classification": {
+          "enum": ["zero_loop_workflow", "one_loop_bounded_loop"]
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "scope"],
+      "properties": {
+        "status": {"const": "approved"},
+        "scope": {"const": "local_artifact_and_evidence_build"}
+      }
+    }
+  }
+}

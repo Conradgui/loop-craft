@@ -155,3 +155,11 @@ Workflow Skill Creator 只复用“先总结已发生事实、让用户纠正、
 Candidate Review 按分类显示不同 packet：0-loop 显示 Workflow steps、success evidence、failure or stop，并审阅每项 must-preserve constraint 在现有 `authority`、`workflow.steps` 或 `workflow.failure_or_stop` 中的落点；1-loop 显示 Observe / Choose / Act / Verify / Record / Adapt cycle、反馈、terminal states、recovery 与 `loops[0].invariants`。两类共同显示 authority、boundary 和 approval scope；不为 0-loop 发明 Schema 不支持的独立 invariants 字段。
 
 Existing Skill Upgrade 在 compatibility gate 通过后，必须以 Decision Record 为输入调用同一 Candidate Review，复用已有答案而不重复提问。Candidate 显式批准后才可写 accepted definition 和 inventory；source mapping 与 manifest 仍需审阅批准后才 build。Core、Schema、Packaging Adapter 均未因本决策修改。
+
+### D-021 Entry Evidence 是 Manifest-bound 批准摘要，不是第二套 IR
+
+三个入口统一输出一个 `entry-evidence-v0.1` 批准摘要，并通过可选 `--entry-evidence` 进入同一构建链。合同根对象固定为七个字段，入口类型与来源摘要类型一一对应；Candidate Review 的 0/1 Loop 分类必须与 accepted definition 一致，批准状态和 scope 固定为本地 Artifact + Evidence 构建，根 `definition_digest` 精确绑定 canonical accepted definition。
+
+Entry Evidence 只保留受控 source IDs、结构化摘要、provenance-labelled facts、已解决澄清、分类和批准，不保存 raw conversation、raw Skill payload、绝对路径、私有源材料或开发记录。该验证只能证明结构、固定 scope、0/1 分类和 digest binding；不能证明摘要真实、完整去敏，也不做 PII 扫描或批准者身份认证。现有入口负责生成和审阅该 JSON，Core 不新增自动抽取器或第二套 Semantic/Execution IR。
+
+Source Package Manifest 与 Entry Evidence 是正交证据：前者证明哪些源包 bytes 被保留，后者记录为什么接受行为合同；两者互不复制或隐式要求。`verify` 从 Manifest 中两组完整绑定字段动态推导 `base + optional source + optional entry` 文件集合，拒绝不完整字段组、结构/摘要/入口类型/definition 错配及缺失或篡改文件，不再增加 5/6/7 文件数量分支。无 Entry Evidence 的历史 build 保持兼容；所有三个入口今后的获批 build 必须显式传入该记录。

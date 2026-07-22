@@ -72,12 +72,13 @@ Use the shared Candidate Review in [candidate-review.md](candidate-review.md). R
 Ask for or propose paths inside the authorized workspace for:
 
 - the accepted definition JSON;
+- a reviewed Entry Evidence JSON containing only safe source IDs and structured summaries;
 - a new output directory that does not exist.
 
-Write the approved `skill-package-v0.1` definition as UTF-8 JSON. Both an approved 0-loop Workflow and an approved 1-loop bounded Loop use the same build command from the `loop-craft` directory:
+Write the approved `skill-package-v0.1` definition as UTF-8 JSON. Write the reviewed `entry-evidence-v0.1` record described in [core-build.md](core-build.md), with `entry_type: from_scratch` and `source_summary.kind: design_interview`. Both an approved 0-loop Workflow and an approved 1-loop bounded Loop use the same build command from the `loop-craft` directory:
 
 ```powershell
-python scripts/build_loop.py build <accepted-definition.json> <new-output-directory>
+python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --entry-evidence <reviewed-entry-evidence.json>
 ```
 
-On success, report the generated Skill path and Evidence path. Do not run the generated Loop, install it, publish it, or enable a schedule unless the user separately asks and authorizes that action.
+On success, report the generated Skill path and Evidence path. Entry Evidence contains no raw interview, absolute paths, private source material, or development record. Do not run the generated Loop, install it, publish it, or enable a schedule unless the user separately asks and authorizes that action.

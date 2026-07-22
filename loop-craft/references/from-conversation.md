@@ -69,17 +69,15 @@ Supporting feedback inside a larger staged workflow does not become a defining L
 
 Read [candidate-review.md](candidate-review.md) and use its review packet and approval rules for every entry. Do not write an accepted definition or output directory before explicit approval.
 
-After approval, route a zero-Loop Workflow to `skill-package-v0.1`, or route exactly one defining Loop to the compatible single-Loop build. Do not compress multi-Loop or unsupported behavior. Then follow [core-build.md](core-build.md) for the real build command.
+After approval, route a zero-Loop Workflow to `skill-package-v0.1`, or route exactly one defining Loop to the compatible single-Loop build. Do not compress multi-Loop or unsupported behavior. Create the reviewed `entry-evidence-v0.1` record described in [core-build.md](core-build.md), using `entry_type: conversation` and `source_summary.kind: workflow_model`, then build with `--entry-evidence <reviewed-entry-evidence.json>`.
 
-The deterministic Core binds the accepted definition and any reviewed source-package manifest to its compiled manifest and evidence. It does not yet bind Conversation-entry provenance. Do not claim otherwise.
-
-After a successful build, preserve the Workflow Model, source references, clarification answers, and approval record in a supplemental `entry-evidence.md` at the build output root, outside both `artifact/` and the deterministic `evidence/` directory. Label it **supplemental, manifest-unbound entry evidence**. Do not add entry provenance files to the deterministic `evidence/` directory; the verifier accepts exactly five generated files or six files when a source-package manifest is bound.
+Entry Evidence retains only safe source IDs, a bounded Workflow Model summary, provenance-labelled fact summaries, resolved clarification summaries, Candidate Review classification, and the fixed local-build approval. Never place raw conversation, absolute paths, private source material, or development records in Entry Evidence or Artifact.
 
 ## 7. Artifact and evidence boundaries
 
 Deliver two separate results when a build occurs:
 
 - **Artifact** — a clean, discoverable Skill containing reusable behavior and approved dependencies. It must not contain raw conversation, private development notes, or unapproved provenance.
-- **Evidence Package** — the Core-generated `evidence/` directory plus the supplemental root-level `entry-evidence.md`. The supplemental record retains the Workflow Model, source/gap labels, clarification record, and Candidate Review approval; it is not covered by the Core manifest. The deterministic directory retains the accepted definition and compiled build evidence.
+- **Evidence Package** — the Core-generated `evidence/` directory. Its canonical `entry-evidence.json` retains the structured Workflow Model summary, safe source IDs, provenance labels, clarification summaries, Candidate Review classification, and approval; `build-manifest.json` binds its digest and entry type alongside the accepted definition and compiled build evidence.
 
 Do not run, install, publish, schedule, or connect the result to an external catalog service. Runtime, Override, Subloop, multi-platform adapters, fixed install locations, and Library Edition remain out of scope unless separately authorized.

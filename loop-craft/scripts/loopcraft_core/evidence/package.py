@@ -8,6 +8,7 @@ from ..adapters.codex_skill import SkillArtifact, directory_digest
 from ..adapters.source_skill import validate_source_manifest
 from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
+from .entry import validate_entry_evidence
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,7 @@ def package_evidence(
     artifact: SkillArtifact,
     evidence_dir: Path,
     source_manifest: dict[str, Any] | None = None,
+    entry_evidence: dict[str, Any] | None = None,
 ) -> EvidenceResult:
     _validate_inputs(
         definition=definition,
@@ -79,6 +81,8 @@ def package_evidence(
     )
     if source_manifest is not None:
         validate_source_manifest(source_manifest)
+    if entry_evidence is not None:
+        validate_entry_evidence(entry_evidence, definition)
     evidence_dir.mkdir(parents=True, exist_ok=False)
     validation_report = {
         "schema_validation": "passed",
@@ -118,6 +122,9 @@ def package_evidence(
         manifest["source_skill_digest"] = source_manifest[
             "source_skill_digest"
         ]
+    if entry_evidence is not None:
+        manifest["entry_evidence_digest"] = sha256_digest(entry_evidence)
+        manifest["entry_type"] = entry_evidence["entry_type"]
 
     _write_json(evidence_dir / "accepted-definition.json", definition)
     _write_json(
@@ -131,5 +138,7 @@ def package_evidence(
             evidence_dir / "source-package-manifest.json",
             source_manifest,
         )
+    if entry_evidence is not None:
+        _write_json(evidence_dir / "entry-evidence.json", entry_evidence)
     _write_json(evidence_dir / "build-manifest.json", manifest)
     return EvidenceResult(evidence_dir, manifest)

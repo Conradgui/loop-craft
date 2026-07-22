@@ -7,7 +7,7 @@ description: Use when a user wants to design one bounded feedback loop from a go
 
 Route the request into one of the supported paths below. Keep the interview and review conversational; use the deterministic Core only after the definition is accepted.
 
-All three design entries recover their own source-specific Candidate Behavior Contract, then apply the single shared [references/loopability-gate.md](references/loopability-gate.md) and [references/candidate-review.md](references/candidate-review.md). Do not duplicate or modify the seven Gate checks inside an entry. A Candidate becomes an accepted definition only after explicit approval of its behavior, authority, representable must-preserve constraints, boundary, and deliverable; only a 1-loop definition has `loops[0].invariants`.
+All three design entries recover their own source-specific Candidate Behavior Contract, then apply the single shared [references/loopability-gate.md](references/loopability-gate.md) and [references/candidate-review.md](references/candidate-review.md). Do not duplicate or modify the seven Gate checks inside an entry. A Candidate becomes an accepted definition only after explicit approval of its behavior, authority, representable must-preserve constraints, boundary, and deliverable; only a 1-loop definition has `loops[0].invariants`. For every approved entry build, create the reviewed structured Entry Evidence described in [references/core-build.md](references/core-build.md) and pass it with `--entry-evidence`.
 
 ## From-scratch design
 
@@ -17,7 +17,7 @@ When the user wants to turn a goal into a new loop, read [references/from-scratc
 - Recommend a one-shot Workflow when fresh feedback cannot change a later action.
 - Build only one bounded Loop in the current Demo profile. Do not compress multiple independent Loops into one.
 - Show the Candidate Review before writing files or invoking the Core.
-- After explicit approval, write the accepted definition and build the target Skill with separate Evidence.
+- After explicit approval, write the accepted definition and reviewed Entry Evidence, then build the target Skill with separate Manifest-bound Evidence.
 
 ## Existing Skill upgrade
 
@@ -38,13 +38,14 @@ When the user wants to turn an authorized completed conversation, interaction, o
 - Ask one high-value clarification question at a time, with the current understanding, evidence or gap, impact, and a proposed interpretation.
 - Reuse the shared Loopability Gate and Candidate Review used by the other entries.
 - Build an approved one-shot workflow as an ordinary zero-Loop Skill through `skill-package-v0.1`. Build exactly one defining Loop when it maps without semantic loss. A multi-loop or otherwise unsupported workflow stops at assessment or Candidate and does not call the Core.
-- Keep the final Skill artifact separate from the original conversation and development record; preserve the Workflow Model, clarifications, and approval trail only in Evidence.
+- Keep the final Skill artifact separate from the original conversation and development record; preserve only structured source summaries, safe source IDs, clarifications, Candidate Review classification, and approval in Entry Evidence.
 
 ## Accepted definition build or drift verification
 
 Read [references/core-build.md](references/core-build.md) before running a command.
 
 - Build only from an accepted JSON definition into a new output directory.
+- Use `--entry-evidence <reviewed-entry-evidence.json>` for a build produced by any of the three approved design entries.
 - Verify only an existing build produced by the build command.
 - Stop when an input is missing, invalid, the wrong kind, or outside the selected operation. Do not guess a replacement input or alter an existing build during verification.
 
