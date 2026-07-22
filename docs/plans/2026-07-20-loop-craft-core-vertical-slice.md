@@ -8,6 +8,8 @@
 
 **Tech Stack:** Python 3.12+ reference implementation, Python standard library, jsonschema 4.x, pytest 8/9, JSON Schema Draft 2020-12, Codex Skill folder format.
 
+**Execution status:** Tasks 1-10 completed for the approved Core vertical slice on 2026-07-22. Final code verification used `d9bfab2e297f6d0ebf0e64df5d1b39f8f1d7ccd8`; see `docs/records/2026-07-22-core-vertical-slice-execution.md`. This status does not include the reserved phase-2 plans listed below.
+
 ---
 
 ## Scope
@@ -77,7 +79,7 @@ tests/
 └─ integration/
    ├─ test_build_pipeline.py
    └─ test_loop_craft_skill.py
-docs/records/2026-07-20-core-vertical-slice-execution.md
+docs/records/2026-07-22-core-vertical-slice-execution.md
 ~~~
 
 Ownership:
@@ -112,7 +114,7 @@ The following approved Spec areas are intentionally reserved for separate plans:
 - Create: loop-craft/scripts/loopcraft_core/__init__.py
 - Create: loop-craft/scripts/loopcraft_core/canonical.py
 
-- [ ] **Step 1: Create configuration and the failing test**
+- [x] **Step 1: Create configuration and the failing test**
 
 ~~~toml
 [build-system]
@@ -167,7 +169,7 @@ def test_canonical_json_rejects_nan() -> None:
         raise AssertionError("NaN must not be accepted")
 ~~~
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -177,7 +179,7 @@ python -m pytest tests/unit/test_canonical.py -v
 
 Expected: ModuleNotFoundError for loopcraft_core or loopcraft_core.canonical.
 
-- [ ] **Step 3: Add the minimal implementation**
+- [x] **Step 3: Add the minimal implementation**
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/__init__.py
@@ -214,7 +216,7 @@ def sha256_digest(value: Any) -> str:
     return f"sha256:{digest}"
 ~~~
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -224,7 +226,7 @@ python -m pytest tests/unit/test_canonical.py -v
 
 Expected: 2 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ~~~powershell
 git add pyproject.toml tests/conftest.py tests/unit/test_canonical.py loop-craft/scripts/loopcraft_core
@@ -240,7 +242,7 @@ git commit -m "test: establish deterministic core serialization"
 - Create: tests/fixtures/accepted-definition.valid.json
 - Create: tests/unit/test_validation.py
 
-- [ ] **Step 1: Add the valid fixture**
+- [x] **Step 1: Add the valid fixture**
 
 ~~~json
 {
@@ -305,7 +307,7 @@ git commit -m "test: establish deterministic core serialization"
 }
 ~~~
 
-- [ ] **Step 2: Write failing validation tests**
+- [x] **Step 2: Write failing validation tests**
 
 ~~~python
 # tests/unit/test_validation.py
@@ -351,7 +353,7 @@ def test_core_slice_requires_exactly_one_loop(loop_count: int) -> None:
     assert any(issue.path == "/loops" for issue in captured.value.issues)
 ~~~
 
-- [ ] **Step 3: Verify RED**
+- [x] **Step 3: Verify RED**
 
 Run:
 
@@ -361,7 +363,7 @@ python -m pytest tests/unit/test_validation.py -v
 
 Expected: import failure because loopcraft_core.validation does not exist.
 
-- [ ] **Step 4: Add the complete initial schema**
+- [x] **Step 4: Add the complete initial schema**
 
 ~~~json
 {
@@ -478,7 +480,7 @@ Expected: import failure because loopcraft_core.validation does not exist.
 }
 ~~~
 
-- [ ] **Step 5: Implement structured schema validation**
+- [x] **Step 5: Implement structured schema validation**
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/kernel/__init__.py
@@ -539,7 +541,7 @@ def validate_definition(definition: dict[str, Any]) -> None:
         raise DefinitionValidationError(issues)
 ~~~
 
-- [ ] **Step 6: Verify GREEN**
+- [x] **Step 6: Verify GREEN**
 
 Run:
 
@@ -557,7 +559,7 @@ Validation issue paths use RFC 6901 JSON Pointers, so the document root is the
 empty string. Add regression tests for these boundaries and keep the one-Loop
 Profile unchanged.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/kernel loop-craft/scripts/loopcraft_core/validation.py tests/fixtures tests/unit/test_validation.py
@@ -570,7 +572,7 @@ git commit -m "feat: validate accepted loop definitions"
 - Modify: loop-craft/scripts/loopcraft_core/validation.py
 - Modify: tests/unit/test_validation.py
 
-- [ ] **Step 1: Add failing semantic and ordering tests**
+- [x] **Step 1: Add failing semantic and ordering tests**
 
 ~~~python
 @pytest.mark.parametrize(
@@ -611,7 +613,7 @@ def test_non_canonical_authority_overlap_is_reported_before_semantics() -> None:
     assert captured.value.issues[0].path == ""
 ~~~
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -621,7 +623,7 @@ python -m pytest tests/unit/test_validation.py -v
 
 Expected: the authority-overlap cases fail before semantic validation exists; the combined surrogate + overlap regression fails until canonical validation runs before semantic formatting.
 
-- [ ] **Step 3: Implement semantic validation**
+- [x] **Step 3: Implement semantic validation**
 
 Add before validate_definition:
 
@@ -679,7 +681,7 @@ def validate_definition(definition: dict[str, Any]) -> None:
         raise DefinitionValidationError(issues)
 ~~~
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -691,7 +693,7 @@ python -m pytest -q
 
 Expected: all validation tests pass, including all three authority category pairs, the surrogate + authority overlap ordering regression, and the Task 2 hardening regressions. The combined validation + canonical run and the full current suite must both report 25 passed.
 
-- [ ] **Step 5: Commit implementation and review fix**
+- [x] **Step 5: Commit implementation and review fix**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/validation.py tests/unit/test_validation.py
@@ -715,7 +717,7 @@ git commit -m "fix: validate canonical input before semantic checks"
 - Create: loop-craft/scripts/loopcraft_core/compiler.py
 - Create: tests/unit/test_compiler.py
 
-- [ ] **Step 1: Write failing compiler tests**
+- [x] **Step 1: Write failing compiler tests**
 
 ~~~python
 # tests/unit/test_compiler.py
@@ -856,7 +858,7 @@ def test_compiler_validates_before_projecting_the_definition() -> None:
         compile_definition(definition)
 ~~~
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -866,7 +868,7 @@ python -m pytest tests/unit/test_compiler.py -v
 
 Expected: import failure because loopcraft_core.compiler does not exist.
 
-- [ ] **Step 3: Implement the compiler**
+- [x] **Step 3: Implement the compiler**
 
 ~~~python
 # loop-craft/scripts/loopcraft_core/compiler.py
@@ -965,7 +967,7 @@ def compile_definition(definition: dict[str, Any]) -> CompileResult:
     return CompileResult(final_execution_ir, source_map)
 ~~~
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -975,7 +977,7 @@ python -m pytest tests/unit/test_compiler.py -v
 
 Expected: 5 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/compiler.py tests/unit/test_compiler.py
@@ -998,7 +1000,7 @@ git commit -m "feat: compile accepted definitions deterministically"
 - Create: loop-craft/scripts/loopcraft_core/adapters/codex_skill.py
 - Create: tests/unit/test_codex_skill_adapter.py
 
-- [ ] **Step 1: Write the eight failing adapter tests**
+- [x] **Step 1: Write the eight failing adapter tests**
 
 ~~~python
 # tests/unit/test_codex_skill_adapter.py
@@ -1090,7 +1092,7 @@ The eight-test matrix must cover:
 7. A fixture that collides under the old NUL-delimited framing does not collide under `directory_digest`.
 8. `agents/openai.yaml` contains only deterministic interface values.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run:
 
@@ -1100,7 +1102,7 @@ python -m pytest tests/unit/test_codex_skill_adapter.py -v
 
 Expected: import failure because the adapter module does not exist.
 
-- [ ] **Step 3: Implement target Skill rendering and the hardened Adapter boundary**
+- [x] **Step 3: Implement target Skill rendering and the hardened Adapter boundary**
 
 The implementation must satisfy the Task 5 preflight contract above. In particular, render body free text through a shared single-line JSON literal helper, generate coarse and fine Source Map entries, apply the explicit terminal stop rule, and frame directory digest inputs with 8-byte big-endian lengths. The code below is the initial structure; the eight-test matrix is authoritative where the initial structure is incomplete.
 
@@ -1301,7 +1303,7 @@ def render_codex_skill(compiled: CompileResult, artifact_root: Path) -> SkillArt
     return SkillArtifact(skill_dir, directory_digest(skill_dir), adapter_map)
 ~~~
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run:
 
@@ -1311,7 +1313,7 @@ python -m pytest tests/unit/test_codex_skill_adapter.py -v
 
 Expected: 8 passed.
 
-- [ ] **Step 5: Run the official structural validator**
+- [x] **Step 5: Run the official structural validator**
 
 Run after generating the fixture into build/adapter-check:
 
@@ -1322,7 +1324,7 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-creator\scripts\quick_valid
 
 Expected: validator exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ~~~powershell
 git add loop-craft/scripts/loopcraft_core/adapters tests/unit/test_codex_skill_adapter.py
@@ -2050,10 +2052,12 @@ Recorded commits: `d6a3ebb` (`feat: package the core slice as Loop Craft`), `67b
 ### Task 10: Full Verification and Execution Record
 
 **Files:**
-- Create after all checks pass: docs/records/2026-07-20-core-vertical-slice-execution.md
+- Update after all checks pass: docs/records/2026-07-22-core-vertical-slice-execution.md
 - Verify: all files from Tasks 1-9
 
-- [ ] **Step 1: Run the complete test suite**
+Recorded execution used the fresh paths `build/final-20260722-a` and `build/final-20260722-b` so existing ignored outputs did not need deletion. The `build/final-a` / `build/final-b` commands below remain the original plan template.
+
+- [x] **Step 1: Run the complete test suite**
 
 Run:
 
@@ -2063,7 +2067,7 @@ python -m pytest -q
 
 Expected: all tests pass with no warnings emitted by project code.
 
-- [ ] **Step 2: Build two independent outputs**
+- [x] **Step 2: Build two independent outputs**
 
 Run:
 
@@ -2074,7 +2078,7 @@ python loop-craft/scripts/build_loop.py build tests/fixtures/accepted-definition
 
 Expected: both commands exit 0.
 
-- [ ] **Step 3: Validate product and generated Skills**
+- [x] **Step 3: Validate product and generated Skills**
 
 Run:
 
@@ -2085,7 +2089,7 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-creator\scripts\quick_valid
 
 Expected: both validators exit 0.
 
-- [ ] **Step 4: Verify determinism and clean drift status**
+- [x] **Step 4: Verify determinism and clean drift status**
 
 Run:
 
@@ -2097,7 +2101,7 @@ python -c "from pathlib import Path; import hashlib; snap=lambda root:{p.relativ
 
 Expected: both reports are clean and the comparison exits 0.
 
-- [ ] **Step 5: Scan generated artifacts for forbidden residue**
+- [x] **Step 5: Scan generated artifacts for forbidden residue**
 
 Run:
 
@@ -2109,7 +2113,7 @@ exit $LASTEXITCODE
 
 Expected: no matches and final exit code 0.
 
-- [ ] **Step 6: Create the execution record only after all checks pass**
+- [x] **Step 6: Create the execution record only after all checks pass**
 
 ~~~markdown
 # Core Vertical Slice Execution Record
@@ -2144,10 +2148,10 @@ This record supports only the Core vertical slice. It does not claim the three i
 
 If any command fails, do not create the record. Fix the corresponding task and rerun the affected gate first.
 
-- [ ] **Step 7: Final commit**
+- [x] **Step 7: Final commit**
 
 ~~~powershell
-git add pyproject.toml loop-craft tests docs/records/2026-07-20-core-vertical-slice-execution.md
+git add pyproject.toml loop-craft tests docs/records/2026-07-22-core-vertical-slice-execution.md
 git commit -m "test: verify the Loop Craft core vertical slice"
 ~~~
 

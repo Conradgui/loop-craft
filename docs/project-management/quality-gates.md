@@ -6,10 +6,12 @@
 | Gate | 对应风险 | 必须满足 | 证据 | 当前状态 |
 |---|---|---|---|---|
 | G-01 执行前置 | R-005 | 获得 Git 初始化、隔离 branch/worktree、目录命名及依赖环境的批准；确认 Python、pytest、jsonschema 版本；不擅自安装、复制或移动资源。 | 用户已确认整份操作清单：保留 ASCII 路径 `C:\Users\Administrator\Documents\loopcraft`、项目显示名“Loopcraft开发”、创建隔离 worktree、使用现有依赖且不安装。`main` 跟踪 `origin/main`；feature worktree 已创建并跟踪 `origin/feature/core-vertical-slice`；版本已确认 | PASS（仅执行前置门槛） |
-| G-02 输入契约与范围 | R-001、R-002 | 在代码/Schema/证据中明确首条切片是 Accepted Definition 的受限子集；首条切片明确一个 Loop，或实现并测试空/多 Loop；不得宣称完整 Semantic IR、Runtime 或三入口已完成。 | G-02-T1 至 G-02-T5 已验证；Task 5 只投影干净目标 Skill，并明确排除 Evidence、Runtime、Library 与后续范围 | 部分验证（Task 1-5 已验证；后续范围 OPEN） |
-| G-03 编译与 Source Map | R-002、R-003 | 重复构建产生相同 IR、artifact 和摘要；每个关键生成字段、当前 Profile 的 Loop 和元数据都有可回溯映射；Manifest 明确 Semantic IR、Execution IR、Override/no-override、Compiler、Adapter、Profile、Artifact 摘要。 | Task 4 Compiler、Task 5 Adapter、Task 6 Manifest、Task 7 deterministic dual-build 与 Task 8 clean/drift 摘要核对子范围已验证 | 部分完成（Compiler + Adapter + Manifest + 双构建 + drift 子范围） |
-| G-04 产物与证据隔离 | R-003、R-004 | artifact 与 evidence 为兄弟目录；证据绑定 artifact digest；Adapter/Evidence 任一中途失败不留下可被误用的部分输出；漂移验证不修改 artifact。 | Task 6 已验证隔离/摘要绑定/写入前拒绝；Task 7 已验证 staging 与部分失败路径；Task 8 已验证非破坏性 drift、唯一 artifact 根条目及直接 symlink 读取边界。普通已有输出、Evidence 写入中途失败、强杀与非本地 FS 仍无证据 | 部分完成（Task 6-8 子范围；不得关闭） |
-| G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-22-core-vertical-slice-execution.md` 及 build evidence | OPEN |
+| G-02 输入契约与范围 | R-001、R-002 | 在代码/Schema/证据中明确首条切片是 Accepted Definition 的受限子集；首条切片明确一个 Loop，或实现并测试空/多 Loop；不得宣称完整 Semantic IR、Runtime 或三入口已完成。 | Task 1-10 证据、最终规格/质量复审和执行记录均保持 `core-slice-v0.1` 单 Loop 边界；未实现能力未被宣称 | PASS（Core vertical slice） |
+| G-03 编译与 Source Map | R-002、R-003 | 重复构建产生相同 IR、artifact 和摘要；每个关键生成字段、当前 Profile 的 Loop 和元数据都有可回溯映射；Manifest 明确 Semantic IR、Execution IR、Override/no-override、Compiler、Adapter、Profile、Artifact 摘要。 | Compiler/Adapter Source Map、六个严格摘要合同、两次 8 文件构建逐字节一致、两次 clean verify；最终复审 Approved | PASS（Core vertical slice） |
+| G-04 产物与证据隔离 | R-003、R-004 | artifact 与 evidence 为兄弟目录；证据绑定 artifact digest；Adapter/Evidence 任一中途失败不留下可被误用的部分输出；漂移验证不修改 artifact。 | 隔离与摘要绑定、Adapter 失败、Evidence 第 2-5 次写入失败、普通已有输出、非破坏性 drift、空目录及直接 symlink 均有回归；强杀/非本地 FS 保留为 P2 residual | PASS（已测试的本地 Core slice） |
+| G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-22-core-vertical-slice-execution.md`：tested SHA `d9bfab2`、110 tests、双 validator、双 clean verify、8 文件逐字节一致、残留扫描无匹配 | PASS（Core vertical slice） |
+
+下列 Task 1-9 子门槛保留各任务当时的历史状态；其中 `OPEN`、`不关闭` 或 `仍待` 只描述当时快照。当前总门槛以本表顶部及 Task 10 子门槛为准。
 
 ### G-02-T1 子门槛
 
@@ -33,7 +35,7 @@ Task 2 的“已验证”不覆盖 Task 3、Compiler、Adapter、Evidence、Pipe
 |---|---|---|---|
 | Task 3：Semantic Validation | 三组 authority 两两交叉检查、schema → canonical → semantic 顺序及 surrogate + authority overlap 错误边界；当前单 Loop Profile 不实现 `duplicate_loop_id` | `5299f81` + `2da604d`；规格/代码质量复审均 `Approved`，无 Critical/Important；全量与 validation + canonical 定向回归均为 `25 passed`；Schema check 与 `git diff --check` 通过 | 已验证（子任务） |
 
-Task 3 的“已验证”只覆盖当前 `core-slice-v0.1` 的语义校验与 canonical 边界；不覆盖 Compiler、Adapter、Evidence、Pipeline、完整 Semantic IR 或阶段出口。质量复审 Agent 未能在其 PATH 环境运行 pytest，测试证据来自主控在 feature worktree 的独立执行。
+Task 3 的“已验证”只覆盖当前 `core-slice-v0.1` 的语义校验与 canonical 边界；不覆盖 Compiler、Adapter、Evidence、Pipeline 或完整 Semantic IR。该次复审未提供独立测试输出，测试证据来自主控在 feature worktree 的 fresh 执行。
 
 ### G-02-T4 子门槛
 
@@ -84,6 +86,14 @@ Task 8 的 drift 验证不写回 artifact/Evidence，也不提供自动修复。
 | Task 9：Loop Craft 产品 Skill 包装 | `SKILL.md`、`agents/openai.yaml`、`references/core-build.md` 的真实边界；accepted Behavior Contract JSON build；existing build 的只读 drift verify；精确 metadata、相对 reference 链接、Skill cwd 命令和 drift CLI 合同 | `d6a3ebb` + `67b1d22` + `adbde41`；规格/代码质量复审均 `Approved`，无 Missing/Extra/Misinterpreted/越界/Critical/Important；主控 fresh Python 3.13 定向 `6 passed`、全量 `64 passed`；官方 `quick_validate.py`：`Skill is valid!`；`git diff --check` 通过；feature worktree clean | 已验证（子任务） |
 
 Task 9 子门只确认产品 Skill 的声明、安装目录内命令边界和现有 build drift 合同；不覆盖真实 forward behavioral test、Runtime、Library、三入口、发布/调度或阶段出口。Creator Pro authoring gates 已应用；官方 validator compatibility passed 只是兼容底线，不把 `quality_lint` 记为通过。G-05 继续保持 `OPEN`。
+
+### Task 10 子门槛
+
+| 子门槛 | 范围 | 证据 | 状态 |
+|---|---|---|---|
+| Task 10：Core 纵向切片出口 | 最终契约修复、全量测试、双构建、双 Skill validator、双 clean verify、逐文件确定性、Evidence 摘要和残留扫描 | `f8b8938`、`2bc139e`、`0268f2d`、`a95db6b`、`d9bfab2`；最终规格/质量复审 `Approved`；主控 fresh `110 passed`；执行记录保存完整命令与摘要 | PASS（Core vertical slice） |
+
+Task 10 只关闭批准的 `core-slice-v0.1`。真实 forward behavioral experiment 按用户决定延后；三入口、Runtime、Override、Subloop、Library Edition、发布/调度和完整阶段 2 仍不在本门槛内。
 
 ### Plan 勘误基线
 
