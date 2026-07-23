@@ -161,6 +161,7 @@ def test_rejects_empty_unresolved_or_unapproved_records(mutate: Any) -> None:
         "/home/conrad/private.txt",
         "path:/home/conrad/private.txt",
         r"\\server\share\private.txt",
+        "//server/share/private.txt",
     ],
 )
 def test_rejects_absolute_local_paths_anywhere_in_the_record(
@@ -174,6 +175,16 @@ def test_rejects_absolute_local_paths_anywhere_in_the_record(
 
     with pytest.raises(EntryEvidenceValidationError, match="absolute local path"):
         validate_entry_evidence(evidence, definition)
+
+
+def test_accepts_https_url_with_ipv6_host() -> None:
+    definition = load_json(ONE_LOOP_DEFINITION)
+    evidence = valid_entry()
+    evidence["source_summary"]["facts"][0]["summary"] = (
+        "source=https://[2001:db8::1]/path"
+    )
+
+    validate_entry_evidence(evidence, definition)
 
 
 def test_loader_rejects_link_or_junction_without_reading_target(
