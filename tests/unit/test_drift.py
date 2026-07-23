@@ -224,7 +224,7 @@ def test_verify_build_rejects_symlinked_skill_directory_without_changes(
     artifact_before = file_snapshot(external_skill)
     evidence_before = file_snapshot(evidence_dir)
 
-    with pytest.raises(ValueError, match="symlink"):
+    with pytest.raises(ValueError, match="link"):
         verify_build(output)
 
     assert skill_link.is_symlink()
@@ -252,7 +252,7 @@ def test_verify_build_rejects_symlinked_artifact_file_without_changes(
     artifact_before = file_snapshot(artifact_dir)
     evidence_before = file_snapshot(evidence_dir)
 
-    with pytest.raises(ValueError, match="symlink"):
+    with pytest.raises(ValueError, match="link"):
         verify_build(output)
 
     assert skill_link.is_symlink()
@@ -285,7 +285,7 @@ def test_verify_build_rejects_symlinked_output_root_without_changes(
     os.symlink(baseline.output_root, output_link, target_is_directory=True)
     baseline_before = file_snapshot(baseline.output_root)
 
-    with pytest.raises(ValueError, match="symlink"):
+    with pytest.raises(ValueError, match="link"):
         verify_build(output_link)
 
     assert output_link.is_symlink()
@@ -306,7 +306,7 @@ def test_verify_build_rejects_symlinked_evidence_directory_without_changes(
     artifact_before = file_snapshot(artifact_dir)
     evidence_before = file_snapshot(baseline.evidence_dir)
 
-    with pytest.raises(ValueError, match="symlink"):
+    with pytest.raises(ValueError, match="link"):
         verify_build(output)
 
     assert evidence_link.is_symlink()
@@ -336,7 +336,7 @@ def test_verify_build_rejects_symlinked_manifest_without_changes(
     artifact_before = file_snapshot(artifact_dir)
     evidence_before = file_snapshot(baseline.evidence_dir)
 
-    with pytest.raises(ValueError, match="symlink"):
+    with pytest.raises(ValueError, match="link"):
         verify_build(output)
 
     assert manifest_link.is_symlink()
