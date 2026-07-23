@@ -95,6 +95,7 @@
     {"date": "2026-07-22", "title": "问题解决看板已重构", "detail": "用五个可追溯 Gate 替代无依据百分比，并增加问题、行动和 Done-when 台账。"},
     {"date": "2026-07-22", "title": "三入口公共 Gate 完成", "detail": "入口合同 9/9、真实 zero-loop Packaging 1/1、官方 Skill validator 通过；质量复核 Approved。"},
     {"date": "2026-07-23", "title": "Entry Evidence Binding 完成", "detail": "最终 46 项定向验证和官方 validator 通过；UNC/IPv6 URL 边界修复后独立质量复核 Approved。"},
-    {"date": "2026-07-23", "title": "Drift 测试合同同步", "detail": "5 个旧文案断言完成 RED/GREEN 修正；drift 定向 38 passed，生产代码未改。"}
+    {"date": "2026-07-23", "title": "Drift 测试合同同步", "detail": "5 个旧文案断言完成 RED/GREEN 修正；drift 定向 38 passed，生产代码未改。"},
+    {"date": "2026-07-23", "title": "README 与交付文档主线启动", "detail": "根 README 已补齐产品、安装、构建、Evidence 边界和参考资源说明；许可证选择仍待明确授权。"}
   ]
 }
