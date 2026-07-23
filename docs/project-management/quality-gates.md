@@ -11,6 +11,15 @@
 | G-04 产物与证据隔离 | R-003、R-004 | artifact 与 evidence 为兄弟目录；证据绑定 artifact digest；Adapter/Evidence 任一中途失败不留下可被误用的部分输出；漂移验证不修改 artifact。 | 隔离与摘要绑定、Adapter 失败、Evidence 第 2-5 次写入失败、普通已有输出、非破坏性 drift、空目录及直接 symlink 均有回归；强杀/非本地 FS 保留为 P2 residual | PASS（已测试的本地 Core slice） |
 | G-05 阶段出口 | R-001..R-005 | 完整相关测试、官方 Skill 结构校验、两次独立构建、clean/drift 验证、禁用词/依赖残留扫描全部有原始输出；执行记录只在全部通过后创建。 | `docs/records/2026-07-22-core-vertical-slice-execution.md`：tested SHA `d9bfab2`、110 tests、双 validator、双 clean verify、8 文件逐字节一致、残留扫描无匹配 | PASS（Core vertical slice） |
 
+## 当前产品链门槛
+
+| Gate | 对应风险 | 必须满足 | 当前证据 | 状态 |
+|---|---|---|---|---|
+| PG-01 三入口判断 | R-013 | From-scratch、Existing Skill、Conversation 使用唯一七项 Gate 与共享 Candidate Review，同时保留入口特定产物边界。 | `loopability-gate.md` 唯一 owner；入口合同 `9 passed`；独立质量复核 Approved。 | PASS |
+| PG-02 Packaging 与 Entry Evidence | R-013 | 0/1-loop 使用现有 Packaging；Entry Evidence 与 Source Package binding 正交；Artifact/Evidence 隔离；旧 build 兼容。 | Entry Evidence 最终定向 `46 passed`；官方 validator 通过；source+entry、路径边界、历史 build clean verify 已覆盖。 | PASS |
+| PG-03 公共仓库交付 | R-014、R-016 | README、项目描述、许可证/NOTICE、文档导航和最小 CI 与实际能力一致。 | README、项目描述和导航已完成；License/NOTICE OPEN；CI deferred。 | 部分完成 |
+| PG-04 真实用户 Demo | R-015 | 用户从任一真实入口完成澄清、批准、build，并获得可调用 Skill 与独立可验证 Evidence。 | 尚无真实用户任务执行记录。 | OPEN |
+
 下列 Task 1-9 子门槛保留各任务当时的历史状态；其中 `OPEN`、`不关闭` 或 `仍待` 只描述当时快照。当前总门槛以本表顶部及 Task 10 子门槛为准。
 
 ### G-02-T1 子门槛

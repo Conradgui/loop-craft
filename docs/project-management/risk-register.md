@@ -16,6 +16,10 @@
 | R-010 | P2 | Task 5 已把 Markdown 正文中的自由文本编码为单行 JSON string literal，关闭多行 Markdown 结构注入；但 JSON literal 仍会原样保留 `<...>`。 | 当前 Skill 以 Markdown 文件交付且官方结构校验通过，不影响本切片；未来若把不可信文本直接送入允许原始 HTML 的渲染器，仍需独立的输出 sanitization。 | 在引入不可信 HTML 渲染目标时由对应 Adapter 增加并测试上下文相关 sanitization；当前为 Minor、deferred，不阻塞 Task 5。 |
 | R-011 | P2 | `SkillArtifact` dataclass 虽 frozen，但 `artifact.source_map` 是浅可变字典；调用方可在 render 后、Evidence 写出前修改其内容。Manifest 现在会绑定实际写出的 Source Map 摘要，但不阻止内部调用方在打包前改变映射。 | 当前 Pipeline 立即传递且最终 Evidence 摘要可核对；未来开放插件调用或延迟传递时仍可能产生语义上错误但内部一致的 Source Map。 | 扩大调用边界前改为深不可变快照/防御性复制。当前：Minor、deferred，不阻塞 Core slice。 |
 | R-012 | P2 | 普通已有 output、Evidence 第 2-5 次写入失败、CLI、symlink 和 drift 回归现已自动化。强杀和非本地文件系统的 `replace` 原子性仍未验证；`file_snapshot` 只能证明内容未改变，不能单独证明从未读取或元数据未变。 | 当前本地文件系统的正常与已测试失败路径有证据；结果不能外推为进程强杀、远程挂载或完整访问监控保证。 | 部署到非本地 FS 或要求 crash consistency 前单独验证。当前：P2 deferred，不阻塞 Core slice。 |
+| R-013 | P1 | 三入口曾使用不同 Gate，Conversation Entry Evidence 曾为 manifest-unbound。唯一 Gate、共享 Candidate Review、`entry-evidence-v0.1`、Manifest digest/type 和动态 verify 已完成。 | 同一候选不再因入口不同而使用不同 Gate；来源摘要与批准记录可以随 build 验证。 | 入口合同、Entry Evidence、source+entry 组合和路径边界定向验证通过，独立质量复核 Approved。当前：已关闭。 |
+| R-014 | P1 | 公共仓库已有 README 和项目描述，但没有项目许可证或 NOTICE；Resource Registry 记录了 Apache-2.0/MIT 来源边界。 | 外部访问者可以阅读代码，但不能据此推断再分发授权；发布与复用边界不完整。 | 项目所有者明确选择许可证，添加匹配的 LICENSE/NOTICE，并复核上游归属。当前：OPEN。 |
+| R-015 | P1 | 三入口、Packaging 和 Entry Evidence 已接通，但尚未使用一个真实用户目标完成调用、澄清、批准、build、Skill + Evidence 交付。 | 结构与定向测试不能替代真实用户体验；阶段出口仍不可批准。 | 完成一次用户授权的真实 Demo，验证产物可调用、Evidence clean、Artifact 无私密来源材料。当前：OPEN。 |
+| R-016 | P2 | 公共仓库尚无 GitHub Actions；当前验证由本地定向命令和人工记录承担。 | 外部提交没有自动结构/回归门，长期可能产生发布漂移。 | 在首次 Demo 后添加与本地命令一致的最小 Windows/Linux CI。当前：deferred，不阻塞首次 Demo。 |
 
 ## 当前判断
 
@@ -29,4 +33,8 @@
 - R-010 是 Task 5 保留的 HTML rendering Minor；单行 JSON literal 已关闭 Markdown 结构注入，但不应被误写为通用 HTML sanitization。当前不阻塞 Task 5。
 - R-011 是浅可变 Source Map 的 Minor；新增摘要关闭了未绑定漂移，但没有把调用对象变为深不可变，扩大调用边界前仍需处理。
 - R-012 只保留强杀、非本地文件系统原子性和完整访问监控的 P2 residual；普通已有 output 与 Evidence 部分写失败缺口已关闭。
+- R-013 已由共享 Gate、Entry Evidence Manifest binding 和独立质量复核关闭。
+- R-014 是当前唯一需要项目所有者选择的公共交付 P1；README 不把“无许可证”误写为开源授权。
+- R-015 保持 OPEN，直到真实用户 Demo 完成；定向测试和 skeleton 不替代该门槛。
+- R-016 为首次 Demo 后的 P2 自动化工作，不抢占当前用户链路。
 - 资源复用记录 §13 第 237 行已更新为“阶段 2 最终 Spec 已写入并批准”；此前的 `stale` 已消除。第 238 行“Git 仓库尚未初始化”因后续 `git init` 已成为新的过时状态，本日志以实际 Git 命令为准。
