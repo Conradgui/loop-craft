@@ -45,8 +45,8 @@ Assessment、manifest 或 build 单独成功都不是用户 Demo 完成。生成
 
 ## 3. Skill-to-Loop Decision Record
 
-**Target:** `skill-polisher` canonical Skill root at pinned revision  
-**Status:** Ready  
+**Target:** `skill-polisher` canonical Skill root at pinned revision
+**Status:** Ready
 **Verdict:** `embedded_loop`
 
 ### Evidence
@@ -58,7 +58,7 @@ Assessment、manifest 或 build 单独成功都不是用户 Demo 完成。生成
 
 ### Material finding
 
-- **STL-001 — Polish 与 Recheck 具备组成反馈循环的部件，但返回边未实现。**  
+- **STL-001 — Polish 与 Recheck 具备组成反馈循环的部件，但返回边未实现。**
   影响：用户批准一次最小修复后，Agent 可能把 `PARTIAL` 当成结束，也可能无界继续，或在新 Finding
   下沿用旧批准。最小改变是把同一 Finding、同一证据、最多两次修改/复核和扩大范围停机写成一个
   supporting bounded Loop；不重建 Skill，不改变 identity。
@@ -114,29 +114,29 @@ Artifact + Evidence build。`STL-001` 是对已批准问题的稳定编号，不
 
 ## 4. Candidate Review
 
-**Classification:** 1-loop bounded Loop，作为 existing Skill 工作流中的 supporting Loop。  
+**Classification:** 1-loop bounded Loop，作为 existing Skill 工作流中的 supporting Loop。
 **Ready state:** Ready。
 
-1. **Outcome / use conditions**  
+1. **Outcome / use conditions**
    只在 Review 已形成稳定证据、用户选择 `STL-001` 并批准本地修改时，把最小 Polish 与同一
    Finding Recheck 连接为有界返回边。来源边界是固定 revision 的 canonical Skill root 和用户已
    批准规格。
-2. **Inputs / outputs**  
+2. **Inputs / outputs**
    输入是 existing Skill、稳定 Finding、原证据标准和本地 mutation boundary；输出是完整
    source-preserving Skill、same-Finding recheck record 和独立 Evidence。
-3. **Authority**  
+3. **Authority**
    允许读目标、只改生成副本中解决 `STL-001` 所需文件、运行批准的本地检查；扩大 Finding、
    目标、权限、成本或任何外部副作用需要新批准；禁止修改源 Skill、无关文件、identity、远端、
    安装、发布、调度或第三轮。
-4. **Success / stop / handoff**  
+4. **Success / stop / handoff**
    同一 Finding 在原证据下 `RESOLVED` 成功；`NOT_REPRODUCED` clean no-op；缺证据/权限、
    新 Finding、无进展或第二次不成功时停止并交接实际状态。
-5. **Inferred / proposed facts**  
+5. **Inferred / proposed facts**
    `embedded_loop` 已由 Gate 决定；返回边、两轮预算和 attempt state 是已批准 proposal；
    definition 内部版本 `0.1.1` 仅表示本地最小行为升级，不宣称上游发布版本。
-6. **Current boundary**  
+6. **Current boundary**
    单 Loop、本地 Artifact + Evidence；无 Runtime、Library Edition、安装、发布、调度或远端写入。
-7. **Approval scope**  
+7. **Approval scope**
    仅写 accepted definition，并从不变 source 构建新的本地 Artifact 与 Evidence。
 
 批准来源：`docs/specs/2026-07-30-existing-skill-demo-skill-polisher-design.md` 的书面批准，以及
