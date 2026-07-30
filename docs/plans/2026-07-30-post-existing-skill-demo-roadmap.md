@@ -2,7 +2,8 @@
 
 > 状态：当前后续计划
 >
-> 事实基线：本地 `main@3a5fe1e`；远端 `origin/main@255438f`
+> 事实基线：本地与远端 `main@1530688`；首次 GitHub Actions
+> [run 30560334591](https://github.com/Conradgui/loop-craft/actions/runs/30560334591) 4 / 4 通过
 
 ## 目标
 
@@ -21,13 +22,14 @@ Conversation Distillation 真实用户路径，最后处理发布许可证。
 
 ### 1. 推送决策与远端 CI
 
-- [ ] 项目所有者明确决定是否推送本地 `main`。
-- [ ] 若获授权，推送当前 main，不夹带 LICENSE 或新的架构修改。
-- [ ] 观察首次 GitHub Actions 矩阵并保存真实结果。
-- [ ] CI 通过：只更新远端验证证据。
+- [x] 项目所有者明确决定推送本地 `main`。
+- [x] 已推送 `main@1530688`，未夹带 LICENSE 或新的架构修改。
+- [x] 首次 GitHub Actions 矩阵已完成并保存真实结果。
+- [x] CI 通过：Ubuntu / Windows × Python 3.12 / 3.13 共 4 / 4 成功。
 - [ ] CI 失败：只诊断并修复实际失败；不借机扩大测试或重构。
 
-停止条件：没有推送授权时停在本地，不把工作流文件存在表述为远端 CI 已通过。
+实际裁决：CI 通过。checkout@v4 与 setup-python@v5 的 Node 20 弃用提示不影响本次运行，
+登记为非阻塞维护信号，不打断 Conversation Distillation 主线。
 
 ### 2. Conversation Distillation 真实 Demo
 

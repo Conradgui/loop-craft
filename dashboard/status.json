@@ -1,32 +1,32 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T09:03:53-07:00",
+  "updated_at": "2026-07-30T09:13:38-07:00",
   "overall": {
-    "label": "Existing Skill Demo 已并入本地 main；等待远端验证决策",
-    "tone": "blocked",
-    "summary": "From-scratch 与 Existing Skill 两条真实用户路径已经走通，Skill Polisher Demo 的规格、计划、执行记录和看板已 fast-forward 并入本地 main。实验实证表明 RV-003 不在该入口路径，Skill Polisher 也未触发 LC-009，因此二者都不应作为当前前置修复。下一决策是是否推送 main 并观察首次远端 CI；Conversation Distillation 仍是下一条产品主线，LICENSE 最后决定。阶段出口继续保持 DRIFT。"
+    "label": "远端 CI 4 / 4 通过；Conversation Distillation 进入主线设计",
+    "tone": "active",
+    "summary": "本地 main 已推送，首次 GitHub Actions 在 Ubuntu / Windows 与 Python 3.12 / 3.13 四个组合上全部通过，远端可恢复与自动验证边界已建立。该结果不增加新的用户入口：Conversation Distillation 仍为 0 / 1，现进入授权输入与 Workflow Model 的设计门槛。RV-003 与 LC-009 继续按真实触发条件观察，LICENSE 最后决定，阶段出口仍为 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
     "progress": 80,
     "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "决定是否推送本地 main；获授权后观察首次远端 CI"
+    "next": "确认 Conversation Distillation 的唯一授权工作记录与目标产物"
   },
   "metrics": [
     {
-      "label": "当前本地版本",
-      "value": "main · 3a5fe1e",
+      "label": "远端验证目标",
+      "value": "main · 1530688",
       "tone": "ready"
     },
     {
-      "label": "远端基线",
-      "value": "origin/main · 255438f",
-      "tone": "blocked"
+      "label": "首次远端 CI",
+      "value": "4 / 4 · success",
+      "tone": "ready"
     },
     {
-      "label": "实验结果",
-      "value": "merged locally · clean",
+      "label": "GitHub Actions",
+      "value": "run · 30560334591",
       "tone": "ready"
     },
     {
@@ -83,16 +83,16 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "main · 3a5fe1e",
+      "value": "main · 1530688",
       "state": "ready",
       "detail": "原有 Core、三入口骨架、规则修复与治理，以及 Skill Polisher Existing Skill Demo 的规格、计划、执行记录和看板均已进入本地 main。"
     },
     {
       "kind": "remote",
       "title": "远端可恢复版本",
-      "value": "origin/main · 255438f",
-      "state": "blocked",
-      "detail": "本次只执行本地提交，不推送；远端仍缺少当前版本，GitHub Actions 也尚未首跑。"
+      "value": "origin/main · 1530688",
+      "state": "ready",
+      "detail": "本地 main 已推送；GitHub Actions run 30560334591 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部成功。"
     }
   ],
   "issues": [
@@ -101,9 +101,9 @@
       "level": "low",
       "state": "ready",
       "title": "当前版本已获得本地 Git 保护",
-      "fact": "Claude Code 候选、接力看板和 Skill Polisher Demo 均已进入本地 main；当前工作区 clean。",
-      "action": "保留本地 main 与实验 worktree；是否推送另行决定。",
-      "done_when": "已满足；本地版本保护不等于远端发布或阶段出口通过。"
+      "fact": "Claude Code 候选、接力看板和 Skill Polisher Demo 均已进入本地 main 并推送至 origin；当前工作区 clean。",
+      "action": "保留 main、远端基线与实验 worktree；不把推送表述为发布。",
+      "done_when": "已满足；远端版本保护与 CI 通过仍不等于 LICENSE 或阶段出口通过。"
     },
     {
       "priority": "P0-01",
@@ -111,7 +111,7 @@
       "state": "ready",
       "title": "Skill Polisher Existing Skill Demo 已走通",
       "fact": "固定 revision 走完只读 Assessment、批准 Candidate、source-preserving build、clean/drift verify、官方 validator 与一个隔离 smoke case；源 Skill 保持 clean。",
-      "action": "保留执行记录与本地产物；远端 CI 决策后进入 Conversation Distillation。",
+      "action": "保留执行记录与本地产物；当前进入 Conversation Distillation。",
       "done_when": "已满足；Existing Skill 入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
@@ -135,11 +135,11 @@
     {
       "priority": "P1-03",
       "level": "medium",
-      "state": "active",
-      "title": "远端 CI 尚未首跑",
-      "fact": ".github/workflows/validate.yml 已进入当前本地版本，但尚未推送，远端从未执行。",
-      "action": "获得明确推送授权后推送本地 main，并观察首次 GitHub Actions；只修复真实失败。",
-      "done_when": "远端矩阵首次运行完成并通过；在此之前只表述为本地已验证。"
+      "state": "ready",
+      "title": "首次远端 CI 已通过",
+      "fact": "GitHub Actions run 30560334591 在 Ubuntu / Windows × Python 3.12 / 3.13 四个组合上全部成功。",
+      "action": "保留运行链接与结论；Node action 弃用提示不阻塞当前产品主线。",
+      "done_when": "已满足；首次远端矩阵完成并通过。"
     },
     {
       "priority": "P1-04",
@@ -209,21 +209,21 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "决定是否推送本地 main",
-      "detail": "本地 main 已包含全部已验证结果；推送会更新远端基线并触发首次 GitHub Actions，需要项目所有者明确授权。",
-      "state": "active"
+      "title": "本地 main 已推送",
+      "detail": "main@1530688 已同步至 origin，没有夹带 LICENSE 或新的架构修改。",
+      "state": "done"
     },
     {
       "id": "N2",
-      "title": "观察并裁决首次远端 CI",
-      "detail": "推送获批后观察真实矩阵；通过则记录远端证据，失败则只修复实际失败，不预先扩展测试。",
-      "state": "queued"
+      "title": "首次远端 CI 已裁决",
+      "detail": "GitHub Actions run 30560334591 的 4 个矩阵任务全部通过；弃用提示登记为非阻塞维护信号。",
+      "state": "done"
     },
     {
       "id": "N3",
       "title": "执行 Conversation Distillation 真实 Demo",
       "detail": "三入口主线最后一条真实用户路径；复用同一 Gate、Compiler、Evidence 与 Adapter，不新建 Entry Framework。",
-      "state": "queued"
+      "state": "active"
     },
     {
       "id": "N4",
@@ -253,7 +253,7 @@
       "items": [
         {
           "title": "远端 CI 首跑",
-          "detail": "仅在 main 获得推送授权后执行；真实失败才改变实现或测试。"
+          "detail": "run 30560334591 已 4 / 4 通过；不为非阻塞 Node action 弃用提示打断当前主线。"
         },
         {
           "title": "LC-009 条件式护栏",
@@ -303,8 +303,8 @@
   "risks": [
     {
       "level": "medium",
-      "title": "当前本地版本尚未推送",
-      "detail": "本地 main 已到 3a5fe1e，但 origin/main 仍停在 255438f；远端备份与 CI 尚未覆盖当前版本。"
+      "title": "GitHub Actions action 版本存在弃用提示",
+      "detail": "checkout@v4 与 setup-python@v5 在当前托管运行器上被提示仍以 Node 20 为目标；GitHub 强制使用 Node 24 后本次 4 / 4 成功，因此登记为非阻塞维护项。"
     },
     {
       "level": "high",
@@ -319,7 +319,7 @@
     {
       "level": "medium",
       "title": "公共发布边界未闭合",
-      "detail": "LICENSE 未定，CI 未远端首跑；不得宣称可再分发或远端验证已生效。"
+      "detail": "LICENSE 未定；虽然首次远端 CI 已通过，仍不得宣称项目已获得再分发授权或阶段出口已放行。"
     }
   ],
   "phase_gates": [
@@ -344,8 +344,12 @@
       "title": "Skill Polisher Demo 并入本地 main"
     },
     {
+      "state": "ready",
+      "title": "首次远端 CI 4 / 4 通过"
+    },
+    {
       "state": "queued",
-      "title": "LICENSE、远端 CI 与阶段出口复核"
+      "title": "Conversation Demo、LICENSE 与阶段出口复核"
     }
   ],
   "known_limits": [
@@ -367,6 +371,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "首次远端 CI 4 / 4 通过",
+      "detail": "main@1530688 已推送；GitHub Actions run 30560334591 在 Ubuntu / Windows 与 Python 3.12 / 3.13 四个组合上全部成功。"
+    },
     {
       "date": "2026-07-30",
       "title": "Existing Skill Demo 同步到本地 main",
