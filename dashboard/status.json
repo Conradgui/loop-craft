@@ -1,22 +1,22 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T04:53:29-07:00",
+  "updated_at": "2026-07-30T08:51:51-07:00",
   "overall": {
-    "label": "当前版本已获得本地 Git 保护；尚未推送远端",
+    "label": "两条真实入口已走通；阶段出口仍为 DRIFT",
     "tone": "blocked",
-    "summary": "当前本地 HEAD 已包含确定性 Core、三入口骨架、共享 Gate、Packaging、Entry Evidence、五轮行为验证后的规则修复、双语 README、治理文档、CI、管控 Agent 与交接看板；origin/main 仍停在 255438f，尚未推送。From-scratch 已完成一次真实用户 Demo；Skill Polisher Existing Skill Demo 的书面规格已批准，正在隔离分支执行，完成前不计入已交付能力。Conversation Distillation 仍无真实调用证据，阶段出口继续保持 DRIFT。"
+    "summary": "From-scratch 与 Existing Skill 两条真实用户路径已经走通。Skill Polisher 固定 revision 经只读 Assessment、批准 Candidate、source-preserving build、独立 Evidence、clean/drift verify、官方 validator 和一个隔离 Review → Polish → Recheck smoke case；源 Skill 未修改。Conversation Distillation 仍无真实调用证据，RV-003、LC-009 的更广包形边界、远端 CI 与 LICENSE 继续开放，因此阶段出口仍为 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
-    "progress": 60,
-    "progress_label": "From-scratch 1 / 1；其余入口 0 / 2",
-    "next": "按批准规格执行 Skill Polisher 的只读 Assessment、source-preserving build 与单一 smoke case"
+    "progress": 80,
+    "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
+    "next": "复核并提交本地实验结果；推送与远端 CI 另行授权"
   },
   "metrics": [
     {
       "label": "当前本地版本",
-      "value": "HEAD · 07-30",
+      "value": "codex/skill-polisher-demo · 07-30",
       "tone": "ready"
     },
     {
@@ -25,8 +25,8 @@
       "tone": "blocked"
     },
     {
-      "label": "提交后工作区",
-      "value": "clean · 0 + 0",
+      "label": "实验结果",
+      "value": "ready · 本地待提交",
       "tone": "ready"
     },
     {
@@ -35,8 +35,13 @@
       "tone": "ready"
     },
     {
-      "label": "其余入口真实 Demo",
-      "value": "0 / 2",
+      "label": "Existing Skill 真实 Demo",
+      "value": "1 / 1",
+      "tone": "ready"
+    },
+    {
+      "label": "Conversation 真实 Demo",
+      "value": "0 / 1",
       "tone": "blocked"
     },
     {
@@ -70,7 +75,7 @@
         "agent": "Codex",
         "id": "current",
         "period": "2026-07-30",
-        "role": "核对对话、Git 与治理记录，校准看板并形成当前本地版本"
+        "role": "校准交接看板，并走通 Skill Polisher Existing Skill 真实 Demo"
       }
     ]
   },
@@ -80,7 +85,7 @@
       "title": "当前本地版本",
       "value": "HEAD · 2026-07-30",
       "state": "ready",
-      "detail": "规则修复、治理与交付文档、CI、管控 Agent、双语 README 和接力看板与原有 Core/三入口能力一起进入本地 Git 历史。"
+      "detail": "原有 Core、三入口骨架、规则修复与治理已受 Git 保护；隔离分支新增 Skill Polisher Existing Skill 真实 Demo 记录，等待本地结果提交。"
     },
     {
       "kind": "remote",
@@ -97,17 +102,17 @@
       "state": "ready",
       "title": "当前版本已获得本地 Git 保护",
       "fact": "项目所有者已授权把 Claude Code 候选与本次交接看板作为当前版本提交；提交后工作区为 clean。",
-      "action": "保留本地提交并复核 Skill Polisher Demo 规格；是否推送另行决定。",
+      "action": "保留本地提交与隔离实验分支；是否推送另行决定。",
       "done_when": "已满足；本地版本保护不等于远端发布或阶段出口通过。"
     },
     {
       "priority": "P0-01",
       "level": "high",
-      "state": "active",
-      "title": "Skill Polisher Existing Skill Demo 尚未执行",
-      "fact": "From-scratch 已真实走通；Skill Polisher Existing Skill Demo 规格已书面批准，并在隔离分支开始执行；Conversation Distillation 继续排队。",
-      "action": "用固定 revision 走完只读 Assessment、已批准 Candidate 的 source-preserving build、verify 与一个 smoke case。",
-      "done_when": "至少一条新增入口形成真实可复核的 Skill + Evidence 用户路径。"
+      "state": "ready",
+      "title": "Skill Polisher Existing Skill Demo 已走通",
+      "fact": "固定 revision 走完只读 Assessment、批准 Candidate、source-preserving build、clean/drift verify、官方 validator 与一个隔离 smoke case；源 Skill 保持 clean。",
+      "action": "保留执行记录与本地产物；下一条真实入口是 Conversation Distillation。",
+      "done_when": "已满足；Existing Skill 入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
       "priority": "P1-01",
@@ -122,10 +127,10 @@
       "priority": "P1-02",
       "level": "medium",
       "state": "active",
-      "title": "LC-009 真实 Skill 包 inventory 不可达",
-      "fact": "source_skill.py 的根文件白名单过窄；之前的放松草案会破坏 RV-001 越界链接安全护栏。",
-      "action": "先补“可绑定源包 + 越界链接”的组合用例，再设计保留无条件链接停机的规范化副本路线。",
-      "done_when": "LC-009 可达，RV-001 与新增组合护栏仍通过。"
+      "title": "LC-009 更广真实 Skill 包边界仍未闭合",
+      "fact": "Skill Polisher canonical root 的 5 个标准文件已直接 inventory 成功，当前 Demo 未触发 LC-009；其它常见非白名单 root 仍缺安全规范，历史放松草案会破坏 RV-001。",
+      "action": "不为已通过的目标修改 Adapter；只有新的真实包形失败时，才绑定 RV-001 组合护栏设计规范化路线。",
+      "done_when": "代表性常见包形可达，未知 root 与链接/junction 继续 fail closed。"
     },
     {
       "priority": "P1-03",
@@ -186,6 +191,11 @@
       "state": "ready"
     },
     {
+      "title": "Existing Skill 真实 Demo",
+      "detail": "Skill Polisher@63df4b5 经 Assessment、STL-001 Candidate、source-preserving build、独立 Evidence、clean/drift verify、validator 与 RNT-001 smoke；源包未修改。",
+      "state": "ready"
+    },
+    {
       "title": "五轮行为验证与规则修复",
       "detail": "18/24 → 20/24 → 25/27 → 7/10 → 5/6；hard-fail 归零，规则改动已进入当前本地版本。",
       "state": "ready"
@@ -199,8 +209,8 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "执行 Skill Polisher Existing Skill Demo",
-      "detail": "书面规格已批准；当前在隔离分支执行固定 revision 获取、只读 Assessment、正式 inventory、source-preserving build、clean/drift verify 与一个 smoke case。",
+      "title": "提交并复核 Skill Polisher Demo 本地结果",
+      "detail": "真实链路已通过；把执行记录、看板和计划状态提交到隔离分支。推送与远端 CI 不在本地实验授权内。",
       "state": "active"
     },
     {
@@ -217,14 +227,14 @@
     },
     {
       "id": "N4",
-      "title": "决定 LICENSE",
-      "detail": "由项目所有者选择许可证并复核上游归属。",
+      "title": "执行 Conversation Distillation 真实 Demo",
+      "detail": "作为三入口主线的最后一条真实用户路径，等待本轮实验结果讨论后进入。",
       "state": "queued"
     },
     {
       "id": "N5",
-      "title": "决定是否推送并观察远端 CI",
-      "detail": "本次只提交本地版本；推送和首次 GitHub Actions 运行另行授权。",
+      "title": "决定是否推送、观察远端 CI，再决定 LICENSE",
+      "detail": "本次只提交本地分支；推送、首次 Actions 和许可证选择需要项目所有者决定。",
       "state": "queued"
     }
   ],
@@ -233,8 +243,8 @@
       "label": "主线 · 用户能力",
       "items": [
         {
-          "title": "Skill Polisher Existing Skill Demo",
-          "detail": "当前唯一 active：批准规格已进入隔离实施；按只读 Assessment → 已批准 Candidate → inventory → source-preserving build → smoke case 推进。"
+          "title": "Conversation Distillation 真实 Demo",
+          "detail": "下一条 mainline 候选；Skill Polisher Existing Skill Demo 已完成，等待本轮结果讨论后再启动。"
         }
       ]
     },
@@ -299,7 +309,7 @@
     {
       "level": "high",
       "title": "阶段出口仍为 DRIFT",
-      "detail": "Existing Skill/Conversation 无真实 Demo，R-020/R-021 未关闭，历史测试预算违规和记录漂移不能由看板更新抹除。"
+      "detail": "Existing Skill 已完成真实 Demo，但 Conversation 仍无真实 Demo，R-020 与更广 R-021 边界未关闭，历史测试预算违规不能由本次结果抹除。"
     },
     {
       "level": "medium",
@@ -326,7 +336,7 @@
       "title": "当前版本获得本地 Git 保护"
     },
     {
-      "state": "active",
+      "state": "ready",
       "title": "Skill Polisher Existing Skill Demo"
     },
     {
@@ -353,6 +363,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Skill Polisher Existing Skill Demo 走通",
+      "detail": "固定 revision 完成 Assessment、STL-001 Candidate、source-preserving build、clean/drift/validator；盲 smoke 的 RNT-001 经一次授权 Polish 与一次 Recheck 从 OPEN 到 RESOLVED，源 Skill 未修改。"
+    },
     {
       "date": "2026-07-30",
       "title": "Skill Polisher Demo 设计获批",
