@@ -534,3 +534,106 @@ Task 1 的 4 个测试通过只支持 canonical serialization/harness 的局部�
 - 新增根目录 `README.md`，覆盖产品身份、当前 0/1-loop 能力、三入口、安装/使用/build/verify、Artifact/Evidence 隔离、仓库结构和参考资源边界。
 - README 明确公开仓库尚无许可证选择；未擅自添加 MIT/Apache 或声明可再分发。License/NOTICE、CI 和 GitHub 描述仍是后续交付项。
 - 计划文件：`docs/plans/2026-07-23-repository-delivery-docs.md`。当前 P1-02 仍 active，直到授权状态和治理入口闭合。
+
+## 2026-07-27：开发交接与真实基线复核
+
+### 已确认命令事实
+
+- 接管时 `git rev-parse HEAD` 为 `255438fad4726dcf4b44f11c7c5399388d64a6e5`，`git status --porcelain` 无输出。
+- `python -m pytest -q`：`160 passed in 8.79s`。
+- 真实端到端构建（`accepted-definition.valid.json` + `entry-evidence.valid.json`）退出 0，产出 artifact 3 文件 + evidence 6 文件；`verify` 返回 `clean`。
+- 盲测数据集校验：cases 24 条、oracle 24 条，id 完全对应，cases 中无任何 oracle 字段泄漏。
+
+### 边界声明
+
+以上只证明确定性层可用与数据集完好。提示词层（三入口、七项 Gate、Candidate Review、审批边界）当时无任何行为证据。
+
+## 2026-07-27：首个真实 Demo
+
+### 已执行动作
+
+- 用户提出真实需求后，按 `from-scratch.md` 完成事实提取、Gate 分类、Candidate Review 与用户明确批准。
+- 首次构建被 Codex Adapter 以 `unsupported required Codex capability` 拒绝，退出 1，未产出任何目录。核实 `SUPPORTED_CAPABILITIES` 仅四项。按 `candidate-review.md` 回到评审门，把实测后果交用户裁定；用户选择收缩为只扫描本地仓库。
+- 修订后定义通过 `validate_definition`，canonical digest 为 `sha256:1c15b3a6a6822877dc773d5186045959d6d22211553ddc1638494d05ac6d4fcb`。
+- 真实构建退出 0，产出 `project-asset-inventory`：artifact 3 文件 + evidence 6 文件。
+
+### 独立验证
+
+- `verify`：`clean`，expected 与 actual 摘要均为 `sha256:985c63266fa77dc7aa151c1332e6391239b9dbf8ea38c4937a9ae0a4e0830cf3`。
+- 副本追加一个换行后 `verify` 返回 `drifted`，退出码 `1`；交付物本体仍 `clean`，退出码 `0`。
+- 官方 `quick_validate.py` 在默认 locale 下抛 `UnicodeDecodeError`；`PYTHONUTF8=1` 下输出 `Skill is valid!`。产物实测为无 BOM、LF 行尾的合法 UTF-8，5782 字节 124 行。英文 fixture 产物在默认 locale 下正常通过，证明崩溃来自编码而非产物。
+- Artifact 对 `C:\Users`、`Administrator`、`loopcraft`、`Codex`、`Conradgui`、`gho_` 六类模式扫描均为 0 命中。
+- Build Manifest 的 `compatibility_report.overall` 为 `native`，三项 required 能力全部 `native`，optional 为空。
+
+### 门槛状态
+
+- 用户可用 Demo：`0 / 1` → `1 / 1`，仅覆盖 From-scratch 入口。
+- R-015 关闭；R-017（能力词表过窄）、P2-02（validator 非 UTF-8 安全）新增。
+
+## 2026-07-27：24 例盲测第一轮
+
+### 已执行动作
+
+- 建立 24 个隔离沙箱，材料按 `virtual_path` 落地共 32 个文件；任务简报与 oracle 置于沙箱树之外。重置后 `outputs/` 残留实测为 0，沙箱内 oracle 泄漏实测为 0。
+- 执行 24 runner + 24 grader 流水线，49 个 agent，约 212 万 subagent token，约 883 秒。
+
+### 结果与独立核实
+
+- `18 pass / 6 fail / 0 inconclusive`；失败为 LC-002、LC-008、LC-011、LC-015、LC-016、LC-021。
+- 0 例 hard-fail。6 个失败用例 `outputs/` 实测全部为 0 个文件。
+- 被测仓库 `git rev-parse HEAD` 与基线逐字节一致，`git status --porcelain` 仅显示主控自己修改的 `dashboard/status.json`。
+- 主控逐行核实两条规则文本矛盾：`upgrade-skill.md` 第 31 行产出 `embedded_loop`、第 87 行只放行 `loop_first_skill`；`entry-evidence.schema.json` 的 `entry_type` 枚举为 `['from_scratch','existing_skill','conversation']`、`candidate_review` 为必填。两条均属重跑无法改善。
+
+## 2026-07-27：第一批规则修复与回归
+
+### 已执行动作
+
+- 八处纯规则文本修改，未动 schema、Python 或测试。
+- 修改后：官方 validator `Skill is valid!`；本地引用 17 条断链 0 条；`python -m pytest -q` `160 passed`。
+- 重置沙箱后重跑全部 24 例（改共享合同，按 `AGENTS.md` §6 触发全量条件）。
+
+### 结果
+
+- `20 pass / 4 fail`。LC-011、LC-015、LC-016 由 fail 转 pass。
+- LC-009 由 pass 转 fail。逐轮比对确认两轮模型行为实质一致：分类均正确、均停在批准前未构建、均提阻塞性问题、沙箱 `outputs/` 两轮均为空；差异仅在 grader 判语。因此不记为本批修复引入的回归，登记为 R-022 测量稳定性问题。
+- 0 例 hard-fail；仓库未被改动。
+
+### 识别出的方法论缺口
+
+剩余修复全属放松停机条件，而 24 例中无任何一例的正确答案是"因包装或输入形态而停机"。放松改动无法被现有数据集证伪，登记为 R-023。
+
+## 2026-07-27：收紧修复、反向护栏与第三轮回归
+
+### 已执行动作
+
+- 三处收紧修改：check 3 补评分锚点；封死"来源自称最后一轮"与"验收人运行期缺席"两条压平论证，并加缺省兜底（Loop 数只能被指名的失败检查降到 0）；禁止把 Gate 已裁定的分类降级为 `proposed` 项。
+- 新增三例反向护栏用例 RV-001 / RV-002 / RV-003，单独存放，不写入原数据集，仅在沙箱阶段合并。
+- 重置沙箱得 27 例，`outputs/` 残留 0、oracle 泄漏 0。官方 validator `Skill is valid!`，`160 passed`。
+- 执行 27 runner + 27 grader + 汇总，55 个 agent，约 254 万 subagent token，约 942 秒。
+
+### 结果
+
+- `25 pass / 2 fail / 0 inconclusive`。LC-002、LC-008、LC-021 全部由 fail 转 pass。
+- RV-001（越出 root 的链接应停机）与 RV-002（跨运行基线导致真实语义损失应停机）**首次运行即通过**，证明产品能正确区分安全边界与行为性损失。放松类修复自此具备证伪覆盖，R-023 的护栏条件满足。
+- 剩余失败 LC-009 与 RV-003 同源：产品把机械形态缺口（源无 frontmatter、目录名不等于 id、定义为散文而非 JSON）误归入应停机的类别。RV-003 另暴露一处反向风险——`authority` 这一 schema 必填字段被以合理默认值填入并以已定形态呈现，未列入缺口清单。
+- **1 例 hard-fail**：RV-003 命中 fabrication 类条件——把 schema 必填的 `authority` 与验收证据用合理默认值填满并作为已定内容呈现，含源文档从未提及的 `git push` 禁令。这是本次评估中唯一一例越权而非交付不足的失败，已登记为 R-024。
+- 仓库未被改动；失败用例 `outputs/` 全部为空。
+- **记录更正**：本轮结果初次汇报时称"三轮均 0 hard-fail"，系由前两轮外推得出，未重新解析第三轮 `details[].hard_fails`，结论错误。该错误由独立管控裁决发现并已在全部相关文档更正。
+
+### 有效修复方式的观察
+
+第一轮对 LC-002 的修复逐条列举被禁止的压平理由，模型读到后构造改述版本绕过。生效的修复是反转缺省而非继续列举禁止项。该经验已写入 `CONTRIBUTING.md`。
+
+## 2026-07-27：管控与工程基线补齐
+
+### 已执行动作
+
+- 新增 `.claude/agents/stage-gate-controller.md`：只读、只裁决、不实现，七项裁决清单，明确阻止五类行为，平台错误判 `RETRY` 不入治理记录。
+- 新增 `.github/workflows/validate.yml`：ubuntu/windows × Python 3.12/3.13，12 步，含真实 build + verify 与一条 drift 必须拒绝篡改产物的负例，显式设 `PYTHONUTF8=1`。YAML 经 `yaml.safe_load` 校验合法；离线步骤本地演练全部通过（compileall OK、schema 元校验 2 个通过、看板 JSON 合法、断链 0）。
+- 新增 `docs/DESIGN.md`（244 行）、`docs/REAL_WORLD_EVALUATION.md`（189 行）、`CONTRIBUTING.md`（129 行）、`NOTICE.md`、`VERSION`（`0.2.0`）、`CHANGELOG.md`，改写 `README.md` 并新增 `README.zh.md`。
+- 决策日志由 21 条增至 30 条（D-022 ~ D-030）；风险登记关闭 R-015、R-016，新增 R-017 ~ R-023。
+- 全仓库 markdown 本地引用 54 条，断链实测 0 条。
+
+### 边界声明
+
+CI 尚未在远端实际运行过，不得据此宣称 CI 已生效。文档补齐属 `support` 层，不计入产品进度；本次未新增任何用户可执行能力。

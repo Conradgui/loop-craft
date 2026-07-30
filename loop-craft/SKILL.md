@@ -26,7 +26,7 @@ When the target is an existing Agent Skill, read [references/upgrade-skill.md](r
 - Assess the complete Skill contract before proposing a Loop architecture.
 - Return the Decision Record before requesting approval to modify anything.
 - Use the Decision Record as input to the shared Candidate Review, reuse existing answers, and obtain explicit Candidate approval before writing the accepted definition or inventorying the source package.
-- Build a one-Loop upgrade through the source-preserving Packaging route when the approved design passes the current compatibility gate. Inventory and review the complete source package before building; otherwise return the Assessment without compressing the design into the single-Loop profile.
+- Build a one-Loop upgrade through the source-preserving Packaging route when the approved design passes the current compatibility gate. The single qualifying Loop may be defining or supporting; an `embedded_loop` verdict with exactly one supporting Loop is buildable when the remaining fixed phases are preserved as workflow behavior. Inventory and review the complete source package before building; otherwise return the Assessment without compressing the design into the single-Loop profile.
 - The deliverable remains a complete discoverable Skill, not a standalone Loop fragment.
 
 ## Conversation distillation

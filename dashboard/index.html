@@ -40,7 +40,7 @@
     .section { margin-top: 34px; }
     .section-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 11px; }
     .section-head small { color: var(--muted); font-size: 12px; }
-    .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+    .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-bottom: 1px solid var(--line); }
     .metric { padding: 18px 16px 17px 0; border-right: 1px solid var(--line); }
     .metric:not(:first-child) { padding-left: 16px; }
     .metric:last-child { border-right: 0; }
@@ -49,6 +49,12 @@
     .metric-value.blocked { color: var(--blocked); }
     .metric-value.ready { color: var(--ready); }
     .metric-value.neutral { color: var(--ink); }
+    .baseline-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+    .baseline-card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-top: 3px solid var(--line); background: var(--surface); }
+    .baseline-card.ready { border-top-color: var(--ready); }
+    .baseline-card.blocked { border-top-color: var(--blocked); }
+    .baseline-value { margin-top: 7px; font-size: 22px; font-weight: 760; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .baseline-card p { margin: 9px 0 0; font-size: 13px; }
     .issue-list { border-top: 1px solid var(--line); }
     .issue-row { display: grid; grid-template-columns: 82px minmax(180px, .9fr) minmax(0, 1.2fr) minmax(0, 1.2fr); gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--line); }
     .issue-code { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
@@ -58,11 +64,12 @@
     .issue-copy strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
     .issue-copy span { display: block; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .list { display: grid; gap: 0; }
-    .lane-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 16px; }
+    .lane-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 22px; margin-top: 16px; }
     .lane { border-top: 3px solid var(--line); padding-top: 12px; }
     .lane.mainline { border-color: var(--accent); }
     .lane.validation { border-color: #d2a447; }
     .lane.support { border-color: var(--ready); }
+    .lane.not_now { border-color: var(--muted); }
     .lane h3 { margin: 0 0 13px; font-size: 13px; }
     .lane-item { padding: 11px 0; border-bottom: 1px solid var(--line); }
     .lane-item strong { display: block; font-size: 13px; }
@@ -73,6 +80,11 @@
     .row-mark.blocked { background: var(--blocked); }
     .row-title { font-size: 14px; font-weight: 750; }
     .row-detail { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .handoff-list { border-top: 1px solid var(--line); }
+    .handoff-item { display: grid; grid-template-columns: 110px minmax(190px, .8fr) minmax(0, 1.6fr); gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--line); align-items: start; }
+    .handoff-item strong { font-size: 13px; }
+    .handoff-item code { color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+    .handoff-item span { color: var(--muted); font-size: 12px; line-height: 1.5; }
     .state { align-self: start; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
     .state.active { color: var(--accent); }
     .state.ready { color: var(--ready); }
@@ -101,7 +113,7 @@
     .error { color: #ffb2a3; font-size: 12px; }
     @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } aside { padding: 24px; } main { padding: 26px 22px 42px; } .issue-row { grid-template-columns: 72px minmax(0, 1fr); } .issue-copy { grid-column: 2; } }
     @media (max-width: 1000px) { .lane-grid { grid-template-columns: 1fr; gap: 18px; } }
-    @media (max-width: 620px) { h1 { font-size: 36px; } .metric-row { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(2) { border-right: 0; } .metric:nth-child(3), .metric:nth-child(4) { border-top: 1px solid var(--line); } .issue-row { grid-template-columns: 1fr; gap: 10px; } .issue-copy { grid-column: 1; } }
+    @media (max-width: 620px) { h1 { font-size: 36px; } .metric-row, .baseline-grid { grid-template-columns: 1fr; } .metric { border-right: 0; border-top: 1px solid var(--line); padding-left: 0 !important; } .issue-row { grid-template-columns: 1fr; gap: 10px; } .issue-copy { grid-column: 1; } .handoff-item { grid-template-columns: 1fr; gap: 5px; } }
   </style>
 </head>
 <body>
@@ -124,6 +136,11 @@
         <div class="metric-row" id="metrics"></div>
       </section>
 
+      <section class="section" aria-labelledby="baselines-title">
+        <div class="section-head"><h2 id="baselines-title">Version baselines</h2><small>local HEAD ≠ origin/main</small></div>
+        <div class="baseline-grid" id="baselines"></div>
+      </section>
+
       <section class="section" aria-labelledby="issues-title">
         <div class="section-head"><h2 id="issues-title">Problem ledger</h2><small>fact → action → done</small></div>
         <div class="issue-list" id="issues"></div>
@@ -135,7 +152,7 @@
       </section>
 
       <section class="section" aria-labelledby="delivered-title">
-        <div class="section-head"><h2 id="delivered-title">Delivered</h2><small>already real</small></div>
+        <div class="section-head"><h2 id="delivered-title">Delivered / candidate</h2><small>version state matters</small></div>
         <div class="list" id="delivered"></div>
       </section>
 
@@ -148,13 +165,18 @@
         <div class="section-head"><h2 id="activity-title">Activity</h2><small>latest updates</small></div>
         <div class="list" id="activity"></div>
       </section>
+
+      <section class="section" aria-labelledby="handoff-title">
+        <div class="section-head"><h2 id="handoff-title">Handoff trail</h2><small id="handoff-label">conversation provenance</small></div>
+        <div class="handoff-list" id="handoff"></div>
+      </section>
     </main>
 
     <aside>
       <div class="updated"><span class="pulse"></span>Live state · <span id="updated-side">—</span></div>
       <div class="side-block">
         <h2>What this means</h2>
-        <p>The deterministic Core is reusable infrastructure. The current objective is to complete the three input routes while keeping each adapter and evidence boundary explicit.</p>
+        <p>当前本地 HEAD 已保护 Core、三入口骨架、真实 Demo、行为验证和治理补强；origin/main 仍停在旧基线，尚未推送。From-scratch 已真实走通，另外两条入口仍缺真实调用证据。</p>
       </div>
       <div class="side-block">
         <h2>Risks</h2>
@@ -197,12 +219,15 @@
       state("progress-bar").style.width = `${data.milestone.progress}%`;
       state("milestone-next").textContent = data.milestone.next;
       state("metrics").innerHTML = data.metrics.map(item => `<div class="metric"><div class="metric-label">${safe(item.label)}</div><div class="metric-value ${safe(item.tone)}">${safe(item.value)}</div></div>`).join("");
+      state("baselines").innerHTML = data.baselines.map(item => `<article class="baseline-card ${safe(item.state)}"><div class="metric-label">${safe(item.title)}</div><div class="baseline-value">${safe(item.value)}</div><p>${safe(item.detail)}</p></article>`).join("");
       state("issues").innerHTML = data.issues.map(item => `<div class="issue-row"><div><div class="issue-code ${safe(item.level)}">${safe(item.priority)} · ${safe(item.state)}</div><div class="issue-title">${safe(item.title)}</div></div><div class="issue-copy"><strong>Current fact</strong><span>${safe(item.fact)}</span></div><div class="issue-copy"><strong>Next action</strong><span>${safe(item.action)}</span></div><div class="issue-copy"><strong>Done when</strong><span>${safe(item.done_when)}</span></div></div>`).join("");
       state("lanes").innerHTML = Object.entries(data.work_lanes).map(([key, lane]) => `<div class="lane ${key}"><h3>${safe(lane.label)}</h3>${lane.items.map(item => `<div class="lane-item"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("")}</div>`).join("");
       const row = (item, stateText) => `<div class="row"><i class="row-mark ${safe(item.state)}"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.detail)}</div></div><span class="state ${safe(item.state)}">${safe(stateText || titleCase(item.state))}</span></div>`;
-      state("delivered").innerHTML = data.delivered.map(item => row(item, "ready")).join("");
+      state("delivered").innerHTML = data.delivered.map(item => row(item)).join("");
       state("next-steps").innerHTML = data.next_steps.map(item => row(item, item.state === "active" ? "now" : "queued")).join("");
       state("activity").innerHTML = data.activity.map(item => `<div class="row"><i class="row-mark ready"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.date)} · ${safe(item.detail)}</div></div></div>`).join("");
+      state("handoff-label").textContent = data.handoff.label;
+      state("handoff").innerHTML = data.handoff.records.map(item => `<div class="handoff-item"><strong>${safe(item.agent)}</strong><code>${safe(item.id)}</code><span>${safe(item.period)} · ${safe(item.role)}</span></div>`).join("");
       state("risks").innerHTML = data.risks.map(item => `<div class="side-item ${safe(item.level)}"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("");
       state("phase-gates").innerHTML = data.phase_gates.map(item => `<div class="gate"><span class="gate-mark ${safe(item.state)}">${item.state === "ready" ? "✓" : "○"}</span><span>${safe(item.title)}</span></div>`).join("");
       state("known-limits").innerHTML = data.known_limits.map(item => `<div class="side-item low"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("");

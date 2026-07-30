@@ -1,0 +1,75 @@
+name: Validate Loop Craft
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+
+    env:
+      # 生成的 Skill 可能包含中文。官方 quick_validate.py 使用未指定编码的
+      # read_text()，在非 UTF-8 locale 下会抛 UnicodeDecodeError。产物本身是
+      # 合法 UTF-8，因此这里强制解释器进入 UTF-8 模式而不是修改第三方脚本。
+      PYTHONUTF8: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Conradgui/skill-creator-pro
+          path: .tmp/skill-creator-pro
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Compile sources
+        run: python -m compileall -q loop-craft/scripts tests
+
+      - name: Run test suite
+        run: python -m pytest -q
+
+      - name: Meta-validate JSON schemas
+        run: |
+          python -c "import json,pathlib;from jsonschema import Draft202012Validator;[Draft202012Validator.check_schema(json.loads(p.read_text(encoding='utf-8'))) or print('schema ok:',p.name) for p in pathlib.Path('loop-craft/scripts/loopcraft_core/kernel/schemas').glob('*.json')]"
+
+      - name: Validate Skill structure
+        run: python .tmp/skill-creator-pro/skills/skill-creator-pro/scripts/quick_validate.py loop-craft
+
+      - name: Check dashboard status is valid JSON
+        run: python -c "import json;json.load(open('dashboard/status.json',encoding='utf-8'));print('dashboard ok')"
+
+      - name: Check every local reference resolves
+        run: |
+          python -c "import re,pathlib,sys;root=pathlib.Path('loop-craft');bad=[(str(md),l) for md in root.rglob('*.md') for l in re.findall(r'\]\(([^)]+)\)', md.read_text(encoding='utf-8')) if not l.startswith(('http://','https://','#')) and not (md.parent/l.split('#')[0]).exists()];[print('broken link:',m,'->',l) for m,l in bad];sys.exit(1 if bad else 0)"
+
+      - name: Verify a real end-to-end build
+        shell: bash
+        working-directory: loop-craft
+        run: |
+          set -e
+          python scripts/build_loop.py build ../tests/fixtures/accepted-definition.valid.json "$RUNNER_TEMP/ci-build" --entry-evidence ../tests/fixtures/entry-evidence.valid.json
+          python scripts/build_loop.py verify "$RUNNER_TEMP/ci-build"
+          python ../.tmp/skill-creator-pro/skills/skill-creator-pro/scripts/quick_validate.py "$RUNNER_TEMP/ci-build/artifact/skill-polish-loop"
+
+      - name: Drift verification must reject a tampered artifact
+        shell: bash
+        working-directory: loop-craft
+        run: |
+          printf '\n' >> "$RUNNER_TEMP/ci-build/artifact/skill-polish-loop/SKILL.md"
+          if python scripts/build_loop.py verify "$RUNNER_TEMP/ci-build"; then
+            echo "drift verification did not reject a tampered artifact"
+            exit 1
+          fi
+          echo "drift correctly rejected"

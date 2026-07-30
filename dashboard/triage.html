@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop Craft · 接力与决策看板</title>
+<style>
+  :root{
+    --bg:#f7f7f5; --panel:#ffffff; --panel-2:#fbfbfa;
+    --ink:#1a1a18; --ink-2:#54534e; --ink-3:#8a8880;
+    --line:#e4e3de; --line-2:#efeeea; --accent:#b4552a;
+    --hot:#c0392b; --hot-bg:#fdf0ee;
+    --warn:#a8730f; --warn-bg:#fdf6e7;
+    --ok:#2f7d55; --ok-bg:#eef7f1;
+    --cool:#3b6ea8; --cool-bg:#eef3f9;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#161614; --panel:#1e1e1c; --panel-2:#232321;
+      --ink:#eceae4; --ink-2:#a8a59d; --ink-3:#75726b;
+      --line:#302f2c; --line-2:#282725; --accent:#e08050;
+      --hot:#e8776a; --hot-bg:#2c1c1a;
+      --warn:#d9a441; --warn-bg:#2a2318;
+      --ok:#63b98a; --ok-bg:#17251d;
+      --cool:#7aa8d8; --cool-bg:#1a222c;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 22px 80px}
+  code,.mono{font-family:var(--mono);font-size:.86em;overflow-wrap:anywhere}
+  header{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+  h1{margin:0 0 10px;font-size:30px;letter-spacing:-.02em;font-weight:650}
+  .verdict{font-size:16px;color:var(--ink-2);max-width:76ch}
+  .verdict b{color:var(--ink);font-weight:600}
+  .stamp{margin-top:14px;font-size:12.5px;color:var(--ink-3);font-family:var(--mono)}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:0 0 34px}
+  .m{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 14px}
+  .m .k{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;margin-bottom:6px}
+  .m .v{font-size:19px;font-weight:640;letter-spacing:-.01em}
+  .m.ok .v{color:var(--ok)} .m.warn .v{color:var(--warn)} .m.hot .v{color:var(--hot)}
+  section{margin:0 0 38px}
+  .shead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .snum{font-family:var(--mono);font-size:12px;color:var(--ink-3);border:1px solid var(--line);border-radius:5px;padding:2px 7px;flex:none}
+  h2{margin:0;font-size:20px;font-weight:640;letter-spacing:-.01em}
+  .sdesc{color:var(--ink-2);font-size:14px;margin:0 0 16px;max-width:78ch}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:11px;border-left:3px solid var(--line)}
+  .grid .card{margin-bottom:0}
+  .card.hot{border-left-color:var(--hot)} .card.warn{border-left-color:var(--warn)}
+  .card.cool{border-left-color:var(--cool)} .card.ok{border-left-color:var(--ok)}
+  .ctop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+  .ctop h3{margin:0;font-size:16px;font-weight:620}
+  .tag{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:4px;background:var(--line-2);color:var(--ink-3);white-space:nowrap}
+  .tag.hot{background:var(--hot-bg);color:var(--hot)} .tag.warn{background:var(--warn-bg);color:var(--warn)}
+  .tag.ok{background:var(--ok-bg);color:var(--ok)} .tag.cool{background:var(--cool-bg);color:var(--cool)}
+  .card p{margin:0 0 9px;color:var(--ink-2);font-size:14.2px}
+  .card p:last-child{margin-bottom:0}
+  .card p b{color:var(--ink);font-weight:600}
+  .rec{background:var(--panel-2);border:1px solid var(--line-2);border-radius:7px;padding:10px 12px;margin-top:11px;font-size:13.6px;color:var(--ink-2)}
+  .rec strong{color:var(--accent);font-weight:640}
+  .timeline{border-left:1px solid var(--line);margin-left:9px}
+  .event{position:relative;padding:0 0 20px 24px}
+  .event:last-child{padding-bottom:0}
+  .event::before{content:"";position:absolute;left:-5px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .event .when{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .event h3{margin:3px 0 4px;font-size:15px}
+  .event p{margin:0;color:var(--ink-2);font-size:13.5px}
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  table{border-collapse:collapse;width:100%;min-width:620px;font-size:13.6px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  th{font-size:11.5px;letter-spacing:.05em;color:var(--ink-3);font-weight:600;background:var(--panel-2);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td.id{font-family:var(--mono);font-size:12px;color:var(--ink-3);white-space:nowrap}
+  .gates{display:grid;gap:8px}
+  .gate{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 14px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.hot{background:var(--hot)}
+  .gate .gname{flex:1;font-size:14px}
+  .gate .gst{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+  .runs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+  .run{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 12px}
+  .run .rn{font-size:11px;color:var(--ink-3);margin-bottom:5px}
+  .run .rv{font-size:17px;font-weight:640;font-family:var(--mono)}
+  .run .rd{font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.4}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding-top:16px;font-size:12.5px;color:var(--ink-3);line-height:1.8}
+  @media (max-width:700px){
+    .wrap{padding:26px 15px 60px} h1{font-size:24px}.verdict{font-size:15px}.grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Loop Craft · 接力与决策看板</div>
+  <h1>本地版本已保护，开始讨论下一条主线</h1>
+  <p class="verdict">
+    <b>当前版本已进入本地 Git 历史；origin/main 仍停在旧基线。</b>
+    From-scratch 已完成一次真实端到端 Demo；Existing Skill Upgrade 与 Conversation Distillation 仍缺真实调用证据。
+    当前阶段出口保持 <b>DRIFT · 不放行</b>。本地提交解决版本保护，不等于远端发布或产品阶段通过。
+  </p>
+  <div class="stamp">快照 2026-07-30 · 本地 HEAD 已更新 · origin/main 255438f · 证据优先级：Git / 实测记录 / 对话 / 治理文档</div>
+</header>
+
+<div class="metrics">
+  <div class="m ok"><div class="k">当前本地版本</div><div class="v">HEAD</div></div>
+  <div class="m warn"><div class="k">远端基线</div><div class="v">255438f</div></div>
+  <div class="m ok"><div class="k">From-scratch Demo</div><div class="v">1 / 1</div></div>
+  <div class="m warn"><div class="k">其余入口 Demo</div><div class="v">0 / 2</div></div>
+  <div class="m ok"><div class="k">fabrication hard-fail</div><div class="v">0</div></div>
+  <div class="m hot"><div class="k">阶段出口</div><div class="v">DRIFT</div></div>
+</div>
+
+<section>
+  <div class="shead"><span class="snum">00</span><h2>当前唯一主线：选择下一条真实 Demo</h2></div>
+  <p class="sdesc">版本保护已经完成。接下来先讨论产品路径，不用提交数、测试数或治理文件替代用户能力。</p>
+  <div class="card hot">
+    <div class="ctop"><h3>Existing Skill 还是 Conversation</h3><span class="tag hot">ACTIVE</span></div>
+    <p>From-scratch 已有一次真实用户证据；另外两条入口虽然共用真实 Gate、Review、Compiler、Evidence 与 Adapter，但仍只有骨架和盲测证据。</p>
+    <p><b>下一步的价值不是再补内部完整度，而是让用户通过第二种入口得到可检查的 Skill + Evidence。</b></p>
+    <div class="rec"><strong>完成条件：</strong>选择一个入口，并用真实目标走完 Review、批准、build、交付与 verify。</div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">01</span><h2>对话接力链</h2></div>
+  <p class="sdesc">会话 ID 只说明工作从哪里来；最终状态仍以仓库命令和可复核执行记录为准。</p>
+  <div class="timeline">
+    <div class="event">
+      <div class="when">2026-07-19 — 07-26 · CODEX</div>
+      <h3><code>019f7ad2-237d-77d2-b4c7-275dbc40feca</code></h3>
+      <p>产品边界 → Core → 三入口 → Packaging → Entry Evidence → 实时看板。期间因 Core 过度深挖而调整为 Demo-first。</p>
+    </div>
+    <div class="event">
+      <div class="when">2026-07-26 · CLAUDE CODE</div>
+      <h3><code>35f026ff-2073-47ea-ac55-52ab462c33b4</code></h3>
+      <p>通过 <code>codex resume 019f7ad2…</code> 接管；完成真实 Demo、五轮行为验证、规则修复、治理文档、CI 和管控 Agent。</p>
+    </div>
+    <div class="event">
+      <div class="when">2026-07-29 · CLAUDE CODE</div>
+      <h3><code>581ebf20-443a-49b8-992b-bff6afadebfe</code></h3>
+      <p>恢复接管记录，确认实际仓库为 loopcraft，并生成原始 <code>triage.html</code>。</p>
+    </div>
+    <div class="event">
+      <div class="when">2026-07-30 · CODEX</div>
+      <h3>当前接力</h3>
+      <p>交叉核对 Codex / Claude Code 会话、Git、状态文件和治理记录，建立双基线看板。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><h2>版本保护边界</h2></div>
+  <p class="sdesc">当前需要区分本地 Git 历史与远端 origin/main；本地提交不会自动触发远端备份或 CI。</p>
+  <div class="grid">
+    <div class="card ok">
+      <div class="ctop"><h3>当前本地版本</h3><span class="tag ok">COMMITTED</span></div>
+      <p><code>HEAD · 2026-07-30</code></p>
+      <p>原有 Core/三入口能力，以及五轮规则修复、治理与交付文档、CI、管控 Agent 和接力看板均已进入本地 Git 历史。</p>
+    </div>
+    <div class="card warn">
+      <div class="ctop"><h3>远端可恢复版本</h3><span class="tag warn">NOT PUSHED</span></div>
+      <p><code>origin/main · 255438f</code></p>
+      <p>本次没有推送。远端尚未包含当前版本，GitHub Actions 也没有对它执行首次验证。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">A</span><h2>值得讨论：四个产品取舍</h2></div>
+  <p class="sdesc">这些不会通过“再跑一轮测试”自动收敛，需要项目所有者决定范围或顺序。</p>
+
+  <div class="card hot">
+    <div class="ctop"><h3>下一条真实 Demo：Existing Skill 还是 Conversation</h3><span class="tag hot">最高优先</span></div>
+    <p>当前“真实 Demo 1/1”只证明 From-scratch。另两条入口仍是已接通但未被真实用户使用的能力。</p>
+    <div class="rec"><strong>建议：</strong>优先做一条新增入口的真实 Demo，而不是继续扩大盲测数量。具体入口顺序留给下一项产品决策。</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ctop"><h3>能力词表：扩展还是声明长期边界</h3><span class="tag warn">R-017</span></div>
+    <p>当前 capability 词表只能表达有限本地能力，无法准确描述网络、托管平台和更细粒度 Git 只读操作。扩展会牵动 Adapter 与测试；不扩则必须把 degraded 明确写成产品边界。</p>
+  </div>
+
+  <div class="card cool">
+    <div class="ctop"><h3>公共仓库许可证</h3><span class="tag cool">R-014</span></div>
+    <p>NOTICE 已说明来源边界，但没有 LICENSE 时默认保留所有权利。许可证选择属于项目所有者授权，Agent 不代选。</p>
+  </div>
+
+  <div class="card warn">
+    <div class="ctop"><h3>本地版本何时推送远端</h3><span class="tag warn">发布边界</span></div>
+    <p>本地提交已经防止工作区成果丢失；推送会触发远端 CI 并形成共享版本。是否推送应与 LICENSE、公开可见性和首次 CI 结果一起讨论。</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">B</span><h2>真正需要重复验证的只有三类</h2></div>
+  <p class="sdesc">判据是：修复一侧时是否可能让另一侧反向劣化。其余支持性修改只做一次最小检查。</p>
+
+  <div class="card hot">
+    <div class="ctop"><h3>LC-009 可达性 ↔ RV-001 安全停机</h3><span class="tag hot">必须绑定</span></div>
+    <p>放宽 source inventory 可达性时，不能删除越出 root 的链接必须停机这条安全边界。候选草案已经被对抗证伪拦下过一次。</p>
+    <div class="rec"><strong>最小协议：</strong><code>LC-009 + RV-001 + 可绑定源包但含越界链接的组合例</code>，不做全量重跑。</div>
+  </div>
+
+  <div class="card warn">
+    <div class="ctop"><h3>放松类修复的反向护栏</h3><span class="tag warn">RV-001 / 002 / 003</span></div>
+    <p>任何放宽停机条件的修改都必须证明不会变成过度构建、语义丢失或凭空发明。三例反向护栏是准入门，不是进度指标。</p>
+  </div>
+
+  <div class="card warn">
+    <div class="ctop"><h3>正确停机 vs 过度停机的评分稳定性</h3><span class="tag warn">R-022</span></div>
+    <p>LC-009 曾在模型行为实质相同的情况下被 grader 从 pass 翻成 fail。先固定评分判据，再把通过率用于产品决策。</p>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">C</span><h2>简要记录：不再占用主线</h2></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>事项</th><th>当前事实</th><th>处理方式</th></tr></thead>
+      <tbody>
+        <tr><td class="id">R-024</td><td>fabrication hard-fail 已在第五轮归零；旧风险表的 OPEN 已过时</td><td>按实测关闭；剩余 RV-003 改归 R-020 路由/provenance</td></tr>
+        <tr><td class="id">R-020</td><td>direct build 在 Entry Evidence schema 中没有合法来源类型</td><td>后续独立 Schema/Python 主线处理</td></tr>
+        <tr><td class="id">R-016</td><td>CI 文件已进入本地版本，但从未在远端运行</td><td>获得推送授权后观察首次远端结果</td></tr>
+        <tr><td class="id">P2-02</td><td>官方 validator 在 Windows 非 UTF-8 locale 下读取中文 Skill 会崩</td><td>使用 <code>PYTHONUTF8=1</code>；不修改第三方脚本</td></tr>
+        <tr><td class="id">BOUNDARY</td><td>源包不是事务快照；强杀、非本地文件系统和完整访问监控未证明</td><td>保留为诚实边界，不为当前本地路径过度 hardening</td></tr>
+        <tr><td class="id">NOT NOW</td><td>多 Loop、Runtime、Override、Subloop、Library Edition、发布与调度</td><td>不进入当前执行队列</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">D</span><h2>阶段出口与验证轨迹</h2></div>
+  <p class="sdesc">看板更新不会自动撤销历史裁决。只有真实用户能力、开放风险和版本状态发生变化，才重做出口复核。</p>
+  <div class="gates">
+    <div class="gate"><span class="dot ok"></span><span class="gname">Git 基线：Core + 三入口骨架 + Packaging + Entry Evidence</span><span class="gst">READY</span></div>
+    <div class="gate"><span class="dot ok"></span><span class="gname">From-scratch 真实 Demo</span><span class="gst">READY</span></div>
+    <div class="gate"><span class="dot ok"></span><span class="gname">当前版本获得本地 Git 保护</span><span class="gst">READY</span></div>
+    <div class="gate"><span class="dot warn"></span><span class="gname">Existing Skill / Conversation 真实 Demo</span><span class="gst">0 / 2</span></div>
+    <div class="gate"><span class="dot hot"></span><span class="gname">LICENSE、远端 CI、R-020/R-021 与阶段复核</span><span class="gst">DRIFT</span></div>
+  </div>
+  <div class="runs">
+    <div class="run"><div class="rn">第 1 轮 · 全量</div><div class="rv">18/24</div><div class="rd">提示词行为基线</div></div>
+    <div class="run"><div class="rn">第 2 轮 · 全量</div><div class="rv">20/24</div><div class="rd">解开 embedded_loop 死锁</div></div>
+    <div class="run"><div class="rn">第 3 轮 · 全量</div><div class="rv">25/27</div><div class="rd">RV-003 暴露 fabrication</div></div>
+    <div class="run"><div class="rn">第 4 轮 · 定向</div><div class="rv">7/10</div><div class="rd">修复造成过度追问回归</div></div>
+    <div class="run"><div class="rn">第 5 轮 · 定向</div><div class="rv">5/6</div><div class="rd">hard-fail 归零，回归关闭</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">E</span><h2>已经真实存在的能力</h2></div>
+  <p class="sdesc">这里区分“已经进入本地 Git”与“尚未在远端验证”，避免把本地提交误写成产品阶段完成。</p>
+  <div class="grid">
+    <div class="card ok">
+      <div class="ctop"><h3>本地 Git 可恢复</h3><span class="tag ok">COMMITTED</span></div>
+      <p>确定性构建、Artifact/Evidence 隔离、drift 检测、三入口骨架、共享 Gate、Packaging、Entry Evidence、规则修复和治理交付文件。</p>
+    </div>
+    <div class="card warn">
+      <div class="ctop"><h3>仍缺远端证据</h3><span class="tag warn">LOCAL ONLY</span></div>
+      <p>当前版本未推送，GitHub Actions 未首跑；Existing Skill 与 Conversation 也仍无真实用户 Demo。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  数据源：Git 状态、Codex/Claude Code 本地会话、<code>docs/project-management</code>、<code>dashboard/status.json</code> 与五轮验证记录。<br>
+  本页负责接力和取舍；实时状态由 <code>status.json</code> 驱动的 <code>index.html</code> 展示。结论冲突时，以命令事实和可复核执行证据为准。
+</footer>
+
+</div>
+</body>
+</html>

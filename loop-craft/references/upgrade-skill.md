@@ -84,12 +84,14 @@ Open decisions:
 
 The current Core and Skill Packaging Adapter can safely build an upgrade only when all are true:
 
-- the approved verdict is `loop_first_skill` with exactly one defining Loop;
+- the approved verdict is `loop_first_skill` with exactly one defining Loop, or
+  `embedded_loop` whose single supporting Loop maps to `skill-package-v0.1` without
+  semantic loss while the remaining fixed phases are preserved as workflow behavior;
 - the recovered behavior contract maps without semantic loss to the current accepted-definition schema;
 - the source package contains only reviewable standard Skill roots and can be inventoried without links or unresolved files; and
 - no approved finding requires unsupported behavior or a second Loop.
 
-If any condition fails, stop at **Assessment only**. Return the Decision Record and the unsupported boundary. Do not flatten multiple or embedded Loops, drop critical resources, or claim that a generated replacement is a complete upgrade.
+If any condition fails, stop at **Assessment only**. Return the Decision Record and the unsupported boundary. Do not flatten two or more qualifying Loops into one, drop critical resources, or claim that a generated replacement is a complete upgrade. A single supporting Loop inside a preserved parent workflow is not a flattened design; compressing several independent cycles into one is.
 
 If the gate passes, use the Decision Record as input to the shared Candidate Review in [candidate-review.md](candidate-review.md). Reuse answers already established by the record and scoped evidence; do not ask them again. Do not write the accepted definition, inventory the source package, or build until the user explicitly approves the Candidate.
 

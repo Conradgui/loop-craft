@@ -65,7 +65,7 @@ Only a 1-loop definition writes `loops[0].invariants`. Do not add unsupported fi
 
 ## 5. Review before writing
 
-Use the shared Candidate Review in [candidate-review.md](candidate-review.md). Resolve material missing or conflict items, then show the packet for the selected 0-loop Workflow or 1-loop bounded Loop. Do not write the accepted definition or create an output directory until the user gives explicit approval.
+Use the shared Candidate Review in [candidate-review.md](candidate-review.md). Resolve only the blocking items defined there; carry every non-blocking gap into the packet as `proposed` or `missing` rather than asking about it first. Then show the packet for the selected 0-loop Workflow or 1-loop bounded Loop. Do not write the accepted definition or create an output directory until the user gives explicit approval.
 
 ## 6. Build after approval
 

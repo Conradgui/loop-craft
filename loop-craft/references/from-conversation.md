@@ -42,7 +42,7 @@ Ask one high-value question at a time. Every question must include all four part
 3. **Impact** — how the answer changes behavior, authority, verification, stopping, or the deliverable.
 4. **Initial proposal** — the smallest reasonable interpretation, explicitly marked proposed.
 
-Prefer questions that resolve trigger, authority, fresh evidence, failure/stop behavior, or output ownership. Stop when remaining uncertainty cannot change the architecture or accepted contract. Never ask a blank question and never fabricate a missing answer.
+Prefer questions that resolve trigger, authority, fresh evidence, failure/stop behavior, or output ownership. Apply the blocking threshold in [candidate-review.md](candidate-review.md): ask only when the answer cannot be derived from the authorized record and the Candidate packet cannot be shown without it. Stop when remaining uncertainty cannot change the architecture or accepted contract. Never ask a blank question and never fabricate a missing answer.
 
 ## 4. Workflow Model to Candidate Behavior Contract
 
