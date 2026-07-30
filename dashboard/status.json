@@ -1,22 +1,22 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T08:55:51-07:00",
+  "updated_at": "2026-07-30T09:03:53-07:00",
   "overall": {
-    "label": "两条真实入口已走通；阶段出口仍为 DRIFT",
+    "label": "Existing Skill Demo 已并入本地 main；等待远端验证决策",
     "tone": "blocked",
-    "summary": "From-scratch 与 Existing Skill 两条真实用户路径已经走通。Skill Polisher 固定 revision 经只读 Assessment、批准 Candidate、source-preserving build、独立 Evidence、clean/drift verify、官方 validator 和一个隔离 Review → Polish → Recheck smoke case；源 Skill 未修改。Conversation Distillation 仍无真实调用证据，RV-003、LC-009 的更广包形边界、远端 CI 与 LICENSE 继续开放，因此阶段出口仍为 DRIFT。"
+    "summary": "From-scratch 与 Existing Skill 两条真实用户路径已经走通，Skill Polisher Demo 的规格、计划、执行记录和看板已 fast-forward 并入本地 main。实验实证表明 RV-003 不在该入口路径，Skill Polisher 也未触发 LC-009，因此二者都不应作为当前前置修复。下一决策是是否推送 main 并观察首次远端 CI；Conversation Distillation 仍是下一条产品主线，LICENSE 最后决定。阶段出口继续保持 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
     "progress": 80,
     "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "本地实验结果已提交；决定是否推送并观察首次远端 CI"
+    "next": "决定是否推送本地 main；获授权后观察首次远端 CI"
   },
   "metrics": [
     {
       "label": "当前本地版本",
-      "value": "codex/skill-polisher-demo · 07-30",
+      "value": "main · 3a5fe1e",
       "tone": "ready"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "label": "实验结果",
-      "value": "committed · 2feab3b",
+      "value": "merged locally · clean",
       "tone": "ready"
     },
     {
@@ -75,7 +75,7 @@
         "agent": "Codex",
         "id": "current",
         "period": "2026-07-30",
-        "role": "校准交接看板，并走通 Skill Polisher Existing Skill 真实 Demo"
+        "role": "走通 Skill Polisher Existing Skill Demo，并同步到本地 main 与后续计划"
       }
     ]
   },
@@ -83,9 +83,9 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "HEAD · 2026-07-30",
+      "value": "main · 3a5fe1e",
       "state": "ready",
-      "detail": "原有 Core、三入口骨架、规则修复与治理已受 Git 保护；Skill Polisher Existing Skill 真实 Demo 结果已在隔离分支提交为 2feab3b。"
+      "detail": "原有 Core、三入口骨架、规则修复与治理，以及 Skill Polisher Existing Skill Demo 的规格、计划、执行记录和看板均已进入本地 main。"
     },
     {
       "kind": "remote",
@@ -101,8 +101,8 @@
       "level": "low",
       "state": "ready",
       "title": "当前版本已获得本地 Git 保护",
-      "fact": "项目所有者已授权把 Claude Code 候选与本次交接看板作为当前版本提交；提交后工作区为 clean。",
-      "action": "保留本地提交与隔离实验分支；是否推送另行决定。",
+      "fact": "Claude Code 候选、接力看板和 Skill Polisher Demo 均已进入本地 main；当前工作区 clean。",
+      "action": "保留本地 main 与实验 worktree；是否推送另行决定。",
       "done_when": "已满足；本地版本保护不等于远端发布或阶段出口通过。"
     },
     {
@@ -111,7 +111,7 @@
       "state": "ready",
       "title": "Skill Polisher Existing Skill Demo 已走通",
       "fact": "固定 revision 走完只读 Assessment、批准 Candidate、source-preserving build、clean/drift verify、官方 validator 与一个隔离 smoke case；源 Skill 保持 clean。",
-      "action": "保留执行记录与本地产物；下一条真实入口是 Conversation Distillation。",
+      "action": "保留执行记录与本地产物；远端 CI 决策后进入 Conversation Distillation。",
       "done_when": "已满足；Existing Skill 入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
@@ -120,7 +120,7 @@
       "state": "active",
       "title": "RV-003 direct-build provenance 不可表达",
       "fact": "Entry Evidence schema 没有 direct build 的合法 entry_type/source_summary.kind，candidate_review 又是必填。",
-      "action": "在独立主线中扩展 schema 和映射，同时如实声明 direct build 未发生 Candidate Review。",
+      "action": "不作为当前前置修复；只有 direct-build 用户路径被正式接受时，才扩展 schema 与映射。",
       "done_when": "direct build 可生成合法 Entry Evidence，且不伪造访谈、Review 或批准来源。"
     },
     {
@@ -129,7 +129,7 @@
       "state": "active",
       "title": "LC-009 更广真实 Skill 包边界仍未闭合",
       "fact": "Skill Polisher canonical root 的 5 个标准文件已直接 inventory 成功，当前 Demo 未触发 LC-009；其它常见非白名单 root 仍缺安全规范，历史放松草案会破坏 RV-001。",
-      "action": "不为已通过的目标修改 Adapter；只有新的真实包形失败时，才绑定 RV-001 组合护栏设计规范化路线。",
+      "action": "保持观察，不为已通过目标修改 Adapter；只有新的真实 canonical root 失败时才绑定 RV-001 组合护栏。",
       "done_when": "代表性常见包形可达，未知 root 与链接/junction 继续 fail closed。"
     },
     {
@@ -138,7 +138,7 @@
       "state": "active",
       "title": "远端 CI 尚未首跑",
       "fact": ".github/workflows/validate.yml 已进入当前本地版本，但尚未推送，远端从未执行。",
-      "action": "后续获得推送授权后观察首次 GitHub Actions 结果。",
+      "action": "获得明确推送授权后推送本地 main，并观察首次 GitHub Actions；只修复真实失败。",
       "done_when": "远端矩阵首次运行完成并通过；在此之前只表述为本地已验证。"
     },
     {
@@ -209,33 +209,33 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "Skill Polisher Demo 本地结果已提交",
-      "detail": "真实链路、执行记录、看板和计划状态已提交到隔离分支 2feab3b；未推送。",
-      "state": "ready"
+      "title": "决定是否推送本地 main",
+      "detail": "本地 main 已包含全部已验证结果；推送会更新远端基线并触发首次 GitHub Actions，需要项目所有者明确授权。",
+      "state": "active"
     },
     {
       "id": "N2",
-      "title": "修复 RV-003 direct-build 来源表达",
-      "detail": "扩展 Entry Evidence schema 与映射，不伪造 Candidate Review 或访谈来源。",
+      "title": "观察并裁决首次远端 CI",
+      "detail": "推送获批后观察真实矩阵；通过则记录远端证据，失败则只修复实际失败，不预先扩展测试。",
       "state": "queued"
     },
     {
       "id": "N3",
-      "title": "重新设计 LC-009 可达性",
-      "detail": "在保留 RV-001 无条件安全停机的前提下，让常见真实 Skill 包可被 inventory。",
+      "title": "执行 Conversation Distillation 真实 Demo",
+      "detail": "三入口主线最后一条真实用户路径；复用同一 Gate、Compiler、Evidence 与 Adapter，不新建 Entry Framework。",
       "state": "queued"
     },
     {
       "id": "N4",
-      "title": "执行 Conversation Distillation 真实 Demo",
-      "detail": "作为三入口主线的最后一条真实用户路径，等待本轮实验结果讨论后进入。",
+      "title": "按真实触发条件恢复 RV-003 / LC-009",
+      "detail": "RV-003 只随 direct-build 用户故事恢复；LC-009 只随新的 canonical Skill root 真实失败恢复。",
       "state": "queued"
     },
     {
       "id": "N5",
-      "title": "决定是否推送、观察远端 CI，再决定 LICENSE",
-      "detail": "本次只提交本地分支；推送、首次 Actions 和许可证选择需要项目所有者决定。",
-      "state": "active"
+      "title": "最后决定 LICENSE",
+      "detail": "在远端 CI 状态与上游归属边界明确后，由项目所有者选择许可证。",
+      "state": "queued"
     }
   ],
   "work_lanes": {
@@ -244,7 +244,7 @@
       "items": [
         {
           "title": "Conversation Distillation 真实 Demo",
-          "detail": "下一条 mainline 候选；Skill Polisher Existing Skill Demo 已完成，等待本轮结果讨论后再启动。"
+          "detail": "下一条产品主线；Existing Skill Demo 已完成，RV-003 与 LC-009 均不作为其前置建设。"
         }
       ]
     },
@@ -252,16 +252,16 @@
       "label": "验证 · 绑定具体风险",
       "items": [
         {
-          "title": "看板最小验证",
-          "detail": "只验证 JSON、字段渲染、桌面/窄屏和本地 HTTP，不运行 Python 全量测试。"
+          "title": "远端 CI 首跑",
+          "detail": "仅在 main 获得推送授权后执行；真实失败才改变实现或测试。"
         },
         {
-          "title": "LC-009 安全护栏",
-          "detail": "后续放松 inventory 时固定绑定 RV-001 与新增组合用例，不再全量重跑。"
+          "title": "LC-009 条件式护栏",
+          "detail": "新的真实 canonical root 失败时才恢复，并固定绑定 RV-001；当前 Skill Polisher 已通过。"
         },
         {
-          "title": "停机评分稳定性",
-          "detail": "先统一“正确停机 vs 过度停机”判据，再把通过率用于决策。"
+          "title": "Conversation Demo 定向验证",
+          "detail": "只验证最后一条入口的来源恢复、Review、build 与一个现实失败风险。"
         }
       ]
     },
@@ -270,11 +270,11 @@
       "items": [
         {
           "title": "LICENSE 决策",
-          "detail": "由项目所有者选择，不擅自添加授权。"
+          "detail": "放在远端 CI 与来源边界之后，由项目所有者选择，不擅自添加授权。"
         },
         {
-          "title": "远端 CI 首跑",
-          "detail": "本地版本获得推送授权后观察真实结果。"
+          "title": "本地证据保留",
+          "detail": "实验 worktree 暂时保留，因为 ignored build 中含真实 Artifact、Evidence 与 smoke 结果。"
         },
         {
           "title": "治理记录一致性",
@@ -286,8 +286,8 @@
       "label": "Not now · 当前队列之外",
       "items": [
         {
-          "title": "扩展能力",
-          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布与调度不进入当前执行队列。"
+          "title": "Direct build 与扩展能力",
+          "detail": "RV-003 direct-build productization、Runtime、Override、Subloop、Library Edition、多 Loop、发布与调度不进入当前执行队列。"
         }
       ]
     }
@@ -304,7 +304,7 @@
     {
       "level": "medium",
       "title": "当前本地版本尚未推送",
-      "detail": "本地 Git 已提供版本保护，但 origin/main 仍停在 255438f，远端备份与 CI 尚未覆盖当前版本。"
+      "detail": "本地 main 已到 3a5fe1e，但 origin/main 仍停在 255438f；远端备份与 CI 尚未覆盖当前版本。"
     },
     {
       "level": "high",
@@ -340,6 +340,10 @@
       "title": "Skill Polisher Existing Skill Demo"
     },
     {
+      "state": "ready",
+      "title": "Skill Polisher Demo 并入本地 main"
+    },
+    {
       "state": "queued",
       "title": "LICENSE、远端 CI 与阶段出口复核"
     }
@@ -363,6 +367,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Existing Skill Demo 同步到本地 main",
+      "detail": "codex/skill-polisher-demo 以 fast-forward 并入 main@3a5fe1e；后续顺序校准为推送决策 → 远端 CI → Conversation Demo → LICENSE。"
+    },
     {
       "date": "2026-07-30",
       "title": "Skill Polisher Existing Skill Demo 走通",
