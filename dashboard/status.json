@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T08:51:51-07:00",
+  "updated_at": "2026-07-30T08:55:51-07:00",
   "overall": {
     "label": "两条真实入口已走通；阶段出口仍为 DRIFT",
     "tone": "blocked",
@@ -11,7 +11,7 @@
     "state": "in_progress",
     "progress": 80,
     "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "复核并提交本地实验结果；推送与远端 CI 另行授权"
+    "next": "本地实验结果已提交；决定是否推送并观察首次远端 CI"
   },
   "metrics": [
     {
@@ -26,7 +26,7 @@
     },
     {
       "label": "实验结果",
-      "value": "ready · 本地待提交",
+      "value": "committed · 2feab3b",
       "tone": "ready"
     },
     {
@@ -85,7 +85,7 @@
       "title": "当前本地版本",
       "value": "HEAD · 2026-07-30",
       "state": "ready",
-      "detail": "原有 Core、三入口骨架、规则修复与治理已受 Git 保护；隔离分支新增 Skill Polisher Existing Skill 真实 Demo 记录，等待本地结果提交。"
+      "detail": "原有 Core、三入口骨架、规则修复与治理已受 Git 保护；Skill Polisher Existing Skill 真实 Demo 结果已在隔离分支提交为 2feab3b。"
     },
     {
       "kind": "remote",
@@ -209,9 +209,9 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "提交并复核 Skill Polisher Demo 本地结果",
-      "detail": "真实链路已通过；把执行记录、看板和计划状态提交到隔离分支。推送与远端 CI 不在本地实验授权内。",
-      "state": "active"
+      "title": "Skill Polisher Demo 本地结果已提交",
+      "detail": "真实链路、执行记录、看板和计划状态已提交到隔离分支 2feab3b；未推送。",
+      "state": "ready"
     },
     {
       "id": "N2",
@@ -235,7 +235,7 @@
       "id": "N5",
       "title": "决定是否推送、观察远端 CI，再决定 LICENSE",
       "detail": "本次只提交本地分支；推送、首次 Actions 和许可证选择需要项目所有者决定。",
-      "state": "queued"
+      "state": "active"
     }
   ],
   "work_lanes": {

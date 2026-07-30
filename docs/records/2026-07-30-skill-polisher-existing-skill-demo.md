@@ -1,6 +1,6 @@
 # Skill Polisher Existing Skill Upgrade 真实 Demo 执行记录
 
-> 状态：本地实验链路完成，等待结果提交
+> 状态：本地实验链路完成；结果提交 `2feab3b`
 >
 > 执行分支：`codex/skill-polisher-demo`
 >

@@ -115,6 +115,6 @@ git status --short
 ```
 
 - [x] 按 `superpowers:verification-before-completion` 复核所有成功声明。
-- [ ] 仅提交 `codex/skill-polisher-demo` 本地分支，不推送；ignored build 产物留在工作树内供检查。
+- [x] 仅提交 `codex/skill-polisher-demo` 本地分支，不推送；ignored build 产物留在工作树内供检查。
 
 Expected: 本地提交可追溯，工作树干净；远端和许可证状态不被误报。
