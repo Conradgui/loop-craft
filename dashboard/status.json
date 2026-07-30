@@ -1,17 +1,17 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T04:40:00-07:00",
+  "updated_at": "2026-07-30T04:53:29-07:00",
   "overall": {
     "label": "当前版本已获得本地 Git 保护；尚未推送远端",
     "tone": "blocked",
-    "summary": "当前本地 HEAD 已包含确定性 Core、三入口骨架、共享 Gate、Packaging、Entry Evidence、五轮行为验证后的规则修复、双语 README、治理文档、CI、管控 Agent 与交接看板；工作区在提交后保持干净。origin/main 仍停在 255438f，尚未推送。From-scratch 已完成一次真实用户 Demo；Existing Skill Upgrade 与 Conversation Distillation 仍无真实调用证据，因此阶段出口继续保持 DRIFT。"
+    "summary": "当前本地 HEAD 已包含确定性 Core、三入口骨架、共享 Gate、Packaging、Entry Evidence、五轮行为验证后的规则修复、双语 README、治理文档、CI、管控 Agent 与交接看板；origin/main 仍停在 255438f，尚未推送。From-scratch 已完成一次真实用户 Demo；Skill Polisher Existing Skill Demo 的书面规格已批准，正在隔离分支执行，完成前不计入已交付能力。Conversation Distillation 仍无真实调用证据，阶段出口继续保持 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
     "progress": 60,
     "progress_label": "From-scratch 1 / 1；其余入口 0 / 2",
-    "next": "复核 Skill Polisher Existing Skill Upgrade 书面规格，再生成实施计划"
+    "next": "按批准规格执行 Skill Polisher 的只读 Assessment、source-preserving build 与单一 smoke case"
   },
   "metrics": [
     {
@@ -105,8 +105,8 @@
       "level": "high",
       "state": "active",
       "title": "Skill Polisher Existing Skill Demo 尚未执行",
-      "fact": "From-scratch 已真实走通；Existing Skill 主线已选择 Skill Polisher，但当前仍处于书面规格复核，Conversation Distillation 继续排队。",
-      "action": "规格批准后，用固定 revision 走完只读 Assessment、Candidate Review、source-preserving build、verify 与一个 smoke case。",
+      "fact": "From-scratch 已真实走通；Skill Polisher Existing Skill Demo 规格已书面批准，并在隔离分支开始执行；Conversation Distillation 继续排队。",
+      "action": "用固定 revision 走完只读 Assessment、已批准 Candidate 的 source-preserving build、verify 与一个 smoke case。",
       "done_when": "至少一条新增入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
@@ -199,8 +199,8 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "复核 Skill Polisher Existing Skill Demo 规格",
-      "detail": "目标、固定 revision、Review → 授权 → 最多两轮 Polish/Recheck 与高效验证漏斗已批准；等待书面规格复核。",
+      "title": "执行 Skill Polisher Existing Skill Demo",
+      "detail": "书面规格已批准；当前在隔离分支执行固定 revision 获取、只读 Assessment、正式 inventory、source-preserving build、clean/drift verify 与一个 smoke case。",
       "state": "active"
     },
     {
@@ -234,7 +234,7 @@
       "items": [
         {
           "title": "Skill Polisher Existing Skill Demo",
-          "detail": "当前唯一 active：先复核书面规格，再规划只读 Assessment、Candidate Review、source-preserving build 与一个 smoke case。"
+          "detail": "当前唯一 active：批准规格已进入隔离实施；按只读 Assessment → 已批准 Candidate → inventory → source-preserving build → smoke case 推进。"
         }
       ]
     },
@@ -326,7 +326,7 @@
       "title": "当前版本获得本地 Git 保护"
     },
     {
-      "state": "queued",
+      "state": "active",
       "title": "Skill Polisher Existing Skill Demo"
     },
     {

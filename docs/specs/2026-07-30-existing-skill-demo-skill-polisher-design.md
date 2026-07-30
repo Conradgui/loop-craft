@@ -1,6 +1,6 @@
 # Skill Polisher Existing Skill Upgrade 真实 Demo 设计
 
-> 状态：已获产品方向批准，等待书面规格复核
+> 状态：已书面批准，进入隔离实施
 > 日期：2026-07-30
 > 任务层级：`mainline`
 > 目标仓库：`Conradgui/skill-polisher`
