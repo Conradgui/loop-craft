@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T04:06:00-07:00",
+  "updated_at": "2026-07-30T04:40:00-07:00",
   "overall": {
     "label": "当前版本已获得本地 Git 保护；尚未推送远端",
     "tone": "blocked",
@@ -11,7 +11,7 @@
     "state": "in_progress",
     "progress": 60,
     "progress_label": "From-scratch 1 / 1；其余入口 0 / 2",
-    "next": "讨论并选择 Existing Skill 或 Conversation 作为下一条真实 Demo"
+    "next": "复核 Skill Polisher Existing Skill Upgrade 书面规格，再生成实施计划"
   },
   "metrics": [
     {
@@ -97,16 +97,16 @@
       "state": "ready",
       "title": "当前版本已获得本地 Git 保护",
       "fact": "项目所有者已授权把 Claude Code 候选与本次交接看板作为当前版本提交；提交后工作区为 clean。",
-      "action": "保留本地提交，讨论下一条产品主线；是否推送另行决定。",
+      "action": "保留本地提交并复核 Skill Polisher Demo 规格；是否推送另行决定。",
       "done_when": "已满足；本地版本保护不等于远端发布或阶段出口通过。"
     },
     {
       "priority": "P0-01",
       "level": "high",
       "state": "active",
-      "title": "两条入口仍无真实用户 Demo",
-      "fact": "From-scratch 已真实走通；Existing Skill Upgrade 与 Conversation Distillation 只有骨架和盲测证据。",
-      "action": "从两条入口中选择一条完成真实目标、Review、批准、构建与交付。",
+      "title": "Skill Polisher Existing Skill Demo 尚未执行",
+      "fact": "From-scratch 已真实走通；Existing Skill 主线已选择 Skill Polisher，但当前仍处于书面规格复核，Conversation Distillation 继续排队。",
+      "action": "规格批准后，用固定 revision 走完只读 Assessment、Candidate Review、source-preserving build、verify 与一个 smoke case。",
       "done_when": "至少一条新增入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
@@ -199,8 +199,8 @@
   "next_steps": [
     {
       "id": "N1",
-      "title": "选择下一条真实 Demo 入口",
-      "detail": "讨论 Existing Skill Upgrade 与 Conversation Distillation 哪一条先形成真实用户路径。",
+      "title": "复核 Skill Polisher Existing Skill Demo 规格",
+      "detail": "目标、固定 revision、Review → 授权 → 最多两轮 Polish/Recheck 与高效验证漏斗已批准；等待书面规格复核。",
       "state": "active"
     },
     {
@@ -233,8 +233,8 @@
       "label": "主线 · 用户能力",
       "items": [
         {
-          "title": "选择下一条真实 Demo",
-          "detail": "当前唯一 active：在 Existing Skill 与 Conversation 中选择一条，形成第二条真实用户路径。"
+          "title": "Skill Polisher Existing Skill Demo",
+          "detail": "当前唯一 active：先复核书面规格，再规划只读 Assessment、Candidate Review、source-preserving build 与一个 smoke case。"
         }
       ]
     },
@@ -327,7 +327,7 @@
     },
     {
       "state": "queued",
-      "title": "Existing Skill / Conversation 真实 Demo"
+      "title": "Skill Polisher Existing Skill Demo"
     },
     {
       "state": "queued",
@@ -353,6 +353,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Skill Polisher Demo 设计获批",
+      "detail": "目标固定为 Conradgui/skill-polisher@63df4b5；Review 只读，授权一个 Finding 后最多两次 Polish/Recheck；采用一目标、一个 smoke case 的高效验证漏斗。"
+    },
     {
       "date": "2026-07-30",
       "title": "当前版本形成本地提交",

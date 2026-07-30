@@ -100,10 +100,10 @@
 
 <header>
   <div class="eyebrow">Loop Craft · 接力与决策看板</div>
-  <h1>本地版本已保护，开始讨论下一条主线</h1>
+  <h1>Skill Polisher Demo 设计已确认</h1>
   <p class="verdict">
     <b>当前版本已进入本地 Git 历史；origin/main 仍停在旧基线。</b>
-    From-scratch 已完成一次真实端到端 Demo；Existing Skill Upgrade 与 Conversation Distillation 仍缺真实调用证据。
+    From-scratch 已完成一次真实端到端 Demo；下一条主线已选择 Skill Polisher Existing Skill Upgrade，当前等待书面规格复核。
     当前阶段出口保持 <b>DRIFT · 不放行</b>。本地提交解决版本保护，不等于远端发布或产品阶段通过。
   </p>
   <div class="stamp">快照 2026-07-30 · 本地 HEAD 已更新 · origin/main 255438f · 证据优先级：Git / 实测记录 / 对话 / 治理文档</div>
@@ -119,13 +119,13 @@
 </div>
 
 <section>
-  <div class="shead"><span class="snum">00</span><h2>当前唯一主线：选择下一条真实 Demo</h2></div>
-  <p class="sdesc">版本保护已经完成。接下来先讨论产品路径，不用提交数、测试数或治理文件替代用户能力。</p>
+  <div class="shead"><span class="snum">00</span><h2>当前唯一主线：复核 Skill Polisher Demo 规格</h2></div>
+  <p class="sdesc">目标和验证预算已经确认；下一步先复核书面规格，再生成实施计划，不提前修改代码。</p>
   <div class="card hot">
-    <div class="ctop"><h3>Existing Skill 还是 Conversation</h3><span class="tag hot">ACTIVE</span></div>
-    <p>From-scratch 已有一次真实用户证据；另外两条入口虽然共用真实 Gate、Review、Compiler、Evidence 与 Adapter，但仍只有骨架和盲测证据。</p>
-    <p><b>下一步的价值不是再补内部完整度，而是让用户通过第二种入口得到可检查的 Skill + Evidence。</b></p>
-    <div class="rec"><strong>完成条件：</strong>选择一个入口，并用真实目标走完 Review、批准、build、交付与 verify。</div>
+    <div class="ctop"><h3>Review → 授权 → Polish / Recheck</h3><span class="tag hot">SPEC REVIEW</span></div>
+    <p>目标固定为 <code>Conradgui/skill-polisher@63df4b5</code> 的 <code>skills/skill-polisher/</code>。Review 保持只读；用户选择一个 Finding 后，最多执行两次 Polish 与两次定向 Recheck。</p>
+    <p><b>LC-009 只在 canonical Skill root 真实 inventory 失败时处理；RV-003 不作为本 Demo 前置。</b></p>
+    <div class="rec"><strong>完成条件：</strong>用户复核书面规格，随后生成实施计划；本阶段不调用 Core 或修改目标 Skill。</div>
   </div>
 </section>
 
@@ -178,9 +178,9 @@
   <p class="sdesc">这些不会通过“再跑一轮测试”自动收敛，需要项目所有者决定范围或顺序。</p>
 
   <div class="card hot">
-    <div class="ctop"><h3>下一条真实 Demo：Existing Skill 还是 Conversation</h3><span class="tag hot">最高优先</span></div>
-    <p>当前“真实 Demo 1/1”只证明 From-scratch。另两条入口仍是已接通但未被真实用户使用的能力。</p>
-    <div class="rec"><strong>建议：</strong>优先做一条新增入口的真实 Demo，而不是继续扩大盲测数量。具体入口顺序留给下一项产品决策。</div>
+    <div class="ctop"><h3>Skill Polisher Demo：不预设必须构建</h3><span class="tag hot">已定方向</span></div>
+    <p>目标已经固定，但 Loopability verdict 必须来自真实 Assessment。若证据不支持一个可无损表达的 supporting Loop，Assessment-only 是正确结果，不能为了把指标从 0 改成 1 而制造 Finding。</p>
+    <div class="rec"><strong>建议：</strong>一目标、一个 Finding、一个 smoke case；如实停机比扩大测试或改换第二个目标更有价值。</div>
   </div>
 
   <div class="card warn">
@@ -244,7 +244,7 @@
     <div class="gate"><span class="dot ok"></span><span class="gname">Git 基线：Core + 三入口骨架 + Packaging + Entry Evidence</span><span class="gst">READY</span></div>
     <div class="gate"><span class="dot ok"></span><span class="gname">From-scratch 真实 Demo</span><span class="gst">READY</span></div>
     <div class="gate"><span class="dot ok"></span><span class="gname">当前版本获得本地 Git 保护</span><span class="gst">READY</span></div>
-    <div class="gate"><span class="dot warn"></span><span class="gname">Existing Skill / Conversation 真实 Demo</span><span class="gst">0 / 2</span></div>
+    <div class="gate"><span class="dot warn"></span><span class="gname">Skill Polisher Existing Skill Demo</span><span class="gst">SPEC REVIEW</span></div>
     <div class="gate"><span class="dot hot"></span><span class="gname">LICENSE、远端 CI、R-020/R-021 与阶段复核</span><span class="gst">DRIFT</span></div>
   </div>
   <div class="runs">
