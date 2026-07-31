@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T04:18:00-07:00",
+  "updated_at": "2026-07-31T04:25:00-07:00",
   "overall": {
     "label": "PASS · 0.3.0 封板",
     "tone": "ready",
@@ -51,7 +51,7 @@
     },
     {
       "label": "本机 Skill 一致性",
-      "value": "24 tracked files · SHA-256 match",
+      "value": "24 Git blobs · byte-exact",
       "tone": "ready"
     },
     {
@@ -283,7 +283,7 @@
     {
       "id": "N5",
       "title": "候选验证、安装同步与产品流程审计",
-      "detail": "171 tests、三份 Demo clean、24 tracked 安装哈希一致；无项目历史的 fresh Agent 对六条路线与四项硬门槛全部 PASS。",
+      "detail": "171 tests、三份 Demo clean、24 个 Git blob 与安装副本逐字节一致；无项目历史的 fresh Agent 对六条路线与四项硬门槛全部 PASS。",
       "state": "done"
     },
     {
@@ -444,8 +444,8 @@
     },
     {
       "date": "2026-07-31",
-      "title": "本机 loop-craft 原子式同步完成",
-      "detail": "24 个 tracked 文件经 staging validator 与逐项 SHA-256 比对后生效；旧安装移动到时间戳备份，安装后 validator 再次通过。"
+      "title": "本机 loop-craft Git blob 精确同步完成",
+      "detail": "24 个 tracked 文件从候选 Git blob 原始字节生成；staging 与安装后均通过官方 validator，路径、文件数和内容逐项一致，旧安装及 Windows 换行转换副本均保留为时间戳备份。"
     },
     {
       "date": "2026-07-31",
