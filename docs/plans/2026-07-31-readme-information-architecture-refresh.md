@@ -26,7 +26,7 @@ Runtime Skill files, schemas, tests, version metadata, `docs/DESIGN.md`, and rel
 - Modify: `README.zh.md`
 - Reference: `docs/specs/2026-07-31-readme-information-architecture-refresh.md`
 
-- [ ] **Step 1: Replace the English README with the approved information architecture**
+- [x] **Step 1: Replace the English README with the approved information architecture**
 
 Use this exact heading order:
 
@@ -59,7 +59,7 @@ Required content:
 - separate current and future capability lists;
 - developer build commands, repository map, and links to design/evaluation/decision/risk documents.
 
-- [ ] **Step 2: Replace the Chinese README with the same factual contract**
+- [x] **Step 2: Replace the Chinese README with the same factual contract**
 
 Use this exact heading order:
 
@@ -83,7 +83,7 @@ capability boundaries as the English edition. Use the approved Chinese hero and 
 Chinese invocation examples. Explain technical terms on first use instead of translating
 English sentence order mechanically.
 
-- [ ] **Step 3: Run the bilingual structure and local-link contract check**
+- [x] **Step 3: Run the bilingual structure and local-link contract check**
 
 Run an inline Python checker that asserts:
 
@@ -99,7 +99,7 @@ Every relative Markdown link in both files resolves from its README directory
 
 Expected: exit 0 with `README contract: PASS` and `missing links: 0`.
 
-- [ ] **Step 4: Review the diff for product truth and readability**
+- [x] **Step 4: Review the diff for product truth and readability**
 
 Confirm the first screen explains Loop before Compiler, the main graph can be restated as
 three entries → shared Core → Evidence/Adjuster split, Direct Build is not called a fourth
