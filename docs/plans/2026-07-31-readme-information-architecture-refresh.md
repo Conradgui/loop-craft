@@ -158,7 +158,7 @@ git commit -m "docs: record README architecture refresh"
 **Files:**
 - Review only: branch diff against `main`
 
-- [ ] **Step 1: Run final branch checks**
+- [x] **Step 1: Run final branch checks**
 
 Confirm branch status is clean, commits contain only the approved documentation/support
 files, local README links resolve, dashboard JSON parses, and the `loop-craft/` tree hash is
