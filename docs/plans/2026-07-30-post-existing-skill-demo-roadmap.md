@@ -37,12 +37,15 @@ Conversation Distillation 真实用户路径，最后处理发布许可证。
 - [x] 已恢复 Observed Workflow Model，逐段确认 0-loop Candidate 行为、权限和停止规则。
 - [x] 已审阅精简实验协议。
 - [x] 已完成不修改产品代码的最小实施计划。
-- [ ] 选择执行方式，并在构建前批准精确 Accepted Definition 与 Entry Evidence。
-- [ ] 复用现有 Workflow Model、Loopability Gate、Candidate Review、Compiler、Evidence 和 Adapter。
-- [ ] 只构建一个可无损表示的 0-loop Workflow 或 1-loop Skill；多 Loop 如实停在 Assessment。
-- [ ] 完成一个最小现实 smoke case，并同步执行记录与看板。
+- [x] 已选择当前会话执行，并在构建前批准精确 Accepted Definition 与 Entry Evidence。
+- [x] 已复用现有 Workflow Model、Loopability Gate、Candidate Review、Compiler、Evidence 和 Adapter。
+- [x] 已无损构建 `project-handoff-dashboard-sync` 0-loop Workflow Skill 与独立 Evidence。
+- [x] 已完成一个最小现实 smoke case，并同步执行记录与看板。
 
 产品出口：三入口都至少有一条真实、可复核的用户路径。
+
+实际裁决：产品出口已满足；M1 三入口真实用户链路完成度为 3 / 3。实验结果暂留在本地
+`codex/conversation-handoff-dashboard-demo` 分支与 ignored build，尚未合并或推送。
 
 ### 3. 条件式问题，不做前置建设
 

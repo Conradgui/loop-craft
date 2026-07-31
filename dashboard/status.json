@@ -1,22 +1,22 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T19:08:13-07:00",
+  "updated_at": "2026-07-30T20:07:27-07:00",
   "overall": {
-    "label": "Conversation 实验协议已审阅；最小实施计划就绪",
+    "label": "三入口真实 Demo 已完成；进入阶段出口与 LICENSE 复核",
     "tone": "active",
-    "summary": "项目接力与已有看板同步记录已被明确授权为唯一输入，Observed Workflow Model、0-loop Candidate 和精简实验协议均已审阅；最小实施计划现在只复用现有 Conversation Entry、Compiler、Evidence 与 Adapter，不修改产品代码。尚未获准写 Accepted Definition 或调用 Core，因此 Conversation 真实 Demo 仍为 0 / 1。远端 CI 保持 4 / 4 通过，RV-003 与 LC-009 不作为前置建设，阶段出口仍为 DRIFT。"
+    "summary": "项目接力与已有看板同步记录已通过 Conversation Entry 恢复为 0-loop Workflow，经真实 Core 生成 project-handoff-dashboard-sync Skill 与独立 Evidence；clean / drift / validator 和一个隔离 smoke 均通过。From-scratch、Existing Skill、Conversation 三个入口现各有一条真实用户路径，M1 完成度 3 / 3。结果暂留本地实验分支，尚未合并或推送；RV-003、LC-009、历史测试预算、LICENSE 与阶段出口继续独立裁决，当前阶段仍为 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
-    "state": "in_progress",
-    "progress": 80,
-    "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "审阅最小实施计划并选择执行方式；构建前确认精确输入"
+    "state": "completed",
+    "progress": 100,
+    "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 1 / 1",
+    "next": "复核并集成 Conversation Demo；随后裁决 LICENSE 与阶段出口"
   },
   "metrics": [
     {
-      "label": "远端验证目标",
-      "value": "main · 1530688",
+      "label": "当前本地 main",
+      "value": "main · 803be93",
       "tone": "ready"
     },
     {
@@ -41,8 +41,8 @@
     },
     {
       "label": "Conversation 真实 Demo",
-      "value": "Candidate confirmed · 0 / 1",
-      "tone": "blocked"
+      "value": "1 / 1 · local branch",
+      "tone": "ready"
     },
     {
       "label": "阶段出口",
@@ -75,7 +75,7 @@
         "agent": "Codex",
         "id": "current",
         "period": "2026-07-30",
-        "role": "走通 Skill Polisher Existing Skill Demo，并同步到本地 main 与后续计划"
+        "role": "走通 Existing Skill 与 Conversation 两条真实 Demo，并完成首次远端 CI"
       }
     ]
   },
@@ -83,16 +83,16 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "main · 1530688",
+      "value": "main · 803be93；Conversation 实验分支待集成",
       "state": "ready",
-      "detail": "原有 Core、三入口骨架、规则修复与治理，以及 Skill Polisher Existing Skill Demo 的规格、计划、执行记录和看板均已进入本地 main。"
+      "detail": "main 已包含既有两条 Demo、远端 CI 记录、Conversation 实验协议与实施计划；完成结果位于本地 codex/conversation-handoff-dashboard-demo 分支，尚未合并。"
     },
     {
       "kind": "remote",
       "title": "远端可恢复版本",
-      "value": "origin/main · 1530688",
+      "value": "origin/main · 6595a58",
       "state": "ready",
-      "detail": "本地 main 已推送；GitHub Actions run 30560334591 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部成功。"
+      "detail": "远端保留首次 CI 通过后的文档状态；GitHub Actions run 30560334591 对 main@1530688 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部成功。"
     }
   ],
   "issues": [
@@ -113,6 +113,15 @@
       "fact": "固定 revision 走完只读 Assessment、批准 Candidate、source-preserving build、clean/drift verify、官方 validator 与一个隔离 smoke case；源 Skill 保持 clean。",
       "action": "保留执行记录与本地产物；当前进入 Conversation Distillation。",
       "done_when": "已满足；Existing Skill 入口形成真实可复核的 Skill + Evidence 用户路径。"
+    },
+    {
+      "priority": "P0-02",
+      "level": "high",
+      "state": "ready",
+      "title": "Conversation Distillation 真实 Demo 已走通",
+      "fact": "授权项目接力记录完成 Observed Workflow、0-loop Review、真实 build、独立 Evidence、clean/drift/validator 与一个隔离 smoke；未获批正文和 canary 未进入输出。",
+      "action": "保留本地实验分支与 ignored 原始证据；复核后再决定是否集成 main。",
+      "done_when": "已满足；Conversation 入口形成真实可复核的 0-loop Skill + Evidence 用户路径。"
     },
     {
       "priority": "P1-01",
@@ -196,6 +205,11 @@
       "state": "ready"
     },
     {
+      "title": "Conversation Distillation 真实 Demo",
+      "detail": "project-handoff-dashboard-sync 经 0-loop Candidate、Conversation Entry Evidence、真实 build、clean/drift/validator 与授权边界 smoke；结果位于本地实验分支。",
+      "state": "ready"
+    },
+    {
       "title": "五轮行为验证与规则修复",
       "detail": "18/24 → 20/24 → 25/27 → 7/10 → 5/6；hard-fail 归零，规则改动已进入当前本地版本。",
       "state": "ready"
@@ -221,9 +235,9 @@
     },
     {
       "id": "N3",
-      "title": "执行 Conversation Distillation 真实 Demo",
-      "detail": "唯一输入、0-loop Candidate 与实验协议已确认；最小实施计划已就绪，下一门槛是选择执行方式并在构建前批准精确 Definition 与 Entry Evidence。",
-      "state": "active"
+      "title": "Conversation Distillation 真实 Demo 已完成",
+      "detail": "本地实验分支已形成 project-handoff-dashboard-sync Skill、独立 Evidence 和一个通过的隔离 smoke；等待复核与集成决策。",
+      "state": "done"
     },
     {
       "id": "N4",
@@ -234,8 +248,8 @@
     {
       "id": "N5",
       "title": "最后决定 LICENSE",
-      "detail": "在远端 CI 状态与上游归属边界明确后，由项目所有者选择许可证。",
-      "state": "queued"
+      "detail": "三入口 Demo 与首次远端 CI 已有真实证据；复核上游归属边界后，由项目所有者选择许可证并裁决阶段出口。",
+      "state": "active"
     }
   ],
   "work_lanes": {
@@ -243,8 +257,8 @@
       "label": "主线 · 用户能力",
       "items": [
         {
-          "title": "Conversation Distillation 真实 Demo",
-          "detail": "0-loop Candidate 与实验协议已确认，最小实施计划已就绪；尚未调用 Core，RV-003 与 LC-009 均不作为前置建设。"
+          "title": "M1 三入口真实用户链路",
+          "detail": "From-scratch、Existing Skill 与 Conversation 均已各走通一条真实路径；等待本地实验分支集成和下一阶段产品决策。"
         }
       ]
     },
@@ -261,7 +275,7 @@
         },
         {
           "title": "Conversation Demo 定向验证",
-          "detail": "只验证最后一条入口的来源恢复、Review、build 与一个现实失败风险。"
+          "detail": "0-loop build、clean/drift/validator 与一个授权边界 smoke 已通过；不追加第二目标或大规模盲测。"
         }
       ]
     },
@@ -309,7 +323,7 @@
     {
       "level": "high",
       "title": "阶段出口仍为 DRIFT",
-      "detail": "Existing Skill 已完成真实 Demo，但 Conversation 仍无真实 Demo，R-020 与更广 R-021 边界未关闭，历史测试预算违规不能由本次结果抹除。"
+      "detail": "三入口真实 Demo 已完成，但 R-020 与更广 R-021 边界、历史测试预算违规和 LICENSE / 公共发布边界仍未裁决。"
     },
     {
       "level": "medium",
@@ -348,8 +362,12 @@
       "title": "首次远端 CI 4 / 4 通过"
     },
     {
+      "state": "ready",
+      "title": "Conversation Distillation 真实 Demo"
+    },
+    {
       "state": "queued",
-      "title": "Conversation Demo、LICENSE 与阶段出口复核"
+      "title": "Conversation 分支集成、LICENSE 与阶段出口复核"
     }
   ],
   "known_limits": [
@@ -371,6 +389,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Conversation Distillation 真实 Demo 走通",
+      "detail": "授权项目接力记录形成 project-handoff-dashboard-sync 0-loop Skill 与独立 Evidence；clean/drift/validator 和一个会话授权、双基线、Git 边界 smoke 均通过。"
+    },
     {
       "date": "2026-07-30",
       "title": "Conversation Demo 最小实施计划就绪",
