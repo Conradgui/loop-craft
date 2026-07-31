@@ -48,7 +48,7 @@ Expected:
 
 - [ ] **Step 2: Create the experiment branch and worktree**
 
-Run from `C:\Users\Administrator\Documents\loopcraft`:
+Run from the repository root:
 
 ```powershell
 git worktree add `
@@ -58,7 +58,7 @@ git worktree add `
 ```
 
 Expected: a new worktree at
-`C:\Users\Administrator\Documents\loopcraft\.worktrees\conversation-handoff-dashboard-demo`
+`$REPOSITORY/.worktrees/conversation-handoff-dashboard-demo`
 on branch `codex/conversation-handoff-dashboard-demo`.
 
 - [ ] **Step 3: Confirm generated evidence will remain ignored**
@@ -378,7 +378,7 @@ $verifyExit = $LASTEXITCODE
 Pop-Location
 if ($verifyExit -ne 0) { exit $verifyExit }
 
-python C:\Users\Administrator\.codex\skills\.system\skill-creator\scripts\quick_validate.py `
+python $CODEX_HOME/skills/.system/skill-creator/scripts/quick_validate.py `
   build\experiments\2026-07-30-conversation-handoff-dashboard-demo\output\artifact\project-handoff-dashboard-sync
 ```
 
