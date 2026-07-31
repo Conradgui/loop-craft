@@ -14,15 +14,21 @@ python scripts/build_loop.py build <accepted-definition.json> <new-output-direct
 
 A successful build exits `0`. The output root contains sibling `artifact/` and `evidence/` directories. `artifact/` contains the generated target Skill. `evidence/` contains the accepted definition, final execution data, source map, validation report, and build manifest. The `skill-package-v0.1` profile accepts either an approved ordinary Workflow with zero Loops or one approved Loop. A zero-Loop definition must include `behavior_contract.workflow.steps`, `success_evidence`, and `failure_or_stop`.
 
-Historical or direct accepted-definition builds may omit Entry Evidence. Every build produced by the From-scratch, Existing Skill, or Conversation entry after Candidate approval must provide the reviewed record:
+Historical builds may omit Entry Evidence and remain verifiable. Every new build must bind the truthful record for its route:
 
 ```powershell
 python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --entry-evidence <reviewed-entry-evidence.json>
 ```
 
-The `entry-evidence-v0.1` contract has exactly seven root fields: `schema_version`, `entry_type`, `definition_digest`, `source_summary`, `clarifications`, `candidate_review`, and `approval`. `entry_type` is `from_scratch`, `existing_skill`, or `conversation`; it maps respectively to `source_summary.kind` `design_interview`, `skill_assessment`, or `workflow_model`. `source_summary` also contains non-empty controlled `source_ids`, a bounded summary, and non-empty provenance-labelled fact summaries. `clarifications` may be empty; each present item contains only a non-empty question summary, answer summary, and `resolution: resolved`.
+The `entry-evidence-v0.1` contract has exactly seven root fields: `schema_version`, `entry_type`, `definition_digest`, `source_summary`, `clarifications`, `candidate_review`, and `approval`. `entry_type` is `from_scratch`, `existing_skill`, or `conversation`; it maps respectively to `source_summary.kind` `design_interview`, `skill_assessment`, or `workflow_model`. `source_summary` also contains non-empty controlled `source_ids`, a bounded summary, and non-empty provenance-labelled fact summaries. `clarifications` may be empty; each present item contains only a non-empty question summary, answer summary, and `resolution: resolved`. `entry-evidence-v0.1` remains valid for these three design entries.
 
 `candidate_review` contains exactly a bounded `summary` of the approved Review conclusion and a `classification` of `zero_loop_workflow` or `one_loop_bounded_loop`; the classification must match the accepted definition's Loop count. The summary does not copy the accepted definition. `approval` contains only `status: approved` and `scope: local_artifact_and_evidence_build`. The root `definition_digest` must exactly equal the accepted definition's canonical digest. The canonical record is written only to `evidence/entry-evidence.json`; its digest and entry type are bound in `build-manifest.json`, and it never enters Artifact.
+
+A Direct Build uses `entry-evidence-v0.2`, `entry_type: direct_build`, `source_summary.kind: accepted_definition`, and `candidate_review: null`. It binds the same canonical definition digest, bounded source facts, resolved clarifications, and fixed local-build approval without claiming that a Candidate Review occurred. Follow [direct-build.md](direct-build.md), then run:
+
+```powershell
+python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --entry-evidence <direct-build-entry-evidence.json>
+```
 
 The caller must supply structured summaries and controlled source IDs, never raw conversation, absolute paths, private source material, raw Skill payloads, or development records. Validation enforces shape, local absolute-path rejection, approval scope, classification, and digest binding; it does not prove summary truth, perform PII scanning, or provide identity authentication. Entry Evidence is an approved input summary, not a second intermediate representation or an automatically extracted record.
 
@@ -56,6 +62,6 @@ Require an existing output root created by the build command, including its sibl
 python scripts/build_loop.py verify <existing-output-directory>
 ```
 
-A clean artifact reports `clean` and exits `0`. A changed artifact reports `drifted` and exits `1`. Verification derives the expected Evidence files from the independent source-package and Entry Evidence bindings in `build-manifest.json`; it does not need the original source directory or Entry Evidence input path. Verification checks the Entry Evidence shape, canonical digest, entry type, definition binding, and classification. Verification is read-only: it does not repair, rebuild, or write back to either sibling directory.
+A clean artifact reports `clean` and exits `0`. A changed artifact reports `drifted` and exits `1`. Verification derives the expected Evidence files from the independent source-package and Entry Evidence bindings in `build-manifest.json`; it does not need the original source directory or Entry Evidence input path. Verification checks the Entry Evidence shape, canonical digest, entry type, definition binding, and, when a Candidate Review exists, its classification. Verification is read-only: it does not repair, rebuild, or write back to either sibling directory.
 
 If the path is missing or is not a valid build root, stop at the error instead of treating it as drift.

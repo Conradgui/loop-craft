@@ -58,6 +58,7 @@ def test_product_skill_routes_supported_entries_and_requires_acceptance() -> Non
         "references/from-scratch.md",
         "references/upgrade-skill.md",
         "references/from-conversation.md",
+        "references/direct-build.md",
         "references/loopability-gate.md",
         "references/core-build.md",
     ):
@@ -69,6 +70,40 @@ def test_product_skill_routes_supported_entries_and_requires_acceptance() -> Non
     assert "conversation history" not in text
     assert "Loop Library" not in text
     assert "Loopy" not in text
+
+
+def test_direct_build_route_uses_accepted_material_without_fake_review() -> None:
+    skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    direct_path = SKILL / "references" / "direct-build.md"
+
+    assert direct_path.is_file()
+    assert "[references/direct-build.md](references/direct-build.md)" in skill_text
+    assert "approved JSON definition" in skill_text
+    assert "approved prose definition" in skill_text
+
+    direct_text = direct_path.read_text(encoding="utf-8")
+    assert "Do not run the Loopability Gate or Candidate Review" in direct_text
+    assert "Do not fabricate a Candidate Review" in direct_text
+    assert "`entry-evidence-v0.2`" in direct_text
+    assert "`entry_type: direct_build`" in direct_text
+    assert "`source_summary.kind: accepted_definition`" in direct_text
+    assert "`candidate_review: null`" in direct_text
+    for material_gap in (
+        "authority",
+        "verification",
+        "stop conditions",
+        "deliverable",
+    ):
+        assert material_gap in direct_text
+    assert "one blocking question at a time" in direct_text
+    assert "--entry-evidence <direct-build-entry-evidence.json>" in direct_text
+
+    core_text = (SKILL / "references" / "core-build.md").read_text(
+        encoding="utf-8"
+    )
+    assert "`entry-evidence-v0.2`" in core_text
+    assert "`candidate_review: null`" in core_text
+    assert "`entry-evidence-v0.1` remains valid" in core_text
 
 
 def test_entries_use_shared_loopability_and_candidate_review_contracts() -> None:

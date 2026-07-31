@@ -40,12 +40,21 @@ When the user wants to turn an authorized completed conversation, interaction, o
 - Build an approved one-shot workflow as an ordinary zero-Loop Skill through `skill-package-v0.1`. Build exactly one defining Loop when it maps without semantic loss. A multi-loop or otherwise unsupported workflow stops at assessment or Candidate and does not call the Core.
 - Keep the final Skill artifact separate from the original conversation and development record; preserve only structured source summaries, safe source IDs, clarifications, a bounded Candidate Review summary and classification, and approval in Entry Evidence.
 
-## Accepted definition build or drift verification
+## Direct accepted-definition build
+
+When the user supplies an approved JSON definition or approved prose definition and asks for a local build, read [references/direct-build.md](references/direct-build.md).
+
+- Treat this as a mechanical build path, not a fourth design entry. Do not rerun the Loopability Gate or Candidate Review.
+- Validate an approved JSON definition directly. Transcribe approved prose without adding design choices, and ask only about schema-required gaps that would change behavior, authority, verification, stop conditions, or the deliverable.
+- Record `entry-evidence-v0.2` with `candidate_review: null`; never fabricate review provenance.
+- Require explicit approval for the local Artifact and Evidence build, use a new output directory, and then follow [references/core-build.md](references/core-build.md).
+
+If the supplied material is a goal, draft, assessment, conversation, or change request rather than an accepted definition, route it to the matching design entry instead.
+
+## Drift verification
 
 Read [references/core-build.md](references/core-build.md) before running a command.
 
-- Build only from an accepted JSON definition into a new output directory.
-- Use `--entry-evidence <reviewed-entry-evidence.json>` for a build produced by any of the three approved design entries.
 - Verify only an existing build produced by the build command.
 - Stop when an input is missing, invalid, the wrong kind, or outside the selected operation. Do not guess a replacement input or alter an existing build during verification.
 
