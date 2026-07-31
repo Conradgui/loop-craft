@@ -1,17 +1,17 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T18:52:50-07:00",
+  "updated_at": "2026-07-30T19:08:13-07:00",
   "overall": {
-    "label": "Conversation 0-loop Candidate 已确认；等待实验协议审阅",
+    "label": "Conversation 实验协议已审阅；最小实施计划就绪",
     "tone": "active",
-    "summary": "项目接力与已有看板同步记录已被明确授权为唯一输入，Observed Workflow Model、两阶段会话授权、数据优先修改边界和 0-loop 裁决已逐段确认。当前只固化精简实验协议，尚未获准写 Accepted Definition 或调用 Core，因此 Conversation 真实 Demo 仍为 0 / 1。远端 CI 保持 4 / 4 通过，RV-003 与 LC-009 不作为前置建设，阶段出口仍为 DRIFT。"
+    "summary": "项目接力与已有看板同步记录已被明确授权为唯一输入，Observed Workflow Model、0-loop Candidate 和精简实验协议均已审阅；最小实施计划现在只复用现有 Conversation Entry、Compiler、Evidence 与 Adapter，不修改产品代码。尚未获准写 Accepted Definition 或调用 Core，因此 Conversation 真实 Demo 仍为 0 / 1。远端 CI 保持 4 / 4 通过，RV-003 与 LC-009 不作为前置建设，阶段出口仍为 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
     "progress": 80,
     "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "审阅 Conversation Distillation 实验协议；随后另行批准本地构建"
+    "next": "审阅最小实施计划并选择执行方式；构建前确认精确输入"
   },
   "metrics": [
     {
@@ -222,7 +222,7 @@
     {
       "id": "N3",
       "title": "执行 Conversation Distillation 真实 Demo",
-      "detail": "唯一输入、Observed Workflow 与 0-loop Candidate 已确认；下一门槛是审阅精简实验协议并另行批准 Accepted Definition 与本地构建。",
+      "detail": "唯一输入、0-loop Candidate 与实验协议已确认；最小实施计划已就绪，下一门槛是选择执行方式并在构建前批准精确 Definition 与 Entry Evidence。",
       "state": "active"
     },
     {
@@ -244,7 +244,7 @@
       "items": [
         {
           "title": "Conversation Distillation 真实 Demo",
-          "detail": "0-loop Candidate 已确认，正处于实验协议审阅门槛；尚未调用 Core，RV-003 与 LC-009 均不作为前置建设。"
+          "detail": "0-loop Candidate 与实验协议已确认，最小实施计划已就绪；尚未调用 Core，RV-003 与 LC-009 均不作为前置建设。"
         }
       ]
     },
@@ -371,6 +371,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Conversation Demo 最小实施计划就绪",
+      "detail": "实验协议已审阅；计划限定为精确 Definition / Entry Evidence、一次真实 build、clean/drift verify 与一个隔离 smoke，不修改产品代码。"
+    },
     {
       "date": "2026-07-30",
       "title": "Conversation 0-loop Candidate 设计确认",

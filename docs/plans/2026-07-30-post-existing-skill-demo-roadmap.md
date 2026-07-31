@@ -35,7 +35,9 @@ Conversation Distillation 真实用户路径，最后处理发布许可证。
 
 - [x] 已选择项目接力与已有看板同步记录作为唯一输入，并锁定两阶段会话授权边界。
 - [x] 已恢复 Observed Workflow Model，逐段确认 0-loop Candidate 行为、权限和停止规则。
-- [ ] 审阅精简实验协议，并另行批准 Accepted Definition 与本地构建。
+- [x] 已审阅精简实验协议。
+- [x] 已完成不修改产品代码的最小实施计划。
+- [ ] 选择执行方式，并在构建前批准精确 Accepted Definition 与 Entry Evidence。
 - [ ] 复用现有 Workflow Model、Loopability Gate、Candidate Review、Compiler、Evidence 和 Adapter。
 - [ ] 只构建一个可无损表示的 0-loop Workflow 或 1-loop Skill；多 Loop 如实停在 Assessment。
 - [ ] 完成一个最小现实 smoke case，并同步执行记录与看板。
