@@ -16,6 +16,7 @@ FIXTURES = ROOT / "tests" / "fixtures"
 DEFINITION = FIXTURES / "accepted-definition.valid.json"
 SOURCE_DEFINITION = FIXTURES / "accepted-definition.source-upgrade.json"
 ENTRY_EVIDENCE = FIXTURES / "entry-evidence.valid.json"
+DIRECT_ENTRY_EVIDENCE = FIXTURES / "entry-evidence.direct-build.json"
 SOURCE_SKILL = FIXTURES / "source-skill" / "existing-skill"
 
 
@@ -77,6 +78,29 @@ def test_build_binds_canonical_entry_evidence_and_keeps_it_out_of_artifact(
     assert verify_build(output)["status"] == "clean"
     artifact = next((output / "artifact").iterdir())
     assert not list(artifact.rglob("entry-evidence.json"))
+
+
+def test_direct_build_entry_evidence_survives_build_and_verify(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "direct-entry-build"
+
+    result = run_cli(
+        "build",
+        DEFINITION,
+        output,
+        "--entry-evidence",
+        DIRECT_ENTRY_EVIDENCE,
+    )
+
+    assert result.returncode == 0, result.stderr
+    entry = load_json(output / "evidence" / "entry-evidence.json")
+    manifest = load_json(output / "evidence" / "build-manifest.json")
+    assert entry["schema_version"] == "entry-evidence-v0.2"
+    assert entry["candidate_review"] is None
+    assert manifest["entry_type"] == "direct_build"
+    assert manifest["entry_evidence_digest"] == sha256_digest(entry)
+    assert verify_build(output)["status"] == "clean"
 
 
 @pytest.mark.parametrize(

@@ -281,6 +281,7 @@ def verify_build(output_root: Path) -> dict[str, str]:
             "from_scratch",
             "existing_skill",
             "conversation",
+            "direct_build",
         }:
             raise ValueError("evidence manifest entry_type contract is invalid")
         try:

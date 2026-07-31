@@ -22,6 +22,7 @@ ENTRY_SUMMARY_KINDS = {
     "from_scratch": "design_interview",
     "existing_skill": "skill_assessment",
     "conversation": "workflow_model",
+    "direct_build": "accepted_definition",
 }
 LOCAL_ABSOLUTE_PATH = re.compile(
     r"(?i)(?:"
@@ -84,14 +85,13 @@ def validate_entry_evidence(
         raise EntryEvidenceValidationError(
             "accepted definition Loop count must be zero or one"
         )
-    expected_classification = classifications[loop_count]
-    if (
-        entry_evidence["candidate_review"]["classification"]
-        != expected_classification
-    ):
-        raise EntryEvidenceValidationError(
-            "entry evidence classification does not match accepted definition"
-        )
+    candidate_review = entry_evidence["candidate_review"]
+    if candidate_review is not None:
+        expected_classification = classifications[loop_count]
+        if candidate_review["classification"] != expected_classification:
+            raise EntryEvidenceValidationError(
+                "entry evidence classification does not match accepted definition"
+            )
 
     if entry_evidence["definition_digest"] != sha256_digest(definition):
         raise EntryEvidenceValidationError(

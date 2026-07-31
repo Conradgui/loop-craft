@@ -15,6 +15,7 @@ from loopcraft_core.evidence.entry import (
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 ENTRY_FIXTURE = FIXTURES / "entry-evidence.valid.json"
+DIRECT_ENTRY_FIXTURE = FIXTURES / "entry-evidence.direct-build.json"
 ONE_LOOP_DEFINITION = FIXTURES / "accepted-definition.valid.json"
 ZERO_LOOP_DEFINITION = FIXTURES / "accepted-definition.zero-loop.json"
 
@@ -25,6 +26,43 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def valid_entry() -> dict[str, Any]:
     return load_json(ENTRY_FIXTURE)
+
+
+def direct_entry() -> dict[str, Any]:
+    return load_json(DIRECT_ENTRY_FIXTURE)
+
+
+def test_accepts_direct_build_without_fabricating_candidate_review() -> None:
+    validate_entry_evidence(direct_entry(), load_json(ONE_LOOP_DEFINITION))
+
+
+def test_rejects_candidate_review_on_direct_build() -> None:
+    evidence = direct_entry()
+    evidence["candidate_review"] = valid_entry()["candidate_review"]
+
+    with pytest.raises(EntryEvidenceValidationError, match="schema"):
+        validate_entry_evidence(evidence, load_json(ONE_LOOP_DEFINITION))
+
+
+@pytest.mark.parametrize(
+    ("entry_type", "summary_kind"),
+    [
+        ("from_scratch", "design_interview"),
+        ("existing_skill", "skill_assessment"),
+        ("conversation", "workflow_model"),
+    ],
+)
+def test_rejects_missing_candidate_review_for_design_entries(
+    entry_type: str,
+    summary_kind: str,
+) -> None:
+    evidence = valid_entry()
+    evidence["entry_type"] = entry_type
+    evidence["source_summary"]["kind"] = summary_kind
+    evidence["candidate_review"] = None
+
+    with pytest.raises(EntryEvidenceValidationError, match="schema"):
+        validate_entry_evidence(evidence, load_json(ONE_LOOP_DEFINITION))
 
 
 @pytest.mark.parametrize(

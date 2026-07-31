@@ -14,6 +14,17 @@
       "minLength": 1,
       "maxLength": 128,
       "pattern": "^[a-z0-9]+(?:[._:-][a-z0-9]+)*$"
+    },
+    "candidateReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "summary"],
+      "properties": {
+        "classification": {
+          "enum": ["zero_loop_workflow", "one_loop_bounded_loop"]
+        },
+        "summary": {"$ref": "#/$defs/summary"}
+      }
     }
   },
   "type": "object",
@@ -28,9 +39,11 @@
     "approval"
   ],
   "properties": {
-    "schema_version": {"const": "entry-evidence-v0.1"},
+    "schema_version": {
+      "enum": ["entry-evidence-v0.1", "entry-evidence-v0.2"]
+    },
     "entry_type": {
-      "enum": ["from_scratch", "existing_skill", "conversation"]
+      "enum": ["from_scratch", "existing_skill", "conversation", "direct_build"]
     },
     "definition_digest": {
       "type": "string",
@@ -42,7 +55,12 @@
       "required": ["kind", "source_ids", "summary", "facts"],
       "properties": {
         "kind": {
-          "enum": ["design_interview", "skill_assessment", "workflow_model"]
+          "enum": [
+            "design_interview",
+            "skill_assessment",
+            "workflow_model",
+            "accepted_definition"
+          ]
         },
         "source_ids": {
           "type": "array",
@@ -85,15 +103,10 @@
       }
     },
     "candidate_review": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["classification", "summary"],
-      "properties": {
-        "classification": {
-          "enum": ["zero_loop_workflow", "one_loop_bounded_loop"]
-        },
-        "summary": {"$ref": "#/$defs/summary"}
-      }
+      "oneOf": [
+        {"$ref": "#/$defs/candidateReview"},
+        {"type": "null"}
+      ]
     },
     "approval": {
       "type": "object",
@@ -104,5 +117,28 @@
         "scope": {"const": "local_artifact_and_evidence_build"}
       }
     }
-  }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "schema_version": {"const": "entry-evidence-v0.1"},
+        "entry_type": {
+          "enum": ["from_scratch", "existing_skill", "conversation"]
+        },
+        "candidate_review": {"$ref": "#/$defs/candidateReview"}
+      }
+    },
+    {
+      "properties": {
+        "schema_version": {"const": "entry-evidence-v0.2"},
+        "entry_type": {"const": "direct_build"},
+        "source_summary": {
+          "properties": {
+            "kind": {"const": "accepted_definition"}
+          }
+        },
+        "candidate_review": {"type": "null"}
+      }
+    }
+  ]
 }

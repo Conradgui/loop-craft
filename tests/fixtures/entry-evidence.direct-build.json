@@ -1,0 +1,22 @@
+{
+  "schema_version": "entry-evidence-v0.2",
+  "entry_type": "direct_build",
+  "definition_digest": "sha256:a8242601fb199672b7fe2f2cd4cb5a6ef442c915d4f47a938bd94ed6f64e58e9",
+  "source_summary": {
+    "kind": "accepted_definition",
+    "source_ids": ["definition-001"],
+    "summary": "The user supplied and approved the accepted definition for a local build.",
+    "facts": [
+      {
+        "provenance": "preserved",
+        "summary": "The accepted definition is the authoritative source for this build."
+      }
+    ]
+  },
+  "clarifications": [],
+  "candidate_review": null,
+  "approval": {
+    "status": "approved",
+    "scope": "local_artifact_and_evidence_build"
+  }
+}
