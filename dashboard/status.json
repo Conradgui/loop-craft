@@ -1,17 +1,17 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T20:07:27-07:00",
+  "updated_at": "2026-07-31T09:30:00-07:00",
   "overall": {
-    "label": "三入口真实 Demo 已完成；进入阶段出口与 LICENSE 复核",
+    "label": "三入口 Demo 已完成；0.3.0 严格封板进入接口修复",
     "tone": "active",
-    "summary": "项目接力与已有看板同步记录已通过 Conversation Entry 恢复为 0-loop Workflow，经真实 Core 生成 project-handoff-dashboard-sync Skill 与独立 Evidence；clean / drift / validator 和一个隔离 smoke 均通过。From-scratch、Existing Skill、Conversation 三个入口现各有一条真实用户路径，M1 完成度 3 / 3。结果暂留本地实验分支，尚未合并或推送；RV-003、LC-009、历史测试预算、LICENSE 与阶段出口继续独立裁决，当前阶段仍为 DRIFT。"
+    "summary": "From-scratch、Existing Skill、Conversation 三入口各有一条真实链路，三份 Artifact fresh verify clean 且官方 validator 通过；但封板前产品完整性审计确认 Direct Build provenance、常见 Existing Skill 包形、仓库与本机安装副本一致性、README/风险/版本事实仍未闭合。项目所有者批准 0.3.0 严格封板：先修 R-020/R-021，再由无项目历史的 Agent 做无副作用接口贯通审计，最后处理 Apache-2.0、安装、远端 CI 与阶段出口。当前仍为 DRIFT。"
   },
   "milestone": {
-    "name": "M1 · 三入口真实用户链路",
-    "state": "completed",
-    "progress": 100,
-    "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 1 / 1",
-    "next": "复核并集成 Conversation Demo；随后裁决 LICENSE 与阶段出口"
+    "name": "M2 · 0.3.0 产品完整性封板",
+    "state": "in_progress",
+    "progress": 20,
+    "progress_label": "范围与验收口径 1 / 1；接口缺口 0 / 2；fresh-context 审计 0 / 1；最终 CI 0 / 1",
+    "next": "修订实施计划；按 TDD 关闭 R-020 与 R-021"
   },
   "metrics": [
     {
@@ -43,6 +43,16 @@
       "label": "Conversation 真实 Demo",
       "value": "1 / 1 · local branch",
       "tone": "ready"
+    },
+    {
+      "label": "0.3.0 接口修复",
+      "value": "R-020 / R-021 · 0 / 2",
+      "tone": "blocked"
+    },
+    {
+      "label": "本机 Skill 一致性",
+      "value": "installed copy ≠ repo candidate",
+      "tone": "blocked"
     },
     {
       "label": "阶段出口",
@@ -129,7 +139,7 @@
       "state": "active",
       "title": "RV-003 direct-build provenance 不可表达",
       "fact": "Entry Evidence schema 没有 direct build 的合法 entry_type/source_summary.kind，candidate_review 又是必填。",
-      "action": "不作为当前前置修复；只有 direct-build 用户路径被正式接受时，才扩展 schema 与映射。",
+      "action": "按 entry-evidence-v0.2 增加 direct_build / accepted_definition，并以 candidate_review: null 明确未发生 Review；保留 v0.1 兼容。",
       "done_when": "direct build 可生成合法 Entry Evidence，且不伪造访谈、Review 或批准来源。"
     },
     {
@@ -138,7 +148,7 @@
       "state": "active",
       "title": "LC-009 更广真实 Skill 包边界仍未闭合",
       "fact": "Skill Polisher canonical root 的 5 个标准文件已直接 inventory 成功，当前 Demo 未触发 LC-009；其它常见非白名单 root 仍缺安全规范，历史放松草案会破坏 RV-001。",
-      "action": "保持观察，不为已通过目标修改 Adapter；只有新的真实 canonical root 失败时才绑定 RV-001 组合护栏。",
+      "action": "最小支持 package.json、missing frontmatter 与非权威目录名；同时用未知 root、身份冲突和越界 link/junction 组合负例保持 fail closed。",
       "done_when": "代表性常见包形可达，未知 root 与链接/junction 继续 fail closed。"
     },
     {
@@ -154,9 +164,9 @@
       "priority": "P1-04",
       "level": "medium",
       "state": "active",
-      "title": "LICENSE 尚未决定",
-      "fact": "README 与 NOTICE 已说明来源边界，但公共仓库没有 LICENSE，默认保留所有权利。",
-      "action": "由项目所有者选择许可证并复核上游归属。",
+      "title": "Apache-2.0 尚未落盘",
+      "fact": "项目所有者已选择 Apache-2.0，但公共仓库仍没有根级 LICENSE，README 与 NOTICE 仍反映旧状态。",
+      "action": "接口修复和产品流程审计通过后，添加标准 LICENSE 并同步 README、NOTICE、pyproject 与 CHANGELOG。",
       "done_when": "LICENSE 加入仓库，README 的授权状态与其一致。"
     },
     {
@@ -241,15 +251,21 @@
     },
     {
       "id": "N4",
-      "title": "按真实触发条件恢复 RV-003 / LC-009",
-      "detail": "RV-003 只随 direct-build 用户故事恢复；LC-009 只随新的 canonical Skill root 真实失败恢复。",
-      "state": "queued"
+      "title": "关闭 R-020 / R-021 接口缺口",
+      "detail": "为 Direct Build 增加不伪造 Candidate Review 的 provenance；让 package.json + missing frontmatter 的真实机械包形可达，同时保留未知 root 与越界链接 fail closed。",
+      "state": "active"
     },
     {
       "id": "N5",
-      "title": "最后决定 LICENSE",
-      "detail": "三入口 Demo 与首次远端 CI 已有真实证据；复核上游归属边界后，由项目所有者选择许可证并裁决阶段出口。",
-      "state": "active"
+      "title": "执行产品流程贯通审计与安装同步",
+      "detail": "无项目历史的 fresh Codex context 只读待发布 Skill，逐条追踪六类路径的输入、输出、下游、审批与停止边界；通过后以备份 + staging 方式更新本机 Skill。",
+      "state": "queued"
+    },
+    {
+      "id": "N6",
+      "title": "Apache-2.0、最终 CI 与 0.3.0 封板",
+      "detail": "统一版本与事实文档，添加许可证，本地出口通过后推送 main；远端矩阵通过后才写 PASS。",
+      "state": "queued"
     }
   ],
   "work_lanes": {
@@ -257,8 +273,8 @@
       "label": "主线 · 用户能力",
       "items": [
         {
-          "title": "M1 三入口真实用户链路",
-          "detail": "From-scratch、Existing Skill 与 Conversation 均已各走通一条真实路径；等待本地实验分支集成和下一阶段产品决策。"
+          "title": "0.3.0 接口完整性修复",
+          "detail": "当前唯一 mainline：关闭 R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形，确保公开用户路径没有隐藏接口洞。"
         }
       ]
     },
@@ -270,12 +286,12 @@
           "detail": "run 30560334591 已 4 / 4 通过；不为非阻塞 Node action 弃用提示打断当前主线。"
         },
         {
-          "title": "LC-009 条件式护栏",
-          "detail": "新的真实 canonical root 失败时才恢复，并固定绑定 RV-001；当前 Skill Polisher 已通过。"
+          "title": "R-021 与 RV-001 组合护栏",
+          "detail": "可达性正例必须与 package.json + 越界 link/junction 负例成对；未知 root 和身份冲突继续停止。"
         },
         {
-          "title": "Conversation Demo 定向验证",
-          "detail": "0-loop build、clean/drift/validator 与一个授权边界 smoke 已通过；不追加第二目标或大规模盲测。"
+          "title": "fresh-context 产品流程审计",
+          "detail": "不真实执行用户项目；只让未知 Agent 追踪 Router → Entry → Gate/Review → Core → Artifact/Evidence/Verify 的接口、边界和终止状态。"
         }
       ]
     },
@@ -283,8 +299,8 @@
       "label": "支持 · 不提高产品完成度",
       "items": [
         {
-          "title": "LICENSE 决策",
-          "detail": "放在远端 CI 与来源边界之后，由项目所有者选择，不擅自添加授权。"
+          "title": "Apache-2.0 与版本一致性",
+          "detail": "项目所有者已选择 Apache-2.0；在接口修复和产品流程审计后统一 VERSION、pyproject、README、NOTICE 与 CHANGELOG。"
         },
         {
           "title": "本地证据保留",
@@ -300,8 +316,8 @@
       "label": "Not now · 当前队列之外",
       "items": [
         {
-          "title": "Direct build 与扩展能力",
-          "detail": "RV-003 direct-build productization、Runtime、Override、Subloop、Library Edition、多 Loop、发布与调度不进入当前执行队列。"
+          "title": "0.3.0 边界外能力",
+          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Tag 不进入当前执行队列；Direct Build 已进入主线修复。"
         }
       ]
     }
@@ -323,7 +339,7 @@
     {
       "level": "high",
       "title": "阶段出口仍为 DRIFT",
-      "detail": "三入口真实 Demo 已完成，但 R-020 与更广 R-021 边界、历史测试预算违规和 LICENSE / 公共发布边界仍未裁决。"
+      "detail": "三入口真实 Demo 已完成，但 R-020/R-021 仍造成公开路径断点，本机安装副本落后于仓库，版本/README/风险事实不一致，Apache-2.0 与最终远端 CI 尚未落地。"
     },
     {
       "level": "medium",
@@ -333,7 +349,7 @@
     {
       "level": "medium",
       "title": "公共发布边界未闭合",
-      "detail": "LICENSE 未定；虽然首次远端 CI 已通过，仍不得宣称项目已获得再分发授权或阶段出口已放行。"
+      "detail": "Apache-2.0 已由项目所有者选定但尚未写入仓库；最终 0.3.0 候选也尚未经过新的远端矩阵，不得提前宣称封板。"
     }
   ],
   "phase_gates": [
@@ -366,8 +382,12 @@
       "title": "Conversation Distillation 真实 Demo"
     },
     {
+      "state": "ready",
+      "title": "0.3.0 严格封板范围与产品流程验收口径"
+    },
+    {
       "state": "queued",
-      "title": "Conversation 分支集成、LICENSE 与阶段出口复核"
+      "title": "R-020 / R-021、fresh-context 审计、安装一致性、Apache-2.0 与最终 CI"
     }
   ],
   "known_limits": [
@@ -389,6 +409,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "0.3.0 严格封板范围与产品流程验收获批",
+      "detail": "封板前审计不再用三条 Demo 或 160 tests 代替产品完整性；R-020/R-021 进入 mainline，Prompt 层改用无副作用 fresh-context 接口贯通审计，Core 层保留确定性测试。"
+    },
     {
       "date": "2026-07-30",
       "title": "Conversation Distillation 真实 Demo 走通",
