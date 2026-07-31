@@ -1,22 +1,22 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T14:10:00-07:00",
+  "updated_at": "2026-07-31T04:18:00-07:00",
   "overall": {
-    "label": "0.3.0 产品接口审计 PASS；等待 GitHub 最终 CI",
-    "tone": "active",
-    "summary": "R-020/R-021、Apache-2.0、安装一致性与确定性出口已闭合；fresh read-only Agent 仅凭安装 Skill 追踪六条路线，接口接通、边界严谨、衔接流畅、冷启动可用四项均 PASS，主 Agent 复核维持 PASS。现在唯一剩余封板门是将候选 fast-forward 到 main、推送并等待该 commit 的 GitHub Actions 4 项矩阵；此前阶段仍为 DRIFT。"
+    "label": "PASS · 0.3.0 封板",
+    "tone": "ready",
+    "summary": "0.3.0 的六条产品路径、R-020/R-021、Apache-2.0、安装一致性、171 tests、三份 Demo clean verify 与 fresh-context 四项产品门槛全部闭合。candidate main@0fe3edb 已推送；GitHub Actions run 30626392947 在 Ubuntu / Windows × Python 3.12 / 3.13 四项全部 success。当前版本正式封板，不创建 Release/Tag，也不扩张到 Runtime、多 Loop 或发布调度。"
   },
   "milestone": {
     "name": "M2 · 0.3.0 产品完整性封板",
-    "state": "in_progress",
-    "progress": 90,
-    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 1 / 1；最终 CI 0 / 1",
-    "next": "最终分支审查；fast-forward main、推送 GitHub 并等待 0.3.0 候选矩阵"
+    "state": "completed",
+    "progress": 100,
+    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 1 / 1；最终 CI 1 / 1",
+    "next": "0.3.0 已封板；只有新的产品目标获批后才开启下一里程碑"
   },
   "metrics": [
     {
       "label": "当前本地 main",
-      "value": "main · 803be93",
+      "value": "candidate · main@0fe3edb",
       "tone": "ready"
     },
     {
@@ -25,8 +25,8 @@
       "tone": "ready"
     },
     {
-      "label": "GitHub Actions",
-      "value": "run · 30560334591",
+      "label": "0.3.0 GitHub Actions",
+      "value": "4 / 4 · run 30626392947",
       "tone": "ready"
     },
     {
@@ -41,7 +41,7 @@
     },
     {
       "label": "Conversation 真实 Demo",
-      "value": "1 / 1 · local branch",
+      "value": "1 / 1 · main",
       "tone": "ready"
     },
     {
@@ -71,8 +71,8 @@
     },
     {
       "label": "阶段出口",
-      "value": "DRIFT · 不放行",
-      "tone": "blocked"
+      "value": "PASS · 0.3.0 封板",
+      "tone": "ready"
     }
   ],
   "handoff": {
@@ -108,16 +108,16 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "main · 803be93；Conversation 实验分支待集成",
+      "value": "main · 0fe3edb candidate + closure facts",
       "state": "ready",
-      "detail": "main 已包含既有两条 Demo、远端 CI 记录、Conversation 实验协议与实施计划；完成结果位于本地 codex/conversation-handoff-dashboard-demo 分支，尚未合并。"
+      "detail": "main 已 fast-forward 集成 Conversation Demo、R-020/R-021、Apache-2.0、候选验证与产品接口审计；纯事实 closure commit 使用 [skip ci]。"
     },
     {
       "kind": "remote",
       "title": "远端可恢复版本",
-      "value": "origin/main · 6595a58",
+      "value": "origin/main · 0fe3edb candidate + closure facts",
       "state": "ready",
-      "detail": "远端保留首次 CI 通过后的文档状态；GitHub Actions run 30560334591 对 main@1530688 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部成功。"
+      "detail": "candidate main@0fe3edb 已由 GitHub Actions run 30626392947 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部验证成功；随后只推送 [skip ci] 事实记录。"
     }
   ],
   "issues": [
@@ -136,7 +136,7 @@
       "state": "ready",
       "title": "Skill Polisher Existing Skill Demo 已走通",
       "fact": "固定 revision 走完只读 Assessment、批准 Candidate、source-preserving build、clean/drift verify、官方 validator 与一个隔离 smoke case；源 Skill 保持 clean。",
-      "action": "保留执行记录与本地产物；当前进入 Conversation Distillation。",
+      "action": "保留执行记录与本地产物；0.3.0 已将其与其它入口共同封板。",
       "done_when": "已满足；Existing Skill 入口形成真实可复核的 Skill + Evidence 用户路径。"
     },
     {
@@ -145,7 +145,7 @@
       "state": "ready",
       "title": "Conversation Distillation 真实 Demo 已走通",
       "fact": "授权项目接力记录完成 Observed Workflow、0-loop Review、真实 build、独立 Evidence、clean/drift/validator 与一个隔离 smoke；未获批正文和 canary 未进入输出。",
-      "action": "保留本地实验分支与 ignored 原始证据；复核后再决定是否集成 main。",
+      "action": "已集成 main；继续保留 ignored 原始证据与实验 worktree，不删除。",
       "done_when": "已满足；Conversation 入口形成真实可复核的 0-loop Skill + Evidence 用户路径。"
     },
     {
@@ -154,7 +154,7 @@
       "state": "ready",
       "title": "Direct Build provenance 已闭合",
       "fact": "entry-evidence-v0.2 已增加 direct_build / accepted_definition，并强制 candidate_review: null；v0.1 三入口保持合法，Direct Build prompt 不重跑或伪造 Review。",
-      "action": "纳入候选全量验证与 fresh-context Direct Build 路线审计。",
+      "action": "候选全量验证与 fresh-context Direct Build 路线均已通过；保持合同不漂移。",
       "done_when": "已满足实现门槛；最终阶段出口仍依赖产品接口审计与 CI。"
     },
     {
@@ -163,17 +163,17 @@
       "state": "ready",
       "title": "常见真实 Skill 包边界已闭合",
       "fact": "代表性 package.json + missing-frontmatter + 非权威目录名包形已 inventory/build/verify；源不修改，generated frontmatter 与 source body 分开映射。",
-      "action": "在候选全量验证与 fresh-context Existing Skill 路线中复核模块衔接。",
+      "action": "候选全量验证与 fresh-context Existing Skill 路线均已通过；保持组合链接护栏。",
       "done_when": "已满足；身份冲突、未知 root 与链接/junction 组合负例继续 fail closed。"
     },
     {
       "priority": "P1-03",
       "level": "medium",
       "state": "ready",
-      "title": "首次远端 CI 已通过",
-      "fact": "GitHub Actions run 30560334591 在 Ubuntu / Windows × Python 3.12 / 3.13 四个组合上全部成功。",
-      "action": "保留运行链接与结论；Node action 弃用提示不阻塞当前产品主线。",
-      "done_when": "已满足；首次远端矩阵完成并通过。"
+      "title": "0.3.0 最终远端 CI 已通过",
+      "fact": "GitHub Actions run 30626392947 对 candidate main@0fe3edb 的 Ubuntu / Windows × Python 3.12 / 3.13 四个组合全部成功。",
+      "action": "保留运行链接与结论；Node action 弃用提示作为非阻塞维护风险。",
+      "done_when": "已满足；0.3.0 候选矩阵 4 / 4 通过。"
     },
     {
       "priority": "P1-04",
@@ -181,7 +181,7 @@
       "state": "ready",
       "title": "Apache-2.0 与 0.3.0 事实已同步",
       "fact": "标准根级 LICENSE 已加入；VERSION、pyproject、双语 README、NOTICE 与 CHANGELOG 均对齐 Apache-2.0 / 0.3.0。",
-      "action": "在最终静态检查中确认无旧授权状态残留。",
+      "action": "最终静态检查与远端 CI 均确认通过。",
       "done_when": "已满足；许可证本身不替代产品与 CI 出口。"
     },
     {
@@ -289,8 +289,8 @@
     {
       "id": "N6",
       "title": "Apache-2.0、最终 CI 与 0.3.0 封板",
-      "detail": "Apache-2.0、版本与本地出口已完成；现在 fast-forward/push main，远端矩阵通过后才写最终 PASS。",
-      "state": "active"
+      "detail": "Apache-2.0、版本、本地出口、main push 与 run 30626392947 的 4 / 4 远端矩阵全部完成；阶段 PASS。",
+      "state": "done"
     }
   ],
   "work_lanes": {
@@ -299,7 +299,7 @@
       "items": [
         {
           "title": "0.3.0 接口完整性修复",
-          "detail": "R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形已完成；当前没有新的 mainline 功能扩张，进入绑定本候选的 validation。"
+          "detail": "R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形已完成并封板；当前没有 active mainline。"
         }
       ]
     },
@@ -307,8 +307,8 @@
       "label": "验证 · 绑定具体风险",
       "items": [
         {
-          "title": "远端 CI 首跑",
-          "detail": "run 30560334591 已 4 / 4 通过；不为非阻塞 Node action 弃用提示打断当前主线。"
+          "title": "0.3.0 最终远端 CI",
+          "detail": "run 30626392947 已 4 / 4 通过；Node action 弃用提示保留为非阻塞维护风险。"
         },
         {
           "title": "R-021 与 RV-001 组合护栏",
@@ -316,7 +316,7 @@
         },
         {
           "title": "fresh-context 产品流程审计",
-          "detail": "不真实执行用户项目；只让未知 Agent 追踪 Router → Entry → Gate/Review → Core → Artifact/Evidence/Verify 的接口、边界和终止状态。"
+          "detail": "未知 Agent 已完成 Router → Entry → Gate/Review → Core → Artifact/Evidence/Verify 六路线追踪，四项硬门槛 PASS。"
         }
       ]
     },
@@ -333,7 +333,7 @@
         },
         {
           "title": "治理记录一致性",
-          "detail": "把 R-024 已关闭、R-020/R-021 仍开放等实测状态同步到事实投影。"
+          "detail": "R-020/R-021/R-024/R-025、版本、许可证、安装、产品审计与最终 CI 均已同步。"
         }
       ]
     },
@@ -362,19 +362,9 @@
       "detail": "checkout@v4 与 setup-python@v5 在当前托管运行器上被提示仍以 Node 20 为目标；GitHub 强制使用 Node 24 后本次 4 / 4 成功，因此登记为非阻塞维护项。"
     },
     {
-      "level": "high",
-      "title": "阶段出口仍为 DRIFT",
-      "detail": "R-020/R-021 与授权/版本事实已闭合，但候选全量验证、安装副本一致性、fresh-context 产品接口审计和最终远端 CI 尚未完成。"
-    },
-    {
       "level": "medium",
       "title": "测试预算历史超限",
       "detail": "三轮全量盲测合计约 690 万 token，超 0.4:1 上限约 7–11 倍；后续保持定向增量。"
-    },
-    {
-      "level": "medium",
-      "title": "公共发布边界未闭合",
-      "detail": "Apache-2.0 已写入候选，但最终 0.3.0 commit 尚未经过新的远端矩阵；不得因许可证完成而提前宣称封板。"
     }
   ],
   "phase_gates": [
@@ -419,7 +409,7 @@
       "title": "候选验证、安装一致性与 fresh-context 产品接口审计"
     },
     {
-      "state": "queued",
+      "state": "ready",
       "title": "main 集成、GitHub 最终 CI 与 0.3.0 PASS"
     }
   ],
@@ -442,6 +432,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "PASS · 0.3.0 封板",
+      "detail": "candidate main@0fe3edb 已推送；GitHub Actions run 30626392947 四项矩阵全部 success。Apache-2.0、安装一致性、产品接口与代码出口同时闭合。"
+    },
     {
       "date": "2026-07-31",
       "title": "fresh-context 产品接口审计 PASS",
