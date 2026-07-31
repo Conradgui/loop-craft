@@ -1,17 +1,17 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-30T09:13:38-07:00",
+  "updated_at": "2026-07-30T18:52:50-07:00",
   "overall": {
-    "label": "远端 CI 4 / 4 通过；Conversation Distillation 进入主线设计",
+    "label": "Conversation 0-loop Candidate 已确认；等待实验协议审阅",
     "tone": "active",
-    "summary": "本地 main 已推送，首次 GitHub Actions 在 Ubuntu / Windows 与 Python 3.12 / 3.13 四个组合上全部通过，远端可恢复与自动验证边界已建立。该结果不增加新的用户入口：Conversation Distillation 仍为 0 / 1，现进入授权输入与 Workflow Model 的设计门槛。RV-003 与 LC-009 继续按真实触发条件观察，LICENSE 最后决定，阶段出口仍为 DRIFT。"
+    "summary": "项目接力与已有看板同步记录已被明确授权为唯一输入，Observed Workflow Model、两阶段会话授权、数据优先修改边界和 0-loop 裁决已逐段确认。当前只固化精简实验协议，尚未获准写 Accepted Definition 或调用 Core，因此 Conversation 真实 Demo 仍为 0 / 1。远端 CI 保持 4 / 4 通过，RV-003 与 LC-009 不作为前置建设，阶段出口仍为 DRIFT。"
   },
   "milestone": {
     "name": "M1 · 三入口真实用户链路",
     "state": "in_progress",
     "progress": 80,
     "progress_label": "From-scratch 1 / 1；Existing Skill 1 / 1；Conversation 0 / 1",
-    "next": "确认 Conversation Distillation 的唯一授权工作记录与目标产物"
+    "next": "审阅 Conversation Distillation 实验协议；随后另行批准本地构建"
   },
   "metrics": [
     {
@@ -41,7 +41,7 @@
     },
     {
       "label": "Conversation 真实 Demo",
-      "value": "0 / 1",
+      "value": "Candidate confirmed · 0 / 1",
       "tone": "blocked"
     },
     {
@@ -222,7 +222,7 @@
     {
       "id": "N3",
       "title": "执行 Conversation Distillation 真实 Demo",
-      "detail": "三入口主线最后一条真实用户路径；复用同一 Gate、Compiler、Evidence 与 Adapter，不新建 Entry Framework。",
+      "detail": "唯一输入、Observed Workflow 与 0-loop Candidate 已确认；下一门槛是审阅精简实验协议并另行批准 Accepted Definition 与本地构建。",
       "state": "active"
     },
     {
@@ -244,7 +244,7 @@
       "items": [
         {
           "title": "Conversation Distillation 真实 Demo",
-          "detail": "下一条产品主线；Existing Skill Demo 已完成，RV-003 与 LC-009 均不作为其前置建设。"
+          "detail": "0-loop Candidate 已确认，正处于实验协议审阅门槛；尚未调用 Core，RV-003 与 LC-009 均不作为前置建设。"
         }
       ]
     },
@@ -371,6 +371,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-30",
+      "title": "Conversation 0-loop Candidate 设计确认",
+      "detail": "唯一授权输入、两阶段会话发现、数据优先修改边界、权限与停止规则已逐段确认；当前只固化精简实验协议，尚未批准构建。"
+    },
     {
       "date": "2026-07-30",
       "title": "首次远端 CI 4 / 4 通过",
