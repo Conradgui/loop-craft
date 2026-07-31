@@ -105,7 +105,7 @@ Confirm the first screen explains Loop before Compiler, the main graph can be re
 three entries → shared Core → Evidence/Adjuster split, Direct Build is not called a fourth
 discovery entry, and no current capability carries a distracting `Available in 0.3.0` label.
 
-- [ ] **Step 5: Commit the bilingual README rewrite**
+- [x] **Step 5: Commit the bilingual README rewrite**
 
 ```text
 git add README.md README.zh.md docs/plans/2026-07-31-readme-information-architecture-refresh.md
@@ -118,7 +118,7 @@ git commit -m "docs: rebuild Loop Craft README experience"
 - Modify: `dashboard/status.json`
 - Modify: `docs/plans/2026-07-31-readme-information-architecture-refresh.md`
 
-- [ ] **Step 1: Record the support-layer README refresh**
+- [x] **Step 1: Record the support-layer README refresh**
 
 Keep overall product status `PASS · 0.3.0 封板` and milestone progress `100`. Update
 `updated_at`, add a completed support item for the product-model README, and prepend one
@@ -131,7 +131,7 @@ Skill 保持当前实线输出，Compact Prompt、Runtime 与未来标准格式�
 
 Do not increase product completion or remove existing risks.
 
-- [ ] **Step 2: Run documentation-only verification**
+- [x] **Step 2: Run documentation-only verification**
 
 Run:
 
@@ -146,7 +146,7 @@ scan for stale current/future capability claims
 
 Expected: every command exits 0. Do not run pytest because no runtime contract changed.
 
-- [ ] **Step 3: Mark this plan complete and commit the status projection**
+- [x] **Step 3: Mark this plan complete and commit the status projection**
 
 ```text
 git add dashboard/status.json docs/plans/2026-07-31-readme-information-architecture-refresh.md

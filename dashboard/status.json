@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T04:25:00-07:00",
+  "updated_at": "2026-07-31T07:30:00-07:00",
   "overall": {
     "label": "PASS · 0.3.0 封板",
     "tone": "ready",
@@ -332,6 +332,10 @@
           "detail": "实验 worktree 暂时保留，因为 ignored build 中含真实 Artifact、Evidence 与 smoke 结果。"
         },
         {
+          "title": "双语 README 产品模型",
+          "detail": "中英文 README 已恢复三入口 → 统一 Core → Evidence / Adjuster 双出口的分—总—分架构，并把当前 Skill 与未来 Adapter 状态分开表达。"
+        },
+        {
           "title": "治理记录一致性",
           "detail": "R-020/R-021/R-024/R-025、版本、许可证、安装、产品审计与最终 CI 均已同步。"
         }
@@ -432,6 +436,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "双语 README 产品模型完成重构",
+      "detail": "中英文 README 已恢复三入口 → 统一 Core → Evidence / Adjuster 双出口的分—总—分产品模型；Skill 保持当前实线输出，Compact Prompt、Runtime 与未来标准格式继续明确标为演进方向。"
+    },
     {
       "date": "2026-07-31",
       "title": "PASS · 0.3.0 封板",
