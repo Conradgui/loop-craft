@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["routes", "overall"],
+  "properties": {
+    "routes": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route",
+          "selection_reason",
+          "references_read",
+          "steps",
+          "terminal_state",
+          "interfaces_connected",
+          "boundaries_rigorous",
+          "handoff_fluent",
+          "usable_cold",
+          "gaps"
+        ],
+        "properties": {
+          "route": {
+            "enum": [
+              "from_scratch",
+              "existing_skill",
+              "conversation",
+              "direct_build",
+              "verify",
+              "multi_loop_refusal"
+            ]
+          },
+          "selection_reason": {"type": "string", "minLength": 1},
+          "references_read": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "input",
+                "owner",
+                "output",
+                "next_consumer",
+                "approval_or_stop",
+                "boundary",
+                "user_facing_next_step"
+              ],
+              "properties": {
+                "input": {"type": "string", "minLength": 1},
+                "owner": {"type": "string", "minLength": 1},
+                "output": {"type": "string", "minLength": 1},
+                "next_consumer": {"type": "string", "minLength": 1},
+                "approval_or_stop": {"type": "string", "minLength": 1},
+                "boundary": {"type": "string", "minLength": 1},
+                "user_facing_next_step": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          "terminal_state": {
+            "enum": [
+              "delivery_ready",
+              "approval_required",
+              "blocked",
+              "unsupported",
+              "clean_or_drift"
+            ]
+          },
+          "interfaces_connected": {"type": "boolean"},
+          "boundaries_rigorous": {"type": "boolean"},
+          "handoff_fluent": {"type": "boolean"},
+          "usable_cold": {"type": "boolean"},
+          "gaps": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "overall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interfaces_connected",
+        "boundaries_rigorous",
+        "handoffs_fluent",
+        "usable_cold",
+        "verdict",
+        "critical_gaps"
+      ],
+      "properties": {
+        "interfaces_connected": {"type": "boolean"},
+        "boundaries_rigorous": {"type": "boolean"},
+        "handoffs_fluent": {"type": "boolean"},
+        "usable_cold": {"type": "boolean"},
+        "verdict": {"enum": ["PASS", "DRIFT"]},
+        "critical_gaps": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

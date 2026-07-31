@@ -142,6 +142,16 @@ This does **not** replace product-flow evidence: the 0.3.0 stage remains DRIFT u
 read-only Agent with no project history can trace every supported route's input, owner, output,
 next consumer, approval/stop condition, boundary, and user-facing next step.
 
+That audit was completed on the exact installed 0.3.0 candidate. One ephemeral, read-only Agent
+used only the installed Skill and traced From-scratch, Existing Skill, Conversation, Direct
+Build, Verify, and multi-Loop refusal. Its output passed the six-route schema; all four product
+gates were true with no critical gap. The main Agent independently checked route uniqueness,
+owner-to-consumer chains, approval/stop semantics, and unchanged installed hashes, then upheld
+PASS. See [the product interface audit](records/2026-07-31-product-interface-audit.md).
+
+This is reasoning evidence, not a fourth real project execution. It complements rather than
+replaces the three preserved Demo builds and deterministic verification.
+
 ### Run 1 — baseline
 
 18/24. Failures: LC-002, LC-008, LC-011, LC-015, LC-016, LC-021.

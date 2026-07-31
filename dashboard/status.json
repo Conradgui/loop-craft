@@ -2,16 +2,16 @@
   "project": "Loop Craft",
   "updated_at": "2026-07-31T14:10:00-07:00",
   "overall": {
-    "label": "0.3.0 候选确定性验证通过；进入安装与产品审计",
+    "label": "0.3.0 产品接口审计 PASS；等待 GitHub 最终 CI",
     "tone": "active",
-    "summary": "R-020/R-021、Apache-2.0 与 0.3.0 事实已闭合；共享合同后的唯一一次全量测试为 171 passed，compile/schema/dashboard/link/官方 validator 全通过，三份既有 Demo 被当前 Core 只读 verify 为 clean。下一门槛是备份式同步本机 Skill、无项目历史 Agent 的产品接口审计和新远端 CI；完成前仍为 DRIFT。"
+    "summary": "R-020/R-021、Apache-2.0、安装一致性与确定性出口已闭合；fresh read-only Agent 仅凭安装 Skill 追踪六条路线，接口接通、边界严谨、衔接流畅、冷启动可用四项均 PASS，主 Agent 复核维持 PASS。现在唯一剩余封板门是将候选 fast-forward 到 main、推送并等待该 commit 的 GitHub Actions 4 项矩阵；此前阶段仍为 DRIFT。"
   },
   "milestone": {
     "name": "M2 · 0.3.0 产品完整性封板",
     "state": "in_progress",
-    "progress": 70,
-    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 0 / 1；最终 CI 0 / 1",
-    "next": "以 staging + 时间戳备份同步本机 Skill；从安装副本执行 fresh-context 产品接口审计"
+    "progress": 90,
+    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 1 / 1；最终 CI 0 / 1",
+    "next": "最终分支审查；fast-forward main、推送 GitHub 并等待 0.3.0 候选矩阵"
   },
   "metrics": [
     {
@@ -51,8 +51,8 @@
     },
     {
       "label": "本机 Skill 一致性",
-      "value": "installed copy ≠ repo candidate",
-      "tone": "blocked"
+      "value": "24 tracked files · SHA-256 match",
+      "tone": "ready"
     },
     {
       "label": "许可证与版本",
@@ -62,6 +62,11 @@
     {
       "label": "0.3.0 候选验证",
       "value": "171 passed · 3 Demo clean",
+      "tone": "ready"
+    },
+    {
+      "label": "产品接口审计",
+      "value": "6 routes · 4 gates PASS",
       "tone": "ready"
     },
     {
@@ -278,14 +283,14 @@
     {
       "id": "N5",
       "title": "候选验证、安装同步与产品流程审计",
-      "detail": "候选全量验证与三份 Demo 只读 verify 已通过；现在以 backup + staging 更新本机 Skill，再由无项目历史的 fresh Codex context 追踪六类路径接口。",
-      "state": "active"
+      "detail": "171 tests、三份 Demo clean、24 tracked 安装哈希一致；无项目历史的 fresh Agent 对六条路线与四项硬门槛全部 PASS。",
+      "state": "done"
     },
     {
       "id": "N6",
       "title": "Apache-2.0、最终 CI 与 0.3.0 封板",
-      "detail": "Apache-2.0 与版本事实已完成；本地出口通过后推送 main，远端矩阵通过后才写 PASS。",
-      "state": "queued"
+      "detail": "Apache-2.0、版本与本地出口已完成；现在 fast-forward/push main，远端矩阵通过后才写最终 PASS。",
+      "state": "active"
     }
   ],
   "work_lanes": {
@@ -410,8 +415,12 @@
       "title": "R-020 / R-021 接口合同与 Apache-2.0"
     },
     {
+      "state": "ready",
+      "title": "候选验证、安装一致性与 fresh-context 产品接口审计"
+    },
+    {
       "state": "queued",
-      "title": "候选全量验证、fresh-context 审计、安装一致性与最终 CI"
+      "title": "main 集成、GitHub 最终 CI 与 0.3.0 PASS"
     }
   ],
   "known_limits": [
@@ -433,6 +442,16 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "fresh-context 产品接口审计 PASS",
+      "detail": "单一 ephemeral read-only Agent 仅凭安装 Skill 追踪 From-scratch、Existing、Conversation、Direct Build、Verify 与 Multi-Loop refusal；六路线结构合法，四项硬门槛全 PASS，主 Agent 复核维持结论。"
+    },
+    {
+      "date": "2026-07-31",
+      "title": "本机 loop-craft 原子式同步完成",
+      "detail": "24 个 tracked 文件经 staging validator 与逐项 SHA-256 比对后生效；旧安装移动到时间戳备份，安装后 validator 再次通过。"
+    },
     {
       "date": "2026-07-31",
       "title": "0.3.0 候选确定性出口通过",
