@@ -382,6 +382,8 @@ def _adapter_source_map(compiled: CompileResult) -> dict[str, list[str]]:
 def _source_adapter_map(
     compiled: CompileResult,
     source_manifest: dict[str, Any],
+    *,
+    generated_frontmatter: bool,
 ) -> dict[str, list[str]]:
     source_map = copy.deepcopy(compiled.source_map)
     for index, entry in enumerate(source_manifest["entries"]):
@@ -389,9 +391,22 @@ def _source_adapter_map(
         if entry["action"] == "preserve":
             source_map[f"{entry['path']}#source"] = [source_pointer]
         elif entry["action"] == "overlay":
-            source_map["SKILL.md#source"] = [source_pointer]
+            source_key = (
+                "SKILL.md#source-body"
+                if generated_frontmatter
+                else "SKILL.md#source"
+            )
+            source_map[source_key] = [source_pointer]
         else:
             source_map[entry["path"]] = [""]
+    if generated_frontmatter:
+        source_map["SKILL.md#generated-frontmatter/name"] = ["/identity/id"]
+        source_map["SKILL.md#generated-frontmatter/description"] = [
+            f"/applicability/use_when/{index}"
+            for index, _ in enumerate(
+                compiled.final_execution_ir["applicability"]["use_when"]
+            )
+        ]
     source_map["references/final-execution-ir.json"] = [""]
 
     loop = compiled.final_execution_ir["loops"][0]
@@ -452,10 +467,22 @@ def _render_source_skill(
     validate_source_manifest(source_manifest)
     execution = compiled.final_execution_ir
     identity_id = execution["identity"]["id"]
-    if source_skill_dir.name != identity_id:
-        raise ValueError("source Skill directory name must match definition identity.id")
-    if source_frontmatter_name(source_skill_dir / "SKILL.md") != identity_id:
+    frontmatter_name = source_frontmatter_name(source_skill_dir / "SKILL.md")
+    if frontmatter_name is not None and frontmatter_name != identity_id:
         raise ValueError("source SKILL.md frontmatter name must match definition identity.id")
+    generated_frontmatter = frontmatter_name is None
+    generated_frontmatter_bytes = b""
+    if generated_frontmatter:
+        description = _frontmatter_description(
+            execution["applicability"]["use_when"]
+        )
+        generated_frontmatter_bytes = (
+            "---\n"
+            f"name: {identity_id}\n"
+            "description: "
+            + json.dumps(description, ensure_ascii=False)
+            + "\n---\n\n"
+        ).encode("utf-8")
 
     skill_dir = artifact_root / identity_id
     skill_dir.mkdir(parents=True, exist_ok=False)
@@ -472,7 +499,10 @@ def _render_source_skill(
             raise ValueError(f"source package entry changed after review: {entry['path']}")
         target_path = skill_dir / Path(entry["path"])
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        target_path.write_bytes(source_bytes)
+        if entry["path"] == "SKILL.md" and generated_frontmatter:
+            target_path.write_bytes(generated_frontmatter_bytes + source_bytes)
+        else:
+            target_path.write_bytes(source_bytes)
 
     loop_lines = [
         "## Feedback Loop",
@@ -526,7 +556,11 @@ def _render_source_skill(
     return SkillArtifact(
         skill_dir=skill_dir,
         artifact_digest=directory_digest(skill_dir),
-        source_map=_source_adapter_map(compiled, source_manifest),
+        source_map=_source_adapter_map(
+            compiled,
+            source_manifest,
+            generated_frontmatter=generated_frontmatter,
+        ),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
     )

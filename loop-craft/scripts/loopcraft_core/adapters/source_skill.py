@@ -17,6 +17,7 @@ ALLOWED_ROOT_FILES = {
     "LICENSE",
     "NOTICE",
     "NOTICE.md",
+    "package.json",
 }
 DIGEST_CONTRACT = re.compile(r"sha256:[0-9a-f]{64}")
 SKILL_ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
@@ -209,13 +210,13 @@ def write_source_manifest(
     return manifest
 
 
-def source_frontmatter_name(skill_path: Path) -> str:
+def source_frontmatter_name(skill_path: Path) -> str | None:
     try:
         lines = skill_path.read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeDecodeError) as exc:
         raise ValueError("source SKILL.md must be readable UTF-8") from exc
     if not lines or lines[0].strip() != "---":
-        raise ValueError("source SKILL.md frontmatter is missing")
+        return None
     try:
         end = next(
             index

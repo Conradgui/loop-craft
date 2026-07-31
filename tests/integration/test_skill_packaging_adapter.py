@@ -1,5 +1,7 @@
 import json
+import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -15,6 +17,7 @@ FIXTURES = ROOT / "tests" / "fixtures"
 ZERO_LOOP = FIXTURES / "accepted-definition.zero-loop.json"
 SOURCE_DEFINITION = FIXTURES / "accepted-definition.source-upgrade.json"
 SOURCE_SKILL = FIXTURES / "source-skill" / "existing-skill"
+MECHANICAL_SOURCE = FIXTURES / "source-skill" / "mechanical-package"
 
 
 def run_cli(*arguments: str | Path) -> subprocess.CompletedProcess[str]:
@@ -142,6 +145,111 @@ def test_inventory_source_build_preserves_resources_and_binds_evidence(
         "/loops/0/invariants"
     ]
     assert verify_build(output)["status"] == "clean"
+
+
+def test_common_mechanical_package_gets_canonical_frontmatter_without_source_edits(
+    tmp_path: Path,
+) -> None:
+    source_before = snapshot(MECHANICAL_SOURCE)
+    manifest_path = tmp_path / "mechanical-manifest.json"
+    output = tmp_path / "mechanical-build"
+
+    inventory = run_cli("inventory", MECHANICAL_SOURCE, manifest_path)
+    assert inventory.returncode == 0, inventory.stderr
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    actions = {entry["path"]: entry["action"] for entry in manifest["entries"]}
+    assert actions == {"SKILL.md": "overlay", "package.json": "preserve"}
+
+    build = run_cli(
+        "build",
+        SOURCE_DEFINITION,
+        output,
+        "--source-skill",
+        MECHANICAL_SOURCE,
+        "--package-manifest",
+        manifest_path,
+    )
+
+    assert build.returncode == 0, build.stderr
+    assert snapshot(MECHANICAL_SOURCE) == source_before
+    artifact = output / "artifact" / "existing-skill"
+    assert (artifact / "package.json").read_bytes() == source_before["package.json"]
+    expected_prefix = (
+        "---\n"
+        "name: existing-skill\n"
+        'description: "Use when an existing result needs evidence-driven repair"\n'
+        "---\n\n"
+    ).encode("utf-8")
+    assert (artifact / "SKILL.md").read_bytes().startswith(
+        expected_prefix + source_before["SKILL.md"]
+    )
+
+    source_map = json.loads(
+        (output / "evidence" / "source-map.json").read_text(encoding="utf-8")
+    )
+    skill_index = next(
+        index
+        for index, entry in enumerate(manifest["entries"])
+        if entry["path"] == "SKILL.md"
+    )
+    assert source_map["SKILL.md#source-body"] == [
+        f"/source-package-manifest/entries/{skill_index}"
+    ]
+    assert source_map["SKILL.md#generated-frontmatter/name"] == ["/identity/id"]
+    assert source_map["SKILL.md#generated-frontmatter/description"] == [
+        "/applicability/use_when/0"
+    ]
+    assert verify_build(output)["status"] == "clean"
+
+
+def test_source_build_rejects_valid_but_conflicting_frontmatter_name(
+    tmp_path: Path,
+) -> None:
+    conflicting = tmp_path / "renamed-source-directory"
+    shutil.copytree(SOURCE_SKILL, conflicting)
+    skill_path = conflicting / "SKILL.md"
+    original_body = skill_path.read_text(encoding="utf-8").split("---\n", 2)[2]
+    skill_path.write_text(
+        "---\nname: conflicting-name\n"
+        "description: Use when the package name conflicts.\n---\n"
+        + original_body,
+        encoding="utf-8",
+    )
+    manifest_path = tmp_path / "conflicting-manifest.json"
+    output = tmp_path / "conflicting-build"
+    assert run_cli("inventory", conflicting, manifest_path).returncode == 0
+
+    build = run_cli(
+        "build",
+        SOURCE_DEFINITION,
+        output,
+        "--source-skill",
+        conflicting,
+        "--package-manifest",
+        manifest_path,
+    )
+
+    assert build.returncode != 0
+    assert "frontmatter name must match definition identity.id" in build.stderr
+    assert not output.exists()
+
+
+def test_package_json_does_not_weaken_out_of_root_link_guard(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "linked-mechanical-package"
+    shutil.copytree(MECHANICAL_SOURCE, source)
+    outside = tmp_path / "outside.txt"
+    outside.write_text("private", encoding="utf-8")
+    try:
+        os.symlink(outside, source / "outside-link.txt")
+    except OSError as exc:
+        pytest.skip(f"links unavailable: {exc}")
+
+    inventory = run_cli("inventory", source, tmp_path / "linked-manifest.json")
+
+    assert inventory.returncode != 0
+    assert "links or junctions" in inventory.stderr
 
 
 def test_source_build_rejects_a_stale_reviewed_manifest(tmp_path: Path) -> None:
