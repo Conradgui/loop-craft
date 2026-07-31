@@ -1,17 +1,17 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T09:30:00-07:00",
+  "updated_at": "2026-07-31T14:10:00-07:00",
   "overall": {
-    "label": "三入口 Demo 已完成；0.3.0 严格封板进入接口修复",
+    "label": "0.3.0 两项接口修复完成；候选进入验证与安装",
     "tone": "active",
-    "summary": "From-scratch、Existing Skill、Conversation 三入口各有一条真实链路，三份 Artifact fresh verify clean 且官方 validator 通过；但封板前产品完整性审计确认 Direct Build provenance、常见 Existing Skill 包形、仓库与本机安装副本一致性、README/风险/版本事实仍未闭合。项目所有者批准 0.3.0 严格封板：先修 R-020/R-021，再由无项目历史的 Agent 做无副作用接口贯通审计，最后处理 Apache-2.0、安装、远端 CI 与阶段出口。当前仍为 DRIFT。"
+    "summary": "R-020 已以 entry-evidence-v0.2 如实表达 Direct Build 未发生 Candidate Review；R-021 已支持 package.json、missing frontmatter 与非权威目录名，同时保留身份冲突和越界链接 fail closed。Apache-2.0、0.3.0 版本与事实文档已同步。下一门槛是共享合同全量验证、三份 Demo 只读 verify、备份式安装同步、无项目历史 Agent 的产品接口审计和新远端 CI；完成前仍为 DRIFT。"
   },
   "milestone": {
     "name": "M2 · 0.3.0 产品完整性封板",
     "state": "in_progress",
-    "progress": 20,
-    "progress_label": "范围与验收口径 1 / 1；接口缺口 0 / 2；fresh-context 审计 0 / 1；最终 CI 0 / 1",
-    "next": "修订实施计划；按 TDD 关闭 R-020 与 R-021"
+    "progress": 55,
+    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 0 / 1；fresh-context 审计 0 / 1；最终 CI 0 / 1",
+    "next": "运行候选确定性出口，随后备份式同步本机 Skill 并执行 fresh-context 产品接口审计"
   },
   "metrics": [
     {
@@ -46,13 +46,18 @@
     },
     {
       "label": "0.3.0 接口修复",
-      "value": "R-020 / R-021 · 0 / 2",
-      "tone": "blocked"
+      "value": "R-020 / R-021 · 2 / 2",
+      "tone": "ready"
     },
     {
       "label": "本机 Skill 一致性",
       "value": "installed copy ≠ repo candidate",
       "tone": "blocked"
+    },
+    {
+      "label": "许可证与版本",
+      "value": "Apache-2.0 · 0.3.0",
+      "tone": "ready"
     },
     {
       "label": "阶段出口",
@@ -136,20 +141,20 @@
     {
       "priority": "P1-01",
       "level": "medium",
-      "state": "active",
-      "title": "RV-003 direct-build provenance 不可表达",
-      "fact": "Entry Evidence schema 没有 direct build 的合法 entry_type/source_summary.kind，candidate_review 又是必填。",
-      "action": "按 entry-evidence-v0.2 增加 direct_build / accepted_definition，并以 candidate_review: null 明确未发生 Review；保留 v0.1 兼容。",
-      "done_when": "direct build 可生成合法 Entry Evidence，且不伪造访谈、Review 或批准来源。"
+      "state": "ready",
+      "title": "Direct Build provenance 已闭合",
+      "fact": "entry-evidence-v0.2 已增加 direct_build / accepted_definition，并强制 candidate_review: null；v0.1 三入口保持合法，Direct Build prompt 不重跑或伪造 Review。",
+      "action": "纳入候选全量验证与 fresh-context Direct Build 路线审计。",
+      "done_when": "已满足实现门槛；最终阶段出口仍依赖产品接口审计与 CI。"
     },
     {
       "priority": "P1-02",
       "level": "medium",
-      "state": "active",
-      "title": "LC-009 更广真实 Skill 包边界仍未闭合",
-      "fact": "Skill Polisher canonical root 的 5 个标准文件已直接 inventory 成功，当前 Demo 未触发 LC-009；其它常见非白名单 root 仍缺安全规范，历史放松草案会破坏 RV-001。",
-      "action": "最小支持 package.json、missing frontmatter 与非权威目录名；同时用未知 root、身份冲突和越界 link/junction 组合负例保持 fail closed。",
-      "done_when": "代表性常见包形可达，未知 root 与链接/junction 继续 fail closed。"
+      "state": "ready",
+      "title": "常见真实 Skill 包边界已闭合",
+      "fact": "代表性 package.json + missing-frontmatter + 非权威目录名包形已 inventory/build/verify；源不修改，generated frontmatter 与 source body 分开映射。",
+      "action": "在候选全量验证与 fresh-context Existing Skill 路线中复核模块衔接。",
+      "done_when": "已满足；身份冲突、未知 root 与链接/junction 组合负例继续 fail closed。"
     },
     {
       "priority": "P1-03",
@@ -163,11 +168,11 @@
     {
       "priority": "P1-04",
       "level": "medium",
-      "state": "active",
-      "title": "Apache-2.0 尚未落盘",
-      "fact": "项目所有者已选择 Apache-2.0，但公共仓库仍没有根级 LICENSE，README 与 NOTICE 仍反映旧状态。",
-      "action": "接口修复和产品流程审计通过后，添加标准 LICENSE 并同步 README、NOTICE、pyproject 与 CHANGELOG。",
-      "done_when": "LICENSE 加入仓库，README 的授权状态与其一致。"
+      "state": "ready",
+      "title": "Apache-2.0 与 0.3.0 事实已同步",
+      "fact": "标准根级 LICENSE 已加入；VERSION、pyproject、双语 README、NOTICE 与 CHANGELOG 均对齐 Apache-2.0 / 0.3.0。",
+      "action": "在最终静态检查中确认无旧授权状态残留。",
+      "done_when": "已满足；许可证本身不替代产品与 CI 出口。"
     },
     {
       "priority": "P2-01",
@@ -176,7 +181,7 @@
       "title": "fabrication hard-fail 已关闭",
       "fact": "第五轮按“从范围内证据推导不等于凭空发明”修正规则后，RV-003 fabrication hard-fail 为 0。",
       "action": "保留来源推导与构建者权限/被构建 Skill 权限的作用域区分。",
-      "done_when": "已满足；剩余 RV-003 是路由和 provenance 问题，不再误标为 fabrication。"
+      "done_when": "已满足；RV-003 的 fabrication 与 Direct Build provenance 已分别按各自 owner 关闭。"
     },
     {
       "priority": "P2-02",
@@ -220,6 +225,16 @@
       "state": "ready"
     },
     {
+      "title": "Direct Build truthful provenance",
+      "detail": "已批准 JSON / 散文 Definition 进入独立 direct route；v0.2 Entry Evidence 用 candidate_review: null 如实绑定，不伪造 Gate 或 Review。",
+      "state": "ready"
+    },
+    {
+      "title": "常见 Existing Skill 包形",
+      "detail": "package.json、missing frontmatter 与非权威目录名可达；源正文/包文件继续字节绑定，身份冲突与越界链接仍停止。",
+      "state": "ready"
+    },
+    {
       "title": "五轮行为验证与规则修复",
       "detail": "18/24 → 20/24 → 25/27 → 7/10 → 5/6；hard-fail 归零，规则改动已进入当前本地版本。",
       "state": "ready"
@@ -253,18 +268,18 @@
       "id": "N4",
       "title": "关闭 R-020 / R-021 接口缺口",
       "detail": "为 Direct Build 增加不伪造 Candidate Review 的 provenance；让 package.json + missing frontmatter 的真实机械包形可达，同时保留未知 root 与越界链接 fail closed。",
-      "state": "active"
+      "state": "done"
     },
     {
       "id": "N5",
-      "title": "执行产品流程贯通审计与安装同步",
-      "detail": "无项目历史的 fresh Codex context 只读待发布 Skill，逐条追踪六类路径的输入、输出、下游、审批与停止边界；通过后以备份 + staging 方式更新本机 Skill。",
-      "state": "queued"
+      "title": "候选验证、安装同步与产品流程审计",
+      "detail": "先运行一次共享合同后的全量验证和三份 Demo 只读 verify；再以 backup + staging 更新本机 Skill，最后由无项目历史的 fresh Codex context 追踪六类路径接口。",
+      "state": "active"
     },
     {
       "id": "N6",
       "title": "Apache-2.0、最终 CI 与 0.3.0 封板",
-      "detail": "统一版本与事实文档，添加许可证，本地出口通过后推送 main；远端矩阵通过后才写 PASS。",
+      "detail": "Apache-2.0 与版本事实已完成；本地出口通过后推送 main，远端矩阵通过后才写 PASS。",
       "state": "queued"
     }
   ],
@@ -274,7 +289,7 @@
       "items": [
         {
           "title": "0.3.0 接口完整性修复",
-          "detail": "当前唯一 mainline：关闭 R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形，确保公开用户路径没有隐藏接口洞。"
+          "detail": "R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形已完成；当前没有新的 mainline 功能扩张，进入绑定本候选的 validation。"
         }
       ]
     },
@@ -287,7 +302,7 @@
         },
         {
           "title": "R-021 与 RV-001 组合护栏",
-          "detail": "可达性正例必须与 package.json + 越界 link/junction 负例成对；未知 root 和身份冲突继续停止。"
+          "detail": "package.json + missing-frontmatter 正例与 package.json + 越界 link 负例均已通过；候选全量测试只再运行一次。"
         },
         {
           "title": "fresh-context 产品流程审计",
@@ -300,7 +315,7 @@
       "items": [
         {
           "title": "Apache-2.0 与版本一致性",
-          "detail": "项目所有者已选择 Apache-2.0；在接口修复和产品流程审计后统一 VERSION、pyproject、README、NOTICE 与 CHANGELOG。"
+          "detail": "标准 LICENSE 与 VERSION、pyproject、双语 README、NOTICE、CHANGELOG 已统一为 Apache-2.0 / 0.3.0。"
         },
         {
           "title": "本地证据保留",
@@ -339,7 +354,7 @@
     {
       "level": "high",
       "title": "阶段出口仍为 DRIFT",
-      "detail": "三入口真实 Demo 已完成，但 R-020/R-021 仍造成公开路径断点，本机安装副本落后于仓库，版本/README/风险事实不一致，Apache-2.0 与最终远端 CI 尚未落地。"
+      "detail": "R-020/R-021 与授权/版本事实已闭合，但候选全量验证、安装副本一致性、fresh-context 产品接口审计和最终远端 CI 尚未完成。"
     },
     {
       "level": "medium",
@@ -349,7 +364,7 @@
     {
       "level": "medium",
       "title": "公共发布边界未闭合",
-      "detail": "Apache-2.0 已由项目所有者选定但尚未写入仓库；最终 0.3.0 候选也尚未经过新的远端矩阵，不得提前宣称封板。"
+      "detail": "Apache-2.0 已写入候选，但最终 0.3.0 commit 尚未经过新的远端矩阵；不得因许可证完成而提前宣称封板。"
     }
   ],
   "phase_gates": [
@@ -386,8 +401,12 @@
       "title": "0.3.0 严格封板范围与产品流程验收口径"
     },
     {
+      "state": "ready",
+      "title": "R-020 / R-021 接口合同与 Apache-2.0"
+    },
+    {
       "state": "queued",
-      "title": "R-020 / R-021、fresh-context 审计、安装一致性、Apache-2.0 与最终 CI"
+      "title": "候选全量验证、fresh-context 审计、安装一致性与最终 CI"
     }
   ],
   "known_limits": [
@@ -409,6 +428,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "R-020 / R-021 与发布事实完成",
+      "detail": "Direct Build v0.2 provenance、常见 Existing Skill 包形、组合链接护栏、Apache-2.0 和 0.3.0 版本事实已落盘；阶段继续 DRIFT，转入候选验证、安装和 unknown-Agent 接口审计。"
+    },
     {
       "date": "2026-07-31",
       "title": "0.3.0 严格封板范围与产品流程验收获批",

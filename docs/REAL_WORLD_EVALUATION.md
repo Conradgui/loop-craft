@@ -17,6 +17,10 @@ ask, when to stop, when to refuse. That behavior lives in roughly 600 lines of p
 Before this evaluation existed, the project had accumulated a green test suite, a working
 build chain, and zero evidence about whether the Skill classified anything correctly.
 
+> 0.3.0 note: the original runs below remain historical evidence. Later targeted runs and the
+> focused closure work are recorded in [0.3.0 closure follow-up](#030-closure-follow-up);
+> old failures are not silently relabelled.
+
 ## Method
 
 24 synthetic cases were authored against the product boundary, plus 3 reverse cases added
@@ -109,6 +113,34 @@ over-reach, and over-reach on a security boundary specifically. A fabricated aut
 that a user rubber-stamps is worse than a build that never happens.
 
 Runs 1 and 2 were under-delivery only. That framing does not extend to run 3.
+
+## 0.3.0 closure follow-up
+
+Runs 4 and 5 targeted the run-3 fabrication failure rather than repeating the full population.
+The final rule distinguishes transcription from invention: a value supported by the authorized
+source, user-granted authority, or user-provided environment facts may be normalized into the
+contract; a schema-required value with no scoped support remains a named blocking gap. The
+targeted set restored LC-001 and LC-021 while RV-003's fabrication hard-fail stayed closed.
+
+Two separate interface defects remained after that prompt-only repair:
+
+- **R-020 / Direct Build provenance.** The contract could not represent that an already
+  accepted Definition was built without a Candidate Review. 0.3.0 adds a mutually exclusive,
+  backward-compatible `entry-evidence-v0.2` Direct Build branch with
+  `candidate_review: null`; old v0.1 design-entry evidence remains valid.
+- **R-021 / common Existing Skill package shape.** A regular root `package.json`, a
+  non-authoritative source directory name, or missing frontmatter stopped a safe package before
+  build. 0.3.0 accepts `package.json`, takes Artifact identity from the accepted Definition,
+  and generates missing frontmatter only in the new Artifact while preserving source body
+  bytes. Conflicting or malformed frontmatter, unknown roots, links, junctions, and special
+  files still stop.
+
+Focused deterministic evidence covers v0.1/v0.2 compatibility, truthful null Review provenance,
+build/verify binding, the representative mechanical package, identity conflict, and a combined
+`package.json` plus out-of-root-link guard. Agent-interface contract checks cover both routes.
+This does **not** replace product-flow evidence: the 0.3.0 stage remains DRIFT until a fresh,
+read-only Agent with no project history can trace every supported route's input, owner, output,
+next consumer, approval/stop condition, boundary, and user-facing next step.
 
 ### Run 1 — baseline
 

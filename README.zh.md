@@ -51,7 +51,7 @@ flowchart TD
 |---|---|---|
 | 提示词层 | 路由、Gate、评审、批准 | 隔离盲测行为评估 |
 | 契约层 | JSON schema——形状只在这里定义一次 | Schema 元校验 |
-| 确定性层 | validate → compile → adapter → evidence → pipeline | 160 个测试 + 逐字节比对 |
+| 确定性层 | validate → compile → adapter → evidence → pipeline | 自动化合同测试 + 逐字节比对 |
 
 这解释了为什么两层**失效方式不同，必须用不同手段验证**。一套全绿的测试对"Gate 分类是否正确"
 一无所知；一次表现良好的访谈也无法说明两次构建是否产出相同字节。两类证据缺一不可，互不替代。
@@ -94,10 +94,11 @@ flowchart TD
 
 三轮共同成立的：0 例在批准前写文件（对照文件系统核实，不采信模型自述）、被测 Skill 从未被改动。
 
-**第三轮出现一例 hard-fail。** RV-003 把 schema 必填的 `authority` 用合理默认值填满——
-其中包括源文档从未提过的 `git push` 禁令——并作为**已定内容**呈现，而不是列为缺口。
-这是对一条安全边界的凭空发明，也是本次评估中唯一一例**越权而非交付不足**的失败。
-它尚未修复，是接下来的第一优先项。详见
+**第三轮出现的一例 hard-fail 已由定向回归关闭。** RV-003 曾把 schema 必填的
+`authority` 用合理默认值填满——其中包括源文档从未提过的 `git push` 禁令——并作为
+已定内容呈现。第四、五轮把边界改准：范围内证据支持的值可以转写；没有证据支持的值必须作为
+具名缺口，不能被整包批准。定向回归随后保持 fabrication hard-fail 为 0。历史第三轮仍如实
+保留 25/27，不改写旧结果。详见
 [REAL_WORLD_EVALUATION.md](docs/REAL_WORLD_EVALUATION.md)。
 
 三条值得单独说明的发现——它们对这项工作的影响比通过率本身更大：
@@ -115,14 +116,16 @@ flowchart TD
 
 ## 当前边界
 
-已支持：从零设计 · 既有 Skill 评估与保源单 Loop 升级 · 已授权对话蒸馏 · 0 Loop 与单 Loop
-打包 · Manifest 绑定的 Entry Evidence · 确定性构建 · 只读 drift 校验。
+已支持：从零设计 · 既有 Skill 评估与保源单 Loop 升级 · 已授权对话蒸馏 · 从已批准 JSON
+或散文 Definition 直接构建 · 0 Loop 与单 Loop 打包 · Manifest 绑定的 Entry Evidence ·
+常见 `package.json` / 缺失 frontmatter 的 Skill 包 · 确定性构建 · 只读 drift 校验。
 
 未实现：多 Loop 构建 · Runtime · Override · Subloop · Compact Prompt 输出 · Library Edition ·
 发布 · 调度 · 安装自动化。
 
-已知缺口与待办记录在
-[risk-register.md](docs/project-management/risk-register.md)——包括仍未通过评估的两例及其原因。
+已知限制与延后风险记录在
+[risk-register.md](docs/project-management/risk-register.md)。历史失败仍保留在评估记录中；
+R-020、R-021、R-024 完成定向关闭后不再被写成开放风险。
 
 ## 安装
 
@@ -135,6 +138,7 @@ flowchart TD
 Use $loop-craft to design a bounded feedback Loop from this goal.
 Use $loop-craft to assess this existing Skill and decide whether a Loop belongs in it.
 Use $loop-craft to distill this authorized conversation into a reusable Skill.
+Use $loop-craft to build this approved definition into a local Skill with separate evidence.
 ```
 
 ## 构建与校验
@@ -166,11 +170,13 @@ python scripts/build_loop.py verify <existing-output-dir>
     ├── source-map.json               每个字段来自哪里
     ├── validation-report.json        校验了什么
     ├── build-manifest.json           把以上全部绑定起来的摘要
-    └── entry-evidence.json           为什么接受它、由谁批准
+    └── entry-evidence.json           路由 provenance 与已批准的构建范围
 ```
 
-这个隔离本身就是设计目的。原始对话、私有源材料、开发记录和本机绝对路径**留在 `evidence/`，
-绝不进入 artifact**——通过对生成包扫描这几类模式来验证。
+这个隔离本身就是设计目的。原始对话、私有源材料、开发记录和本机绝对路径既不进入 Artifact，
+也不进入 Entry Evidence。Entry Evidence 只保留受控 source ID、有 provenance 标签的有限摘要、
+已解决澄清摘要、Definition digest 和固定的本地构建批准；Source Package Evidence 保存相对路径
+与摘要，不复制私有源 payload。
 
 Manifest 可以携带两组互相独立的绑定：**Source Package Evidence** 证明哪些源包字节被保留；
 **Entry Evidence** 记录为什么接受这个行为。两者互不蕴含，`verify` 会根据实际存在的绑定
@@ -181,7 +187,7 @@ Manifest 可以携带两组互相独立的绑定：**Source Package Evidence** �
 ```text
 loop-craft/          可安装的 Skill——SKILL.md、references、Core 脚本、schema
 docs/                架构设计、评估证据、spec、计划、决策日志、风险登记
-tests/               160 个单元与集成测试
+tests/               确定性单元、集成与合同测试
 dashboard/           实时项目看板（status.json + 静态页面）
 .claude/agents/      stage-gate 管控 Agent——独立的质量与过程裁决
 ```
@@ -199,7 +205,7 @@ Loop Craft 选择性地本地化了 Loopy、Workflow Skill Creator、Skill Polis
 [resource-registry.yaml](docs/references/resource-registry.yaml)，摘要见
 [NOTICE.md](NOTICE.md)。
 
-## 许可证状态
+## 许可证
 
-本仓库**尚未**选定再分发许可证。没有 `LICENSE` 文件意味着默认保留所有权利——**这不是隐含授权**。
-在此之前请按开发材料对待。已登记为 `R-014`。
+Loop Craft 按 [Apache License 2.0](LICENSE) 分发。独立设计参考项目继续适用各自的许可证与
+归属要求，详见 [NOTICE.md](NOTICE.md)。

@@ -2,6 +2,53 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.3.0 - 2026-07-31
+
+Product-path closure release.
+
+### Added
+
+- A Direct Definition Build route for approved JSON or prose definitions. New
+  `entry-evidence-v0.2` records use `entry_type: direct_build`,
+  `source_summary.kind: accepted_definition`, and `candidate_review: null`, so the build
+  remains provenance-bound without claiming a Candidate Review occurred.
+- Safe support for common Existing Skill packages containing a regular root `package.json`,
+  a source directory whose name is not the accepted identity, and a `SKILL.md` with missing
+  frontmatter. Canonical frontmatter is generated only in the new Artifact; original source
+  body bytes and package files remain Manifest-bound.
+- A real Conversation Distillation Demo producing a zero-Loop Skill plus separate Evidence,
+  clean/drift verification, official validation, and an isolated behavior smoke check.
+- Apache License 2.0 for this repository.
+
+### Changed
+
+- Existing Skill identity now comes from the accepted Definition. Valid conflicting,
+  malformed, unterminated, or duplicate source frontmatter names stop the build instead of
+  being silently normalized.
+- Source package inventory keeps unknown roots, links, junctions, special files, stale
+  manifests, and source/output overlap fail closed.
+- Documentation now states the actual privacy boundary: raw conversations, private source
+  material, development records, and absolute local paths belong in neither the Artifact nor
+  Entry Evidence. Only bounded summaries, controlled source IDs, digests, and approved
+  clarifications are retained.
+- Version metadata is unified at `0.3.0`.
+
+### Evaluation follow-up
+
+- Targeted run 5 closed the RV-003 fabrication hard-fail by distinguishing values supported by
+  scoped evidence from invented defaults. The remaining Direct Build provenance and mechanical
+  Existing Skill package gaps were then fixed at the deterministic and Agent-interface layers.
+- The historical 25/27 run is not relabelled. No expensive full-population rerun was performed;
+  0.3.0 uses focused contract tests plus a separate fresh-context product-interface audit.
+
+### Known limitations
+
+- Builds support zero or one qualifying Loop. Multi-Loop builds, Runtime, Override, Subloop,
+  Library Edition, publishing, scheduling, installation automation, GitHub Release, and tags
+  remain outside the 0.3.0 product boundary.
+- The platform capability vocabulary remains intentionally narrow; unsupported required
+  capabilities stop the build and unsupported optional capabilities are marked degraded.
+
 ## 0.2.0 - 2026-07-27
 
 First release with behavioral evidence. Everything before this was verified only at the

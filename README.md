@@ -56,7 +56,7 @@ prompt layer; everything below the contract boundary is a pure function.**
 |---|---|---|
 | Prompt | Routing, the Gate, Review, approval | Blind behavioral evaluation |
 | Contract | JSON schemas — the only place a shape is defined | Schema meta-validation |
-| Deterministic | validate → compile → adapter → evidence → pipeline | 160 unit/integration tests, byte comparison |
+| Deterministic | validate → compile → adapter → evidence → pipeline | Automated contracts, byte comparison |
 
 This is why the two layers **fail differently and must be verified differently**. A green test
 suite says nothing about whether the Gate classifies correctly. A well-behaved interview says
@@ -105,12 +105,13 @@ hidden from the agent under test. Full method and limitations:
 Across all three runs: zero files written before approval (verified against the filesystem,
 not the model's self-report) and the Skill under test never modified.
 
-**One hard-fail, in run 3.** RV-003 filled the schema-required `authority` field with
-plausible defaults — including a `git push` prohibition its source document never mentions —
-and presented them as settled rather than as gaps. That is fabrication of a security
-boundary, and it is the one failure in this evaluation that is over-reach rather than
-under-delivery. It is unfixed, and it is the next thing being worked on. Details:
-[REAL_WORLD_EVALUATION.md](docs/REAL_WORLD_EVALUATION.md).
+**One hard-fail occurred in run 3 and was closed by targeted follow-up.** RV-003 had filled the
+schema-required `authority` field with plausible defaults — including a `git push`
+prohibition its source never mentioned — and presented them as settled. Runs 4 and 5 refined
+the rule: a value supported by scoped evidence may be transcribed, while an unsupported value
+must remain a named gap and cannot be blanket-approved. The targeted regression then kept the
+fabrication hard-fail at zero. Historical run 3 remains recorded as 25/27 rather than being
+rewritten. Details: [REAL_WORLD_EVALUATION.md](docs/REAL_WORLD_EVALUATION.md).
 
 Three findings worth stating plainly, because they shaped the work more than the pass rate did:
 
@@ -132,15 +133,17 @@ attempt.
 ## Current boundary
 
 Supported: from-scratch design · existing-Skill assessment with source-preserving single-Loop
-upgrade · authorized conversation distillation · zero-Loop and single-Loop packaging ·
-manifest-bound Entry Evidence · deterministic build · read-only drift verification.
+upgrade · authorized conversation distillation · direct build from an approved JSON or prose
+definition · zero-Loop and single-Loop packaging · manifest-bound Entry Evidence · common
+`package.json` / missing-frontmatter Skill packages · deterministic build · read-only drift
+verification.
 
 Not implemented: multi-Loop builds · Runtime · Override · Subloop · Compact Prompt output ·
 Library Edition · publishing · scheduling · installation automation.
 
-Known gaps with open remediation are tracked in
-[risk-register.md](docs/project-management/risk-register.md) — including the two cases still
-failing evaluation and why.
+Known limitations and deferred risks are tracked in
+[risk-register.md](docs/project-management/risk-register.md). The historical failures remain in
+the evaluation record; R-020/R-021/R-024 are not presented as open after their focused closure.
 
 ## Install
 
@@ -154,6 +157,7 @@ platform's Skill validator.
 Use $loop-craft to design a bounded feedback Loop from this goal.
 Use $loop-craft to assess this existing Skill and decide whether a Loop belongs in it.
 Use $loop-craft to distill this authorized conversation into a reusable Skill.
+Use $loop-craft to build this approved definition into a local Skill with separate evidence.
 ```
 
 ## Build and verify
@@ -187,12 +191,14 @@ explicit encoding.
     ├── source-map.json               which field came from where
     ├── validation-report.json        what was checked
     ├── build-manifest.json           digests binding all of the above
-    └── entry-evidence.json           why it was accepted, and by whom
+    └── entry-evidence.json           route provenance and approved build scope
 ```
 
 The separation is the point. Raw conversations, private source material, development records,
-and absolute local paths stay in `evidence/` and never enter the artifact — verified by
-scanning generated packages for exactly those patterns.
+and absolute local paths enter neither the artifact nor Entry Evidence. Entry Evidence retains
+only controlled source IDs, bounded provenance-labelled summaries, resolved clarification
+summaries, the accepted-definition digest, and the fixed local-build approval. Source Package
+Evidence retains relative paths and digests rather than raw private source payloads.
 
 Two independent bindings can appear in the manifest: **Source Package Evidence** proves which
 source bytes were preserved; **Entry Evidence** records why the behavior was accepted. Neither
@@ -203,7 +209,7 @@ implies the other, and `verify` derives the expected file set from whichever are
 ```text
 loop-craft/          the installable Skill — SKILL.md, references, Core scripts, schemas
 docs/                DESIGN, evaluation, specs, plans, decision log, risk register
-tests/               160 unit and integration tests
+tests/               deterministic unit, integration, and contract tests
 dashboard/           live project status (status.json + a static page)
 .claude/agents/      stage-gate controller — independent quality and process review
 ```
@@ -222,8 +228,8 @@ recorded per source in
 [resource-registry.yaml](docs/references/resource-registry.yaml) and summarised in
 [NOTICE.md](NOTICE.md).
 
-## License status
+## License
 
-This repository has **not** yet selected a redistribution license. Absence of a `LICENSE` file
-means all rights reserved by default — it is not an implicit grant. Treat it as development
-material. Tracked as `R-014`.
+Loop Craft is distributed under the
+[Apache License 2.0](LICENSE). Independent design references keep their own licenses and
+attribution requirements; see [NOTICE.md](NOTICE.md).

@@ -637,3 +637,27 @@ Task 1 的 4 个测试通过只支持 canonical serialization/harness 的局部�
 ### 边界声明
 
 CI 尚未在远端实际运行过，不得据此宣称 CI 已生效。文档补齐属 `support` 层，不计入产品进度；本次未新增任何用户可执行能力。
+
+## 2026-07-31：0.3.0 严格封板接口修复
+
+### 已执行动作
+
+- R-020：先写 Direct Build v0.2 正负例，确认旧 schema 精准失败；实现
+  `direct_build` / `accepted_definition` / `candidate_review: null` 后，
+  Entry Evidence 与 build/verify 定向 41 例通过。
+- 增加 `direct-build.md` 与主 Skill 路由：已批准 JSON 直接校验，已批准散文只机械转写，
+  对真实 schema 缺口一次只问一个；不伪造 Gate 或 Candidate Review。Agent-interface
+  合同定向通过。
+- R-021：代表性 `package.json` + missing-frontmatter + 非权威目录名 fixture 在旧实现上
+  精准失败；最小修复后 11 个 source packaging 用例通过，源包不修改，Artifact identity
+  取自获批 Definition，generated frontmatter 与 source body 在 Source Map 分开。
+- 保留身份冲突拒绝和 `package.json` + 越界 link 组合负例；未照抄 D-032 已被证伪的宽松草案。
+- 添加 Apache-2.0 标准 LICENSE，统一 VERSION / pyproject 为 0.3.0，并同步双语 README、
+  NOTICE、CHANGELOG、评估说明、风险与决策记录。
+
+### 当前门槛
+
+- R-020、R-021、R-024、R-025 的实现/规则缺口关闭。
+- 阶段仍为 DRIFT：尚需一次共享合同后的全量确定性验证、三份既有 Demo 的只读 verify、
+  本机安装副本一致性、unknown Agent 产品接口审计和新 commit 的远端 CI。
+- 未重新执行真实用户项目，也未重复全量盲测 population；测试投入只绑定本轮具体接口风险。

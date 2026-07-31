@@ -265,3 +265,26 @@ G4 亦确认超限：三轮盲测合计 153 个 agent、6,897,321 token，测试
 第五轮据此重新界定：字段进入缺口清单的条件是**没有任何范围内证据支持其取值**，而不是源材料缺少那句话；范围内证据包括源材料、用户声明的授权与用户提供的环境事实；**从其中任何一处推导都属于转写，转写永远不是发明**。并补一条作用域边界：授予构建者的权限（构建时可读写哪些目录）本身不等于被构建 Skill 的权限，后者必须从关于该 Skill 自身行为的证据推导。
 
 修改后 LC-001 与 LC-021 均恢复通过，RV-003 的 hard-fail 保持关闭，RV-001、LC-002、LC-019 保持通过。RV-003 剩余的路由与 provenance 问题需 schema 改动（R-020），不在纯规则文本可解决范围内。
+
+### D-034 0.3.0 用真实接口合同关闭 R-020 与 R-021
+
+Direct Build 不是第四种设计入口：它只消费已经批准的 JSON 或散文 Definition，因此不重新运行
+Loopability Gate 或 Candidate Review。采用互斥且向后兼容的
+`entry-evidence-v0.2`，用 `direct_build`、`accepted_definition` 与
+`candidate_review: null` 如实表达路径；三种设计入口继续使用 v0.1 和真实 Review 对象。散文
+转写只搬运范围内证据支持的值，对会改变行为、权限、验证、停止或交付的真实缺口逐项询问。
+
+Existing Skill 的修复不采用 D-032 否决的“删除机械门槛”方案。Inventory 只新增 regular
+`package.json`；源目录名不再充当身份权威；缺失 frontmatter 仅在新 Artifact 内由已批准
+Definition 生成，原始正文紧随其后并继续由 source manifest 绑定。已有 frontmatter 冲突、
+未知 root、link/junction、特殊文件和 stale manifest 仍无条件停止。组合负例明确证明
+`package.json` 合法不会削弱 RV-001。
+
+### D-035 0.3.0 采用 Apache-2.0，产品出口仍由 fresh audit 与新 CI 决定
+
+项目所有者已选择 Apache License 2.0。根级 `LICENSE` 使用标准文本，`NOTICE.md` 明确
+Loop Craft 原创部分与独立设计参考的许可证边界，`VERSION` 与 pyproject 统一为 `0.3.0`。
+这解决公共复用授权与版本漂移，但属于支持层事实，不替代产品可用性证据。
+
+0.3.0 在 unknown Agent 的无副作用接口审计与候选 commit 的新 GitHub Actions 矩阵通过前
+保持 DRIFT。旧 160-tests/首次 CI/三条 Demo 都不能单独外推为新候选封板通过。

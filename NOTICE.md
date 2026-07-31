@@ -30,9 +30,11 @@ Evidence Package, and read-only drift verification — is this project's own wor
 
 ## Repository license status
 
-This repository has **not** yet selected a redistribution license. Absence of a `LICENSE`
-file means all rights are reserved by default; it is not an implicit grant. Treat the
-repository as development material until the project owner adds one.
+The original Loop Craft work in this repository is distributed under the Apache License,
+Version 2.0; see [`LICENSE`](LICENSE). That license does not relicense the independent
+upstream projects listed above. Their own licenses, notices, and attribution requirements
+continue to apply to their respective material.
 
-This is a tracked delivery item, not an oversight. See `R-014` in
-[`docs/project-management/risk-register.md`](docs/project-management/risk-register.md).
+The listed sources were used as design references rather than vendored runtime dependencies.
+If future changes copy upstream code or assets into this repository, the contributor must add
+the applicable upstream license and modification notices before distribution.
