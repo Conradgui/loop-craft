@@ -2,16 +2,16 @@
   "project": "Loop Craft",
   "updated_at": "2026-07-31T14:10:00-07:00",
   "overall": {
-    "label": "0.3.0 两项接口修复完成；候选进入验证与安装",
+    "label": "0.3.0 候选确定性验证通过；进入安装与产品审计",
     "tone": "active",
-    "summary": "R-020 已以 entry-evidence-v0.2 如实表达 Direct Build 未发生 Candidate Review；R-021 已支持 package.json、missing frontmatter 与非权威目录名，同时保留身份冲突和越界链接 fail closed。Apache-2.0、0.3.0 版本与事实文档已同步。下一门槛是共享合同全量验证、三份 Demo 只读 verify、备份式安装同步、无项目历史 Agent 的产品接口审计和新远端 CI；完成前仍为 DRIFT。"
+    "summary": "R-020/R-021、Apache-2.0 与 0.3.0 事实已闭合；共享合同后的唯一一次全量测试为 171 passed，compile/schema/dashboard/link/官方 validator 全通过，三份既有 Demo 被当前 Core 只读 verify 为 clean。下一门槛是备份式同步本机 Skill、无项目历史 Agent 的产品接口审计和新远端 CI；完成前仍为 DRIFT。"
   },
   "milestone": {
     "name": "M2 · 0.3.0 产品完整性封板",
     "state": "in_progress",
-    "progress": 55,
-    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 0 / 1；fresh-context 审计 0 / 1；最终 CI 0 / 1",
-    "next": "运行候选确定性出口，随后备份式同步本机 Skill 并执行 fresh-context 产品接口审计"
+    "progress": 70,
+    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 0 / 1；最终 CI 0 / 1",
+    "next": "以 staging + 时间戳备份同步本机 Skill；从安装副本执行 fresh-context 产品接口审计"
   },
   "metrics": [
     {
@@ -57,6 +57,11 @@
     {
       "label": "许可证与版本",
       "value": "Apache-2.0 · 0.3.0",
+      "tone": "ready"
+    },
+    {
+      "label": "0.3.0 候选验证",
+      "value": "171 passed · 3 Demo clean",
       "tone": "ready"
     },
     {
@@ -273,7 +278,7 @@
     {
       "id": "N5",
       "title": "候选验证、安装同步与产品流程审计",
-      "detail": "先运行一次共享合同后的全量验证和三份 Demo 只读 verify；再以 backup + staging 更新本机 Skill，最后由无项目历史的 fresh Codex context 追踪六类路径接口。",
+      "detail": "候选全量验证与三份 Demo 只读 verify 已通过；现在以 backup + staging 更新本机 Skill，再由无项目历史的 fresh Codex context 追踪六类路径接口。",
       "state": "active"
     },
     {
@@ -428,6 +433,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "0.3.0 候选确定性出口通过",
+      "detail": "171 tests、compileall、两个 Schema、dashboard JSON、本地引用和官方 validator 全通过；From-scratch、Existing、Conversation 三份保留 Demo 被当前 Core 只读 verify 为 clean。"
+    },
     {
       "date": "2026-07-31",
       "title": "R-020 / R-021 与发布事实完成",
