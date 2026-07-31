@@ -135,6 +135,25 @@ def test_entries_use_shared_loopability_and_candidate_review_contracts() -> None
     assert "Assessment only" in unsupported
 
 
+def test_existing_skill_route_explains_safe_mechanical_package_normalization() -> None:
+    references = SKILL / "references"
+    upgrade_text = (references / "upgrade-skill.md").read_text(encoding="utf-8")
+    core_text = (references / "core-build.md").read_text(encoding="utf-8")
+    combined = upgrade_text + "\n" + core_text
+
+    assert "`package.json`" in combined
+    assert "source directory name is not identity authority" in combined
+    assert "accepted Definition identity" in combined
+    assert "missing frontmatter" in combined
+    assert "original source body bytes" in combined
+    assert "frontmatter name conflicts" in combined
+    assert "links, junctions, special files, or unknown root entries" in (
+        combined.lower()
+    )
+    assert "source package is never modified" in combined
+    assert "generated frontmatter" in combined
+
+
 def test_from_scratch_routes_approved_workflows_and_loops_through_packaging() -> None:
     text = (SKILL / "references" / "from-scratch.md").read_text(
         encoding="utf-8"

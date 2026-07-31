@@ -88,7 +88,7 @@ The current Core and Skill Packaging Adapter can safely build an upgrade only wh
   `embedded_loop` whose single supporting Loop maps to `skill-package-v0.1` without
   semantic loss while the remaining fixed phases are preserved as workflow behavior;
 - the recovered behavior contract maps without semantic loss to the current accepted-definition schema;
-- the source package contains only reviewable standard Skill roots and can be inventoried without links or unresolved files; and
+- the source package contains only reviewable standard Skill roots and can be inventoried without links or unresolved files; regular root files include `SKILL.md`, supported license/notice files, and `package.json`; and
 - no approved finding requires unsupported behavior or a second Loop.
 
 If any condition fails, stop at **Assessment only**. Return the Decision Record and the unsupported boundary. Do not flatten two or more qualifying Loops into one, drop critical resources, or claim that a generated replacement is a complete upgrade. A single supporting Loop inside a preserved parent workflow is not a flattened design; compressing several independent cycles into one is.
@@ -97,10 +97,12 @@ If the gate passes, use the Decision Record as input to the shared Candidate Rev
 
 After Candidate approval, map the approved contract to one accepted definition using profile `skill-package-v0.1`. Preserve the Skill's public outcome, invocation conditions, authority, observable verification, terminal behavior, and invariants. Create a reviewed `entry-evidence-v0.1` record with `entry_type: existing_skill`, `source_summary.kind: skill_assessment`, safe source IDs, structured fact summaries, resolved clarifications, a bounded Candidate Review summary and classification, and the fixed local-build approval. Inventory the source package, then show the definition mapping, reviewed Entry Evidence, and reviewed source-package manifest and obtain approval before building.
 
+The source directory name is not identity authority; the accepted Definition identity controls the new Artifact directory. A safely parsed existing frontmatter name must agree with that identity. When `SKILL.md` has missing frontmatter, the Adapter may generate canonical name and description frontmatter from the accepted Definition while preserving the original source body bytes immediately after it. If an existing frontmatter name conflicts, is malformed, or appears more than once, stop rather than silently rebrand the Skill.
+
 ## 7. Perform the approved upgrade
 
 After approval, re-read the target. If it changed materially or implementation requires a new finding, boundary, resource, or authority, stop for renewed approval.
 
-Build the replacement into a new output directory with `--source-skill`, `--package-manifest`, and `--entry-evidence`; do not edit or overwrite the source Skill. Follow [core-build.md](core-build.md) for the exact inventory/build commands and failure handling. The source-package binding proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. Neither record replaces or copies the other. Entry Evidence contains no raw Skill payload, absolute paths, private source material, or development record. The output must contain the complete source-preserving Skill and its separate source-bound and entry-bound Evidence package.
+Build the replacement into a new output directory with `--source-skill`, `--package-manifest`, and `--entry-evidence`; the source package is never modified. Follow [core-build.md](core-build.md) for the exact inventory/build commands and failure handling. The source-package binding proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. Neither record replaces or copies the other. Entry Evidence contains no raw Skill payload, absolute paths, private source material, or development record. The output must contain the complete source-preserving Skill and its separate source-bound and entry-bound Evidence package.
 
 Report the Decision Record, approved finding IDs, generated Skill path, Evidence path, preserved behavior, checks actually performed, and unresolved risks. Do not claim a complete upgrade when the Core compatibility gate did not pass.

@@ -42,7 +42,7 @@ First write a new, reviewable source-package manifest:
 python scripts/build_loop.py inventory <source-skill-directory> <new-manifest.json>
 ```
 
-Review the manifest before approval. It records only sorted POSIX-relative paths, the `preserve`, `overlay`, or `generated` action, file digests, and the complete source Skill digest. It never records an absolute source path. Unknown root entries, links, a missing `SKILL.md`, or an occupied manifest path stop inventory.
+Review the manifest before approval. It records only sorted POSIX-relative paths, the `preserve`, `overlay`, or `generated` action, file digests, and the complete source Skill digest. It never records an absolute source path. Supported regular root files are `SKILL.md`, `package.json`, and the named license/notice files; supported root directories remain `agents/`, `references/`, `scripts/`, and `assets/`. Links, junctions, special files, or unknown root entries stop inventory, as do a missing `SKILL.md` or an occupied manifest path.
 
 After the one-Loop upgrade and manifest are both approved, build into a new directory:
 
@@ -50,9 +50,9 @@ After the one-Loop upgrade and manifest are both approved, build into a new dire
 python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --source-skill <source-skill-directory> --package-manifest <reviewed-manifest.json> --entry-evidence <reviewed-entry-evidence.json>
 ```
 
-`--source-skill` and `--package-manifest` must be supplied together. This route accepts only `skill-package-v0.1` with exactly one Loop. The source directory name and safely parsed `SKILL.md` frontmatter name must both equal `behavior_contract.identity.id`. The build re-inventories the source and stops if anything differs from the reviewed manifest, if source and output overlap, or if the resulting `SKILL.md` exceeds 500 lines.
+`--source-skill` and `--package-manifest` must be supplied together. This route accepts only `skill-package-v0.1` with exactly one Loop. The source directory name is not identity authority; the accepted Definition identity determines the Artifact directory. If source `SKILL.md` has frontmatter, its safely parsed name must match the accepted Definition identity. If it has missing frontmatter, the Adapter generates canonical name and description frontmatter from that identity and the accepted applicability, then preserves the original source body bytes after it. Existing frontmatter name conflicts, malformed or unterminated frontmatter, and duplicate names stop the build. The build re-inventories the source and stops if anything differs from the reviewed manifest, if source and output overlap, or if the resulting `SKILL.md` exceeds 500 lines.
 
-The source is never modified. The new artifact preserves source-owned metadata, references, scripts, assets, and license material byte-for-byte; appends the approved `## Feedback Loop` section to `SKILL.md`; and generates `references/final-execution-ir.json`. The source-package manifest proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. They are independent Manifest bindings and neither duplicates nor requires the other outside this approved-entry command.
+The source package is never modified. The new artifact preserves source-owned metadata, `package.json`, references, scripts, assets, and license material byte-for-byte; appends the approved `## Feedback Loop` section to `SKILL.md`; and generates `references/final-execution-ir.json`. When frontmatter is generated, the Source Map distinguishes generated frontmatter fields from the preserved source body. The source-package manifest proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. They are independent Manifest bindings and neither duplicates nor requires the other outside this approved-entry command.
 
 ## Verify an existing build
 
