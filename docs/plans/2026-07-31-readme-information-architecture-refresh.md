@@ -164,8 +164,12 @@ Confirm branch status is clean, commits contain only the approved documentation/
 files, local README links resolve, dashboard JSON parses, and the `loop-craft/` tree hash is
 unchanged from `main`.
 
-- [ ] **Step 2: Integrate without rewriting product history**
+- [x] **Step 2: Integrate without rewriting product history**
 
 Fast-forward `main` only when it still points to the design commit or is an ancestor of the
 documentation branch. Push only after local/remote equality and the final documentation
 checks pass. The README-only change does not create a Release or Tag.
+
+Result: the user selected local integration. `main` was fast-forwarded after documentation
+verification; the merged worktree and local feature branch were removed. Remote push,
+Release, and Tag creation were intentionally not performed.
