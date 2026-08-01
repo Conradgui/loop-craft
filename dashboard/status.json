@@ -1,23 +1,23 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T07:30:00-07:00",
+  "updated_at": "2026-07-31T21:09:48-07:00",
   "overall": {
-    "label": "PASS · 0.3.0 封板",
-    "tone": "ready",
-    "summary": "0.3.0 的六条产品路径、R-020/R-021、Apache-2.0、安装一致性、171 tests、三份 Demo clean verify 与 fresh-context 四项产品门槛全部闭合。candidate main@0fe3edb 已推送；GitHub Actions run 30626392947 在 Ubuntu / Windows × Python 3.12 / 3.13 四项全部 success。当前版本正式封板，不创建 Release/Tag，也不扩张到 Runtime、多 Loop 或发布调度。"
+    "label": "ACTIVE · 0.4.0 双输出闭环",
+    "tone": "progress",
+    "summary": "0.3.0 的 Codex Skill + Evidence 主链保持已验证；审计确认原定 Compact Prompt 只存在于旧 Loopy 与设计记录，尚未进入当前 Core。已批准 0.4.0 混合方案：补齐 Compact Prompt Adapter，保留确定性 Codex Skill Adapter，并增加当前 Codex 原生 Validator 与 Skill Creator PRO 质量门。Runtime、多 Loop、发布调度继续不进入本轮。"
   },
   "milestone": {
-    "name": "M2 · 0.3.0 产品完整性封板",
-    "state": "completed",
-    "progress": 100,
-    "progress_label": "范围 1 / 1；接口缺口 2 / 2；候选验证 1 / 1；fresh-context 审计 1 / 1；最终 CI 1 / 1",
-    "next": "0.3.0 已封板；只有新的产品目标获批后才开启下一里程碑"
+    "name": "M3 · 0.4.0 Skill / Prompt 双 Adapter",
+    "state": "active",
+    "progress": 10,
+    "progress_label": "事实审计 1 / 1；方案确认 1 / 1；规格复核 0 / 1；实现与验证 0 / 1",
+    "next": "复核双 Adapter 与 Codex 兼容门设计规格，然后进入定向实施"
   },
   "metrics": [
     {
       "label": "当前本地 main",
-      "value": "candidate · main@0fe3edb",
-      "tone": "ready"
+      "value": "main@4ebd041 · ahead origin 6",
+      "tone": "progress"
     },
     {
       "label": "首次远端 CI",
@@ -71,8 +71,13 @@
     },
     {
       "label": "阶段出口",
-      "value": "PASS · 0.3.0 封板",
-      "tone": "ready"
+      "value": "ACTIVE · 0.4.0 设计门",
+      "tone": "progress"
+    },
+    {
+      "label": "当前 Adapter 输出",
+      "value": "1 / 2 · Skill ready",
+      "tone": "progress"
     }
   ],
   "handoff": {
@@ -291,6 +296,12 @@
       "title": "Apache-2.0、最终 CI 与 0.3.0 封板",
       "detail": "Apache-2.0、版本、本地出口、main push 与 run 30626392947 的 4 / 4 远端矩阵全部完成；阶段 PASS。",
       "state": "done"
+    },
+    {
+      "id": "N7",
+      "title": "补齐 Skill / Compact Prompt 双 Adapter",
+      "detail": "设计已确认：一次 build 选择一种输出；Codex Skill 保持确定性构建并增加原生 Validator，Compact Prompt 从旧 Loopy 规则迁移，两条路径分别绑定 Evidence。",
+      "state": "active"
     }
   ],
   "work_lanes": {
@@ -298,8 +309,8 @@
       "label": "主线 · 用户能力",
       "items": [
         {
-          "title": "0.3.0 接口完整性修复",
-          "detail": "R-020 Direct Build provenance 与 R-021 常见 Existing Skill 包形已完成并封板；当前没有 active mainline。"
+          "title": "0.4.0 双 Adapter 用户路径",
+          "detail": "当前 active mainline：Adapter Router 支持 codex-skill / compact-prompt 二选一；补齐 Adapter 中立 Evidence、Codex 原生兼容门与两条真实 verify 路径。"
         }
       ]
     },
@@ -345,8 +356,8 @@
       "label": "Not now · 当前队列之外",
       "items": [
         {
-          "title": "0.3.0 边界外能力",
-          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Tag 不进入当前执行队列；Direct Build 已进入主线修复。"
+          "title": "0.4.0 边界外能力",
+          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Git Tag 不进入当前执行队列；Compact Prompt 已从演进方向移入 mainline。"
         }
       ]
     }
@@ -436,6 +447,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-31",
+      "title": "0.4.0 双 Adapter 混合方案获批",
+      "detail": "确认补齐 Compact Prompt Adapter；Codex Skill 继续确定性构建，复用 Skill Creator PRO 方法并增加当前 Codex 原生 Validator。复核 finding 必须修回 Adapter 后重建，不直接修改生成 Artifact。"
+    },
     {
       "date": "2026-07-31",
       "title": "双语 README 产品模型完成重构",
