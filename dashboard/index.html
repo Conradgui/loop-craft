@@ -137,7 +137,7 @@
       </section>
 
       <section class="section" aria-labelledby="baselines-title">
-        <div class="section-head"><h2 id="baselines-title">Version baselines</h2><small>local HEAD ≠ origin/main</small></div>
+        <div class="section-head"><h2 id="baselines-title">Version baselines</h2><small id="baselines-note">checking local / remote</small></div>
         <div class="baseline-grid" id="baselines"></div>
       </section>
 
@@ -176,7 +176,7 @@
       <div class="updated"><span class="pulse"></span>Live state · <span id="updated-side">—</span></div>
       <div class="side-block">
         <h2>What this means</h2>
-        <p>当前本地 HEAD 已保护 Core、三入口骨架、真实 Demo、行为验证和治理补强；origin/main 仍停在旧基线，尚未推送。From-scratch 已真实走通，另外两条入口仍缺真实调用证据。</p>
+        <p id="what-this-means">正在读取当前项目结论…</p>
       </div>
       <div class="side-block">
         <h2>Risks</h2>
@@ -220,11 +220,13 @@
       state("milestone-next").textContent = data.milestone.next;
       state("metrics").innerHTML = data.metrics.map(item => `<div class="metric"><div class="metric-label">${safe(item.label)}</div><div class="metric-value ${safe(item.tone)}">${safe(item.value)}</div></div>`).join("");
       state("baselines").innerHTML = data.baselines.map(item => `<article class="baseline-card ${safe(item.state)}"><div class="metric-label">${safe(item.title)}</div><div class="baseline-value">${safe(item.value)}</div><p>${safe(item.detail)}</p></article>`).join("");
+      state("baselines-note").textContent = data.baselines.every(item => item.state === "ready") ? "local = origin/main" : "local / remote transition";
+      state("what-this-means").textContent = data.overall.summary;
       state("issues").innerHTML = data.issues.map(item => `<div class="issue-row"><div><div class="issue-code ${safe(item.level)}">${safe(item.priority)} · ${safe(item.state)}</div><div class="issue-title">${safe(item.title)}</div></div><div class="issue-copy"><strong>Current fact</strong><span>${safe(item.fact)}</span></div><div class="issue-copy"><strong>Next action</strong><span>${safe(item.action)}</span></div><div class="issue-copy"><strong>Done when</strong><span>${safe(item.done_when)}</span></div></div>`).join("");
       state("lanes").innerHTML = Object.entries(data.work_lanes).map(([key, lane]) => `<div class="lane ${key}"><h3>${safe(lane.label)}</h3>${lane.items.map(item => `<div class="lane-item"><strong>${safe(item.title)}</strong><span>${safe(item.detail)}</span></div>`).join("")}</div>`).join("");
       const row = (item, stateText) => `<div class="row"><i class="row-mark ${safe(item.state)}"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.detail)}</div></div><span class="state ${safe(item.state)}">${safe(stateText || titleCase(item.state))}</span></div>`;
       state("delivered").innerHTML = data.delivered.map(item => row(item)).join("");
-      state("next-steps").innerHTML = data.next_steps.map(item => row(item, item.state === "active" ? "now" : "queued")).join("");
+      state("next-steps").innerHTML = data.next_steps.map(item => row(item, item.state === "active" ? "now" : item.state === "done" ? "done" : "queued")).join("");
       state("activity").innerHTML = data.activity.map(item => `<div class="row"><i class="row-mark ready"></i><div><div class="row-title">${safe(item.title)}</div><div class="row-detail">${safe(item.date)} · ${safe(item.detail)}</div></div></div>`).join("");
       state("handoff-label").textContent = data.handoff.label;
       state("handoff").innerHTML = data.handoff.records.map(item => `<div class="handoff-item"><strong>${safe(item.agent)}</strong><code>${safe(item.id)}</code><span>${safe(item.period)} · ${safe(item.role)}</span></div>`).join("");
