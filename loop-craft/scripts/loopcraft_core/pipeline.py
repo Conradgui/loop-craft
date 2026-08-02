@@ -26,6 +26,10 @@ from .canonical import sha256_digest
 from .compiler import compile_definition
 from .evidence.entry import load_entry_evidence, validate_entry_evidence
 from .evidence.package import package_evidence
+from .native_validation import (
+    run_native_validation,
+    validate_native_validation_receipt,
+)
 from .validation import validate_definition
 
 
@@ -72,6 +76,7 @@ def build_definition(
     package_manifest_path: Path | None = None,
     entry_evidence_path: Path | None = None,
     adapter_name: str = "codex-skill",
+    native_validator_path: Path | None = None,
 ) -> BuildResult:
     if adapter_name not in {"codex-skill", "compact-prompt"}:
         raise ValueError(f"unsupported adapter: {adapter_name}")
@@ -82,6 +87,10 @@ def build_definition(
     if adapter_name == "compact-prompt" and source_skill_dir is not None:
         raise ValueError(
             "compact-prompt does not support source Skill packaging"
+        )
+    if adapter_name == "compact-prompt" and native_validator_path is not None:
+        raise ValueError(
+            "native validator applies only to codex-skill"
         )
     definition = json.loads(definition_path.read_text(encoding="utf-8"))
     validate_definition(definition)
@@ -126,6 +135,12 @@ def build_definition(
                 compiled,
                 staging_root / "artifact",
             )
+        native_validation = None
+        if native_validator_path is not None:
+            native_validation = run_native_validation(
+                artifact.artifact_dir,
+                native_validator_path,
+            )
         evidence = package_evidence(
             definition=definition,
             compiled=compiled,
@@ -133,6 +148,7 @@ def build_definition(
             evidence_dir=staging_root / "evidence",
             source_manifest=source_manifest,
             entry_evidence=entry_evidence,
+            native_validation=native_validation,
         )
         _promote_staging_output(staging_root, output_root)
 
@@ -217,6 +233,10 @@ def verify_build(output_root: Path) -> dict[str, str]:
         "source_skill_digest",
     }
     entry_binding_fields = {"entry_evidence_digest", "entry_type"}
+    native_binding_fields = {
+        "native_validation_digest",
+        "native_validator_digest",
+    }
     binding_specs = (
         (
             "source package",
@@ -227,6 +247,11 @@ def verify_build(output_root: Path) -> dict[str, str]:
             "entry evidence",
             entry_binding_fields,
             "entry-evidence.json",
+        ),
+        (
+            "native validation",
+            native_binding_fields,
+            "native-validation.json",
         ),
     )
     expected_evidence_files = set(base_evidence_files)
@@ -244,6 +269,7 @@ def verify_build(output_root: Path) -> dict[str, str]:
         )
     bound_source = "source package" in bound_contracts
     bound_entry = "entry evidence" in bound_contracts
+    bound_native = "native validation" in bound_contracts
     if not isinstance(accepted_definition, dict) or not isinstance(
         execution_ir, dict
     ):
@@ -343,6 +369,28 @@ def verify_build(output_root: Path) -> dict[str, str]:
             raise ValueError("evidence entry evidence digest does not match")
         if entry_evidence["entry_type"] != manifest["entry_type"]:
             raise ValueError("evidence entry type does not match manifest")
+    if bound_native:
+        try:
+            native_validation = json.loads(
+                (evidence_root / "native-validation.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError(
+                "native validation receipt is invalid"
+            ) from exc
+        validate_native_validation_receipt(native_validation)
+        if sha256_digest(native_validation) != manifest[
+            "native_validation_digest"
+        ]:
+            raise ValueError(
+                "native validation receipt digest does not match"
+            )
+        if native_validation["validator_digest"] != manifest[
+            "native_validator_digest"
+        ]:
+            raise ValueError("native validator digest does not match")
     try:
         semantic_payload = {
             "schema_version": accepted_definition["schema_version"],

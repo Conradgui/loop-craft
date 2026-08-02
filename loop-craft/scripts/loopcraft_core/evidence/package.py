@@ -9,6 +9,7 @@ from ..adapters.codex_skill import directory_digest
 from ..adapters.source_skill import validate_source_manifest
 from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
+from ..native_validation import validate_native_validation_receipt
 from .entry import validate_entry_evidence
 
 
@@ -64,6 +65,7 @@ def package_evidence(
     evidence_dir: Path,
     source_manifest: dict[str, Any] | None = None,
     entry_evidence: dict[str, Any] | None = None,
+    native_validation: dict[str, Any] | None = None,
 ) -> EvidenceResult:
     _validate_inputs(
         definition=definition,
@@ -75,6 +77,12 @@ def package_evidence(
         validate_source_manifest(source_manifest)
     if entry_evidence is not None:
         validate_entry_evidence(entry_evidence, definition)
+    if native_validation is not None:
+        if artifact.adapter_name != "codex-skill":
+            raise ValueError(
+                "native validation receipt applies only to codex-skill"
+            )
+        validate_native_validation_receipt(native_validation)
     evidence_dir.mkdir(parents=True, exist_ok=False)
     validation_report = {
         "schema_validation": "passed",
@@ -115,6 +123,13 @@ def package_evidence(
     if entry_evidence is not None:
         manifest["entry_evidence_digest"] = sha256_digest(entry_evidence)
         manifest["entry_type"] = entry_evidence["entry_type"]
+    if native_validation is not None:
+        manifest["native_validation_digest"] = sha256_digest(
+            native_validation
+        )
+        manifest["native_validator_digest"] = native_validation[
+            "validator_digest"
+        ]
 
     _write_json(evidence_dir / "accepted-definition.json", definition)
     _write_json(
@@ -130,5 +145,10 @@ def package_evidence(
         )
     if entry_evidence is not None:
         _write_json(evidence_dir / "entry-evidence.json", entry_evidence)
+    if native_validation is not None:
+        _write_json(
+            evidence_dir / "native-validation.json",
+            native_validation,
+        )
     _write_json(evidence_dir / "build-manifest.json", manifest)
     return EvidenceResult(evidence_dir, manifest)

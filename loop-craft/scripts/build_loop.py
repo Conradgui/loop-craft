@@ -25,6 +25,7 @@ def parse_args() -> argparse.Namespace:
         choices=("codex-skill", "compact-prompt"),
         default="codex-skill",
     )
+    build.add_argument("--native-validator", type=Path)
 
     inventory = subcommands.add_parser("inventory")
     inventory.add_argument("source_skill_dir", type=Path)
@@ -52,6 +53,7 @@ def main() -> int:
             package_manifest_path=args.package_manifest,
             entry_evidence_path=args.entry_evidence,
             adapter_name=args.adapter,
+            native_validator_path=args.native_validator,
         )
         print(f"Artifact: {result.artifact_dir}")
         print(f"Evidence: {result.evidence_dir}")

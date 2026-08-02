@@ -44,6 +44,22 @@ def file_snapshot(root: Path) -> dict[str, bytes]:
     }
 
 
+def write_validator(path: Path, *, exit_code: int = 0) -> None:
+    path.write_text(
+        "\n".join(
+            [
+                "import sys",
+                "print('Skill is valid!' if "
+                f"{exit_code} == 0 else 'Skill is invalid!', "
+                f"file=sys.stdout if {exit_code} == 0 else sys.stderr)",
+                f"raise SystemExit({exit_code})",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_pipeline_builds_identical_outputs(tmp_path: Path) -> None:
     first = build_definition(FIXTURE, tmp_path / "first")
     second = build_definition(FIXTURE, tmp_path / "second")
@@ -100,6 +116,88 @@ def test_compact_prompt_rejects_source_skill_packaging(
         )
 
     assert not output.exists()
+
+
+def test_codex_skill_binds_native_validation_receipt(
+    tmp_path: Path,
+) -> None:
+    validator = tmp_path / "quick_validate.py"
+    write_validator(validator)
+    output = tmp_path / "native-validated"
+
+    result = build_definition(
+        FIXTURE,
+        output,
+        native_validator_path=validator,
+    )
+
+    receipt_path = output / "evidence" / "native-validation.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert result.manifest["native_validation_digest"].startswith("sha256:")
+    assert result.manifest["native_validator_digest"] == receipt[
+        "validator_digest"
+    ]
+    assert receipt["status"] == "passed"
+    assert verify_build(output)["status"] == "clean"
+
+
+def test_native_validator_failure_leaves_no_output(tmp_path: Path) -> None:
+    validator = tmp_path / "quick_validate.py"
+    write_validator(validator, exit_code=1)
+    output = tmp_path / "native-failed"
+
+    with pytest.raises(ValueError, match="Codex native validator failed"):
+        build_definition(
+            FIXTURE,
+            output,
+            native_validator_path=validator,
+        )
+
+    assert not output.exists()
+
+
+def test_compact_prompt_rejects_codex_native_validator(
+    tmp_path: Path,
+) -> None:
+    validator = tmp_path / "quick_validate.py"
+    write_validator(validator)
+    output = tmp_path / "prompt-native-validator"
+
+    with pytest.raises(
+        ValueError,
+        match="native validator applies only to codex-skill",
+    ):
+        build_definition(
+            FIXTURE,
+            output,
+            adapter_name="compact-prompt",
+            native_validator_path=validator,
+        )
+
+    assert not output.exists()
+
+
+def test_verify_rejects_tampered_native_validation_receipt(
+    tmp_path: Path,
+) -> None:
+    validator = tmp_path / "quick_validate.py"
+    write_validator(validator)
+    output = tmp_path / "tampered-native-receipt"
+    build_definition(
+        FIXTURE,
+        output,
+        native_validator_path=validator,
+    )
+    receipt_path = output / "evidence" / "native-validation.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["stdout_digest"] = "sha256:" + "0" * 64
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match="native validation receipt digest does not match",
+    ):
+        verify_build(output)
 
 
 def test_invalid_input_leaves_no_partial_output(tmp_path: Path) -> None:
