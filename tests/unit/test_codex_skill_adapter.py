@@ -84,6 +84,10 @@ def test_adapter_generates_only_a_clean_complete_target_skill(tmp_path: Path) ->
     result = render_codex_skill(compiled, tmp_path)
     execution = compiled.final_execution_ir
 
+    assert result.artifact_dir == result.skill_dir
+    assert result.adapter_name == "codex-skill"
+    assert result.adapter_version == "0.1.0"
+    assert result.profile_digest.startswith("sha256:")
     assert sorted(file_snapshot(result.skill_dir)) == [
         "SKILL.md",
         "agents/openai.yaml",

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass
 import json
 from pathlib import Path
 from typing import Any
 
-from ..canonical import canonical_json_bytes
+from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
+from .artifact import ArtifactResult
 from .source_skill import (
     directory_digest,
     file_bytes_digest,
@@ -30,13 +30,7 @@ SUPPORTED_CAPABILITIES = {
 CONFORMANCE = "self_contained"
 
 
-@dataclass(frozen=True)
-class SkillArtifact:
-    skill_dir: Path
-    artifact_digest: str
-    source_map: dict[str, list[str]]
-    compatibility_report: dict[str, Any]
-    conformance: str
+SkillArtifact = ArtifactResult
 
 
 def calculate_compatibility_report(
@@ -554,12 +548,17 @@ def _render_source_skill(
     execution_ir_path.parent.mkdir(parents=True, exist_ok=True)
     execution_ir_path.write_bytes(canonical_json_bytes(execution) + b"\n")
     return SkillArtifact(
-        skill_dir=skill_dir,
+        artifact_dir=skill_dir,
         artifact_digest=directory_digest(skill_dir),
         source_map=_source_adapter_map(
             compiled,
             source_manifest,
             generated_frontmatter=generated_frontmatter,
+        ),
+        adapter_name="codex-skill",
+        adapter_version="0.2.0",
+        profile_digest=sha256_digest(
+            {"platform": "codex", "profile_version": "0.1.0"}
         ),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
@@ -636,9 +635,14 @@ def render_codex_skill(
     )
 
     return SkillArtifact(
-        skill_dir=skill_dir,
+        artifact_dir=skill_dir,
         artifact_digest=directory_digest(skill_dir),
         source_map=_adapter_source_map(compiled),
+        adapter_name="codex-skill",
+        adapter_version="0.1.0",
+        profile_digest=sha256_digest(
+            {"platform": "codex", "profile_version": "0.1.0"}
+        ),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
     )

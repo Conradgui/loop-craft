@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from ..adapters.codex_skill import SkillArtifact, directory_digest
+from ..adapters.artifact import ArtifactResult
+from ..adapters.codex_skill import directory_digest
 from ..adapters.source_skill import validate_source_manifest
 from ..canonical import canonical_json_bytes, sha256_digest
 from ..compiler import CompileResult
@@ -25,7 +26,7 @@ def _validate_inputs(
     *,
     definition: dict[str, Any],
     compiled: CompileResult,
-    artifact: SkillArtifact,
+    artifact: ArtifactResult,
     evidence_dir: Path,
 ) -> None:
     execution_ir = compiled.final_execution_ir
@@ -68,7 +69,7 @@ def package_evidence(
     *,
     definition: dict[str, Any],
     compiled: CompileResult,
-    artifact: SkillArtifact,
+    artifact: ArtifactResult,
     evidence_dir: Path,
     source_manifest: dict[str, Any] | None = None,
     entry_evidence: dict[str, Any] | None = None,
