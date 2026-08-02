@@ -9,9 +9,9 @@
   "milestone": {
     "name": "M4 · v0.4.0 正式开源发布",
     "state": "active",
-    "progress": 40,
-    "progress_label": "发布设计 1 / 1；仓库合同 1 / 1；本地出口 0 / 1；PR / main CI 0 / 1；Release / 保护 0 / 1",
-    "next": "完成本地发布出口，走 ready PR 与双阶段远端 CI，再从已验证 commit 创建 v0.4.0 Release 并保护 main"
+    "progress": 60,
+    "progress_label": "发布设计 1 / 1；仓库合同 1 / 1；本地出口 1 / 1；PR / main CI 0 / 1；Release / 保护 0 / 1",
+    "next": "推送 ready PR 并等待 PR / main 双阶段远端 CI，再从已验证 commit 创建 v0.4.0 Release 并保护 main"
   },
   "metrics": [
     {
@@ -61,7 +61,7 @@
     },
     {
       "label": "0.4.0 本地候选验证",
-      "value": "190 passed · Skill / Prompt clean",
+      "value": "191 passed · Skill / Prompt clean",
       "tone": "ready"
     },
     {
@@ -86,7 +86,7 @@
     },
     {
       "label": "正式开源仓库合同",
-      "value": "LOCAL READY · remote pending",
+      "value": "LOCAL PASS · remote pending",
       "tone": "progress"
     }
   ],
@@ -332,7 +332,7 @@
     {
       "id": "N9",
       "title": "v0.4.0 正式开源发布",
-      "detail": "本地仓库合同已补齐；下一步是完整本地出口、ready PR、PR/main 双阶段 CI、可校验 Release 资产、Private Vulnerability Reporting 与 main 保护。",
+      "detail": "本地仓库合同、191 tests、Validator、链接与真实双产物均通过；下一步是 ready PR、PR/main 双阶段 CI、可校验 Release 资产、Private Vulnerability Reporting 与 main 保护。",
       "state": "active"
     }
   ],
@@ -507,6 +507,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-01",
+      "title": "v0.4.0 正式发布本地出口通过",
+      "detail": "191 tests、compileall、Schema、54 份 Markdown、当前 Codex Validator 与真实 Skill/Prompt 双构建通过；Skill Creator PRO quality lint 的单条启发式提醒经复核为必要护栏。"
+    },
     {
       "date": "2026-08-01",
       "title": "v0.4.0 正式开源发布合同本地就绪",
