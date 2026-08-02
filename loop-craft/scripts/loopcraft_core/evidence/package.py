@@ -44,16 +44,7 @@ def _validate_inputs(
             "evidence directory must be physically separate from artifact"
         )
 
-    execution_ir_path = (
-        artifact.skill_dir / "references" / "final-execution-ir.json"
-    )
-    try:
-        artifact_execution_ir = execution_ir_path.read_bytes()
-    except OSError as exc:
-        raise ValueError(
-            "artifact execution IR reference is unavailable"
-        ) from exc
-    if artifact_execution_ir != canonical_json_bytes(execution_ir) + b"\n":
+    if artifact.execution_ir_digest != sha256_digest(execution_ir):
         raise ValueError(
             "artifact execution IR does not match compiled execution IR"
         )
@@ -107,11 +98,9 @@ def package_evidence(
         "override_mode": "none",
         "override_digest": None,
         "compiler_version": compiled.final_execution_ir["compiler_version"],
-        "adapter": "codex-skill",
-        "adapter_version": "0.2.0" if source_manifest is not None else "0.1.0",
-        "profile_digest": sha256_digest(
-            {"platform": "codex", "profile_version": "0.1.0"}
-        ),
+        "adapter": artifact.adapter_name,
+        "adapter_version": artifact.adapter_version,
+        "profile_digest": artifact.profile_digest,
         "compatibility_report": artifact.compatibility_report,
         "conformance": artifact.conformance,
         "artifact_digest": artifact.artifact_digest,

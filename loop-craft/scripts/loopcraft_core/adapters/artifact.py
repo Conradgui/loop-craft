@@ -13,6 +13,7 @@ class ArtifactResult:
     adapter_name: str
     adapter_version: str
     profile_digest: str
+    execution_ir_digest: str
     compatibility_report: dict[str, Any]
     conformance: str
 

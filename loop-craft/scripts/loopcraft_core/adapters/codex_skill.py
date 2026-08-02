@@ -560,6 +560,7 @@ def _render_source_skill(
         profile_digest=sha256_digest(
             {"platform": "codex", "profile_version": "0.1.0"}
         ),
+        execution_ir_digest=sha256_digest(compiled.final_execution_ir),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
     )
@@ -643,6 +644,7 @@ def render_codex_skill(
         profile_digest=sha256_digest(
             {"platform": "codex", "profile_version": "0.1.0"}
         ),
+        execution_ir_digest=sha256_digest(compiled.final_execution_ir),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
     )

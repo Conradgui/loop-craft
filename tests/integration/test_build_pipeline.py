@@ -54,6 +54,54 @@ def test_pipeline_builds_identical_outputs(tmp_path: Path) -> None:
     assert first.evidence_dir.name == "evidence"
 
 
+def test_pipeline_selects_compact_prompt_without_changing_default(
+    tmp_path: Path,
+) -> None:
+    default = build_definition(FIXTURE, tmp_path / "default")
+    prompt = build_definition(
+        FIXTURE,
+        tmp_path / "prompt",
+        adapter_name="compact-prompt",
+    )
+
+    assert (default.artifact_dir / "SKILL.md").is_file()
+    assert not (default.artifact_dir / "PROMPT.md").exists()
+    assert (prompt.artifact_dir / "PROMPT.md").is_file()
+    assert not (prompt.artifact_dir / "SKILL.md").exists()
+    assert prompt.manifest["adapter"] == "compact-prompt"
+
+
+def test_pipeline_rejects_unknown_adapter_before_creating_output(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "unknown-adapter"
+
+    with pytest.raises(ValueError, match="unsupported adapter: unknown"):
+        build_definition(FIXTURE, output, adapter_name="unknown")
+
+    assert not output.exists()
+
+
+def test_compact_prompt_rejects_source_skill_packaging(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "prompt-source-package"
+
+    with pytest.raises(
+        ValueError,
+        match="compact-prompt does not support source Skill packaging",
+    ):
+        build_definition(
+            FIXTURE,
+            output,
+            adapter_name="compact-prompt",
+            source_skill_dir=tmp_path / "source",
+            package_manifest_path=tmp_path / "manifest.json",
+        )
+
+    assert not output.exists()
+
+
 def test_invalid_input_leaves_no_partial_output(tmp_path: Path) -> None:
     invalid = tmp_path / "invalid.json"
     invalid.write_text(
@@ -150,6 +198,23 @@ def test_cli_build_returns_zero_and_prints_output_paths(
     assert "Evidence:" in result.stdout
     assert len(list((output / "artifact").iterdir())) == 1
     assert (output / "evidence" / "build-manifest.json").is_file()
+
+
+def test_cli_build_selects_compact_prompt(tmp_path: Path) -> None:
+    output = tmp_path / "cli-prompt"
+
+    result = run_cli(
+        "build",
+        FIXTURE,
+        output,
+        "--adapter",
+        "compact-prompt",
+    )
+
+    assert result.returncode == 0, result.stderr
+    artifact_dir = next((output / "artifact").iterdir())
+    assert (artifact_dir / "PROMPT.md").is_file()
+    assert not (artifact_dir / "SKILL.md").exists()
 
 
 def test_cli_verify_clean_returns_zero_and_json(

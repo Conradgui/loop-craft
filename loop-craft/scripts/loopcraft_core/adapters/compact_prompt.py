@@ -186,6 +186,7 @@ def render_compact_prompt(
         profile_digest=sha256_digest(
             {"platform": "presentation", "profile_version": "0.1.0"}
         ),
+        execution_ir_digest=sha256_digest(execution),
         compatibility_report=compatibility_report,
         conformance=CONFORMANCE,
     )

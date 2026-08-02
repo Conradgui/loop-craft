@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from loopcraft_core.adapters.compact_prompt import render_compact_prompt
+from loopcraft_core.canonical import sha256_digest
 from loopcraft_core.compiler import CompileResult, compile_definition
 
 
@@ -35,11 +36,12 @@ def reverse_mapping_order(value: Any) -> Any:
     return value
 
 
-def assert_common_contract(result: Any) -> str:
+def assert_common_contract(result: Any, execution: dict[str, Any]) -> str:
     assert file_snapshot(result.artifact_dir).keys() == {"PROMPT.md"}
     assert result.adapter_name == "compact-prompt"
     assert result.adapter_version == "0.1.0"
     assert result.profile_digest.startswith("sha256:")
+    assert result.execution_ir_digest == sha256_digest(execution)
     assert result.conformance == "runtime_delegated"
     assert result.compatibility_report["overall"] == "emulated"
     assert result.source_map["PROMPT.md#prompt"]
@@ -54,8 +56,8 @@ def test_renders_one_loop_without_dropping_behavior_boundaries(
     )
 
     result = render_compact_prompt(compiled, tmp_path)
-    text = assert_common_contract(result)
     execution = compiled.final_execution_ir
+    text = assert_common_contract(result, execution)
 
     expected = [
         execution["purpose"]["outcome"],
@@ -86,8 +88,9 @@ def test_renders_zero_loop_workflow_without_inventing_a_loop(
     )
 
     result = render_compact_prompt(compiled, tmp_path)
-    text = assert_common_contract(result)
-    workflow = compiled.final_execution_ir["workflow"]
+    execution = compiled.final_execution_ir
+    text = assert_common_contract(result, execution)
+    workflow = execution["workflow"]
 
     for value in (
         *workflow["steps"],

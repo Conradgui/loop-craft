@@ -11,6 +11,7 @@ from loopcraft_core.adapters.codex_skill import (
     render_codex_skill,
 )
 from loopcraft_core.canonical import canonical_json_bytes
+from loopcraft_core.canonical import sha256_digest
 from loopcraft_core.compiler import compile_definition
 
 
@@ -88,6 +89,7 @@ def test_adapter_generates_only_a_clean_complete_target_skill(tmp_path: Path) ->
     assert result.adapter_name == "codex-skill"
     assert result.adapter_version == "0.1.0"
     assert result.profile_digest.startswith("sha256:")
+    assert result.execution_ir_digest == sha256_digest(execution)
     assert sorted(file_snapshot(result.skill_dir)) == [
         "SKILL.md",
         "agents/openai.yaml",

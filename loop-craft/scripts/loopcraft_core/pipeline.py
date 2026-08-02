@@ -12,6 +12,7 @@ from .adapters.codex_skill import (
     render_codex_skill,
     validate_compatibility_contract,
 )
+from .adapters.compact_prompt import render_compact_prompt
 from .adapters.source_skill import (
     is_link_or_junction,
     load_reviewed_manifest,
@@ -52,10 +53,17 @@ def build_definition(
     source_skill_dir: Path | None = None,
     package_manifest_path: Path | None = None,
     entry_evidence_path: Path | None = None,
+    adapter_name: str = "codex-skill",
 ) -> BuildResult:
+    if adapter_name not in {"codex-skill", "compact-prompt"}:
+        raise ValueError(f"unsupported adapter: {adapter_name}")
     if (source_skill_dir is None) != (package_manifest_path is None):
         raise ValueError(
             "source Skill and package manifest must be provided together"
+        )
+    if adapter_name == "compact-prompt" and source_skill_dir is not None:
+        raise ValueError(
+            "compact-prompt does not support source Skill packaging"
         )
     definition = json.loads(definition_path.read_text(encoding="utf-8"))
     validate_definition(definition)
@@ -88,12 +96,18 @@ def build_definition(
         prefix=f".{output_root.name}.",
     ) as temporary:
         staging_root = Path(temporary) / "output"
-        artifact = render_codex_skill(
-            compiled,
-            staging_root / "artifact",
-            source_skill_dir=source_skill_dir,
-            source_manifest=source_manifest,
-        )
+        if adapter_name == "codex-skill":
+            artifact = render_codex_skill(
+                compiled,
+                staging_root / "artifact",
+                source_skill_dir=source_skill_dir,
+                source_manifest=source_manifest,
+            )
+        else:
+            artifact = render_compact_prompt(
+                compiled,
+                staging_root / "artifact",
+            )
         evidence = package_evidence(
             definition=definition,
             compiled=compiled,
@@ -106,7 +120,7 @@ def build_definition(
 
     return BuildResult(
         output_root,
-        output_root / "artifact" / artifact.skill_dir.name,
+        output_root / "artifact" / artifact.artifact_dir.name,
         output_root / "evidence",
         evidence.manifest,
     )
