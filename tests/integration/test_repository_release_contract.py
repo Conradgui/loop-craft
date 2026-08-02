@@ -55,3 +55,20 @@ def test_repository_is_ready_for_a_reproducible_public_release() -> None:
     )
     for section in ("User impact", "Scope", "Validation", "Not run", "Boundaries"):
         assert section in pull_request
+
+    stable_skill = "https://github.com/Conradgui/loop-craft/tree/v0.4.0/loop-craft"
+    for readme_name in ("README.md", "README.zh.md"):
+        readme = (ROOT / readme_name).read_text(encoding="utf-8")
+        assert stable_skill in readme
+        for community_path in (
+            "SECURITY.md",
+            "CONTRIBUTING.md",
+            "CODE_OF_CONDUCT.md",
+            "https://github.com/Conradgui/loop-craft/issues",
+            "https://github.com/Conradgui/loop-craft/pulls",
+        ):
+            assert community_path in readme
+
+    contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "SECURITY.md" in contributing
+    assert "Do not open a public Issue" in contributing

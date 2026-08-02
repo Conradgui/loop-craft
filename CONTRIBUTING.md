@@ -127,3 +127,13 @@ the official Skill validator, link checking, a real build/verify, and a drift ne
 on Linux and Windows across Python 3.12 and 3.13.
 
 CI does not cover behavioral evaluation. If you touched prose, say so and attach results.
+
+## Security reports
+
+Do not open a public Issue for a suspected vulnerability, authority-boundary bypass, sensitive
+Evidence leak or approval/stop-condition bypass. Follow [SECURITY.md](SECURITY.md) and use the
+private GitHub reporting form. Public Bug reports must use synthetic or redacted inputs and must
+not contain credentials, personal data, raw private conversations or unrelated local paths.
+
+Participation in Issues and Pull Requests is also governed by the
+[Code of Conduct](CODE_OF_CONDUCT.md).

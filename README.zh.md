@@ -16,7 +16,8 @@
 > “有 Loop”强行制造循环。
 
 [English](README.md) · [架构设计](docs/DESIGN.md) ·
-[评估证据](docs/REAL_WORLD_EVALUATION.md) · [参与开发](CONTRIBUTING.md)
+[评估证据](docs/REAL_WORLD_EVALUATION.md) · [参与开发](CONTRIBUTING.md) ·
+[安全策略](SECURITY.md)
 
 ---
 
@@ -94,7 +95,7 @@ flowchart TB
 
 ```text
 使用 $skill-installer 安装这个地址中的 Skill：
-https://github.com/Conradgui/loop-craft/tree/main/loop-craft
+https://github.com/Conradgui/loop-craft/tree/v0.4.0/loop-craft
 ```
 
 安装后开启一个新的 Codex 对话，让新 Skill 被重新发现。
@@ -265,6 +266,13 @@ Loop Craft 选择性地本地化了 Loopy、Workflow Skill Creator、Skill Polis
 
 每个来源的固定 revision、采纳机制、排除内容和所有权边界记录在
 [资源登记](docs/references/resource-registry.yaml)，摘要见 [NOTICE](NOTICE.md)。
+
+## 社区参与
+
+可复现缺陷请提交到 [Issues](https://github.com/Conradgui/loop-craft/issues)，代码与文档改动请走
+[Pull Requests](https://github.com/Conradgui/loop-craft/pulls)。参与前请阅读[贡献指南](CONTRIBUTING.md)
+和[行为准则](CODE_OF_CONDUCT.md)。疑似漏洞或权限边界绕过必须使用[安全策略](SECURITY.md)中的
+私密入口，不要公开到 Issue。
 
 ## 许可证
 
