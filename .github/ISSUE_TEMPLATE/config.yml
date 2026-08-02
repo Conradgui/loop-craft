@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/Conradgui/loop-craft/security/advisories/new
+    about: Report vulnerabilities and authority-boundary bypasses without exposing sensitive material.
+  - name: Usage and product boundaries
+    url: https://github.com/Conradgui/loop-craft#readme
+    about: Check installation, routes, current capabilities and explicit limitations first.

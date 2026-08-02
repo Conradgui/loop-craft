@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible Loop Craft defect without exposing private source material.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Loop Craft. For suspected security issues, stop here and use the private reporting link shown in the template chooser.
+  - type: dropdown
+    id: version
+    attributes:
+      label: Loop Craft version
+      options:
+        - v0.4.0
+        - main
+        - Other commit or version
+    validations:
+      required: true
+  - type: dropdown
+    id: route
+    attributes:
+      label: Entry route
+      options:
+        - From scratch
+        - Existing Skill
+        - Conversation
+        - Direct Build
+        - Verify
+    validations:
+      required: true
+  - type: dropdown
+    id: adapter
+    attributes:
+      label: Selected Adapter
+      options:
+        - codex-skill
+        - compact-prompt
+        - Not reached or not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic inputs and include the exact command or Agent request.
+      placeholder: Describe the smallest sequence that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Python version and Agent surface.
+    validations:
+      required: true
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Evidence redaction
+      options:
+        - label: I removed secrets, personal data, raw private conversations, absolute local paths and unrelated Evidence.
+          required: true
+        - label: This is not a security vulnerability or an authority-boundary bypass.
+          required: true
