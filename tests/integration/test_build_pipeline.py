@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from loopcraft_core.pipeline import build_definition
+from loopcraft_core.pipeline import build_definition, verify_build
 
 
 FIXTURE = (
@@ -133,6 +133,29 @@ def test_adapter_failure_cleans_staging_output(
     assert not output.exists()
 
 
+def test_pipeline_retries_transient_permission_error_when_promoting_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_replace = Path.replace
+    promotion_attempts = 0
+
+    def fail_first_promotion(path: Path, target: Path) -> Path:
+        nonlocal promotion_attempts
+        if path.name == "output":
+            promotion_attempts += 1
+            if promotion_attempts == 1:
+                raise PermissionError("transient filesystem lock")
+        return original_replace(path, target)
+
+    monkeypatch.setattr(Path, "replace", fail_first_promotion)
+
+    result = build_definition(FIXTURE, tmp_path / "retried-build")
+
+    assert promotion_attempts == 2
+    assert result.artifact_dir.is_dir()
+
+
 @pytest.mark.parametrize("fail_at_write", [2, 3, 4, 5])
 def test_evidence_failure_cleans_partial_staging_output(
     tmp_path: Path,
@@ -215,6 +238,39 @@ def test_cli_build_selects_compact_prompt(tmp_path: Path) -> None:
     artifact_dir = next((output / "artifact").iterdir())
     assert (artifact_dir / "PROMPT.md").is_file()
     assert not (artifact_dir / "SKILL.md").exists()
+
+
+def test_compact_prompt_verify_reports_clean_and_drift(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "prompt-verify"
+    result = build_definition(
+        FIXTURE,
+        output,
+        adapter_name="compact-prompt",
+    )
+
+    assert result.manifest["adapter"] == "compact-prompt"
+    assert result.manifest["adapter_version"] == "0.1.0"
+    assert result.manifest["conformance"] == "runtime_delegated"
+    assert verify_build(output)["status"] == "clean"
+
+    prompt_file = result.artifact_dir / "PROMPT.md"
+    prompt_file.write_bytes(prompt_file.read_bytes() + b"drift\n")
+
+    assert verify_build(output)["status"] == "drifted"
+
+
+def test_verify_rejects_unknown_manifest_adapter(tmp_path: Path) -> None:
+    output = tmp_path / "unknown-manifest-adapter"
+    build_definition(FIXTURE, output)
+    manifest_path = output / "evidence" / "build-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["adapter"] = "unknown"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="unsupported evidence adapter"):
+        verify_build(output)
 
 
 def test_cli_verify_clean_returns_zero_and_json(

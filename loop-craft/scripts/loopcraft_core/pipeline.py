@@ -5,14 +5,18 @@ import json
 from pathlib import Path
 import re
 import tempfile
+import time
 from typing import Any
 
 from .adapters.codex_skill import (
     directory_digest,
     render_codex_skill,
-    validate_compatibility_contract,
+    validate_compatibility_contract as validate_codex_compatibility_contract,
 )
-from .adapters.compact_prompt import render_compact_prompt
+from .adapters.compact_prompt import (
+    render_compact_prompt,
+    validate_compatibility_contract as validate_prompt_compatibility_contract,
+)
 from .adapters.source_skill import (
     is_link_or_junction,
     load_reviewed_manifest,
@@ -34,6 +38,20 @@ class BuildResult:
     artifact_dir: Path
     evidence_dir: Path
     manifest: dict[str, Any]
+
+
+def _promote_staging_output(
+    staging_root: Path,
+    output_root: Path,
+) -> None:
+    for attempt in range(4):
+        try:
+            staging_root.replace(output_root)
+            return
+        except PermissionError:
+            if attempt == 3:
+                raise
+            time.sleep(0.05 * (attempt + 1))
 
 
 def _ensure_source_output_separate(
@@ -116,7 +134,7 @@ def build_definition(
             source_manifest=source_manifest,
             entry_evidence=entry_evidence,
         )
-        staging_root.replace(output_root)
+        _promote_staging_output(staging_root, output_root)
 
     return BuildResult(
         output_root,
@@ -180,6 +198,18 @@ def verify_build(output_root: Path) -> dict[str, str]:
 
     if not isinstance(manifest, dict):
         raise ValueError("evidence manifest must be an object")
+    adapter_name = manifest.get("adapter")
+    if adapter_name not in {"codex-skill", "compact-prompt"}:
+        raise ValueError(f"unsupported evidence adapter: {adapter_name}")
+    adapter_version = manifest.get("adapter_version")
+    if not isinstance(adapter_version, str) or not adapter_version:
+        raise ValueError("evidence adapter version is invalid")
+    profile_digest = manifest.get("profile_digest")
+    if (
+        not isinstance(profile_digest, str)
+        or DIGEST_CONTRACT.fullmatch(profile_digest) is None
+    ):
+        raise ValueError("evidence profile digest contract is invalid")
     if "compatibility_report" not in manifest or "conformance" not in manifest:
         raise ValueError("evidence manifest is missing adapter contracts")
     source_binding_fields = {
@@ -341,11 +371,18 @@ def verify_build(output_root: Path) -> dict[str, str]:
         raise ValueError(
             "evidence execution IR definition does not match manifest"
         )
-    validate_compatibility_contract(
-        execution_ir,
-        manifest["compatibility_report"],
-        manifest["conformance"],
-    )
+    if adapter_name == "codex-skill":
+        validate_codex_compatibility_contract(
+            execution_ir,
+            manifest["compatibility_report"],
+            manifest["conformance"],
+        )
+    else:
+        validate_prompt_compatibility_contract(
+            execution_ir,
+            manifest["compatibility_report"],
+            manifest["conformance"],
+        )
 
     artifact_root = output_root / "artifact"
     if is_link_or_junction(artifact_root):
