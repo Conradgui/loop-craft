@@ -10,6 +10,7 @@ def test_repository_is_ready_for_a_reproducible_public_release() -> None:
 
     assert "permissions:\n  contents: read" in workflow
     assert "workflow_dispatch:" in workflow
+    assert "push:\n    branches: [main]" in workflow
     assert (
         "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1"
         in workflow

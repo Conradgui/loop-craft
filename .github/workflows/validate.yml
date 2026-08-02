@@ -2,6 +2,7 @@ name: Validate Loop Craft
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
