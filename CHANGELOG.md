@@ -18,6 +18,8 @@ Dual-output Adapter release.
   normalized result digests.
 - Adapter-neutral Artifact contracts and adapter-aware read-only verification for both Skill
   and Prompt drift.
+- A stable `v0.4.0/loop-craft` installation path plus Security, Code of Conduct, structured
+  Issue Forms and a Pull Request contract for public collaboration.
 
 ### Changed
 
@@ -28,14 +30,16 @@ Dual-output Adapter release.
 - Final staging promotion has a bounded retry for the observed transient Windows
   `PermissionError`; persistent permission failures still stop the build.
 - Version metadata is unified at `0.4.0`.
+- GitHub Actions and the Skill Creator PRO validator source are pinned to immutable revisions;
+  the workflow can also be invoked manually as a release gate.
 
 ### Boundaries
 
 - Compact Prompt preserves the approved behavior, authority, verification, stopping and
   invariant content, but it does not supply tools, state, scheduling, or independent audit.
 - Source-preserving Existing Skill upgrades remain Codex Skill builds. Runtime, multi-Loop,
-  Override, Subloop, publishing, scheduling, installation automation, Release and Git tags
-  remain outside this version.
+  Override, Subloop, publishing, scheduling and installation automation remain outside this
+  version.
 
 ## 0.3.0 - 2026-07-31
 

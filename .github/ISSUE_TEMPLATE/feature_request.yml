@@ -1,0 +1,50 @@
+name: Feature request
+description: Propose a bounded user capability, not infrastructure without a user path.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: user_problem
+    attributes:
+      label: User problem and value
+      description: What can a user not complete today, and who encounters the problem?
+    validations:
+      required: true
+  - type: textarea
+    id: current_alternative
+    attributes:
+      label: Current alternative
+      description: How is the task handled today, and why is that insufficient?
+    validations:
+      required: true
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Product boundary
+      options:
+        - Existing 0/1-Loop and Adapter behavior
+        - New entry or packaging behavior
+        - Runtime, multi-Loop, publishing or another currently unsupported area
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed outcome
+      description: Describe observable user behavior, not a preferred internal implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and examples
+      description: Provide sanitized examples, repeated failure patterns or prior attempts.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: I checked the README boundaries and existing Issues before proposing this capability.
+          required: true
+        - label: I removed private conversations, credentials, personal data and unrelated Evidence.
+          required: true

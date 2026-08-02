@@ -1,23 +1,23 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-08-01T22:53:49-07:00",
+  "updated_at": "2026-08-01T23:33:59-07:00",
   "overall": {
-    "label": "PASS · 0.4.0 双输出闭环",
-    "tone": "ready",
-    "summary": "三个入口汇合到同一 Compiler 与 Final Execution IR；一次 build 可选择确定性 Codex Skill 或语义完整、runtime-delegated 的 Compact Prompt，并为所选 Artifact 生成独立 Evidence。Codex Skill 可绑定当前官方 Validator 的摘要收据。本地双产物 clean，main 与 GitHub 元数据已同步，run 30734873022 的 Ubuntu / Windows × Python 3.12 / 3.13 四项全部成功。Runtime 是独立执行产品，不是本轮缺失尾项。"
+    "label": "RELEASE CANDIDATE · v0.4.0 正式开源发布",
+    "tone": "progress",
+    "summary": "0.4.0 产品能力保持 PASS：三入口、Skill / Compact Prompt 双 Adapter、Evidence 与 verify 均已闭合。正式开源发布合同已在隔离分支补齐：稳定版本安装路径、不可变 CI 依赖、Security、Code of Conduct、Issue Forms 与 PR 模板已本地可用；PR CI、main CI、v0.4.0 Release、私密漏洞报告和 main 保护仍待远端真实裁决。"
   },
   "milestone": {
-    "name": "M3 · 0.4.0 Skill / Prompt 双 Adapter",
-    "state": "complete",
-    "progress": 100,
-    "progress_label": "设计 1 / 1；实现 1 / 1；本地双产物 1 / 1；文档与看板 1 / 1；远端 CI 1 / 1",
-    "next": "0.4.0 已封板；后续新能力按独立产品决策重新进入 mainline，不把 Runtime 等边界外方向视为当前欠账"
+    "name": "M4 · v0.4.0 正式开源发布",
+    "state": "active",
+    "progress": 60,
+    "progress_label": "发布设计 1 / 1；仓库合同 1 / 1；本地出口 1 / 1；PR / main CI 0 / 1；Release / 保护 0 / 1",
+    "next": "推送 ready PR 并等待 PR / main 双阶段远端 CI，再从已验证 commit 创建 v0.4.0 Release 并保护 main"
   },
   "metrics": [
     {
       "label": "当前本地版本",
-      "value": "main · 0.4.0",
-      "tone": "ready"
+      "value": "codex/oss-release-readiness · 0.4.0",
+      "tone": "progress"
     },
     {
       "label": "首次远端 CI",
@@ -61,7 +61,7 @@
     },
     {
       "label": "0.4.0 本地候选验证",
-      "value": "190 passed · Skill / Prompt clean",
+      "value": "191 passed · Skill / Prompt clean",
       "tone": "ready"
     },
     {
@@ -71,8 +71,8 @@
     },
     {
       "label": "阶段出口",
-      "value": "PASS · local + remote",
-      "tone": "ready"
+      "value": "PRODUCT PASS · RELEASE PENDING",
+      "tone": "progress"
     },
     {
       "label": "当前 Adapter 输出",
@@ -83,6 +83,11 @@
       "label": "Codex 原生兼容收据",
       "value": "Skill is valid! · digest-bound",
       "tone": "ready"
+    },
+    {
+      "label": "正式开源仓库合同",
+      "value": "LOCAL PASS · remote pending",
+      "tone": "progress"
     }
   ],
   "handoff": {
@@ -118,9 +123,9 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "main · 0.4.0 closure",
-      "state": "ready",
-      "detail": "双 Adapter、Evidence 绑定、原生 Validator 收据、双语 README、版本事实与远端裁决已进入 main；本地合并后 190 tests 通过。"
+      "value": "codex/oss-release-readiness · local candidate",
+      "state": "progress",
+      "detail": "产品 0.4.0 基线之上已补齐不可变 CI、稳定安装和公开协作合同；尚未推送或改变远端 Release 状态。"
     },
     {
       "kind": "remote",
@@ -323,6 +328,12 @@
       "title": "0.4.0 远端封板",
       "detail": "main 与 GitHub description/topics 已同步；run 30734873022 的 Ubuntu / Windows × Python 3.12 / 3.13 四项全部成功。未创建 Release 或 Git Tag。",
       "state": "done"
+    },
+    {
+      "id": "N9",
+      "title": "v0.4.0 正式开源发布",
+      "detail": "本地仓库合同、191 tests、Validator、链接与真实双产物均通过；下一步是 ready PR、PR/main 双阶段 CI、可校验 Release 资产、Private Vulnerability Reporting 与 main 保护。",
+      "state": "active"
     }
   ],
   "work_lanes": {
@@ -332,12 +343,20 @@
         {
           "title": "0.4.0 双 Adapter 用户路径",
           "detail": "本地主线已交付：Adapter Router 支持 codex-skill / compact-prompt 二选一；Adapter 中立 Evidence、Codex 原生兼容门与两条真实 verify 路径均已接通。"
+        },
+        {
+          "title": "v0.4.0 稳定开源分发",
+          "detail": "当前 active mainline：让用户从不可变 Tag 安装，并让 Artifact、SHA-256、CI 与仓库权限形成可复核发布链。"
         }
       ]
     },
     "validation": {
       "label": "验证 · 绑定具体风险",
       "items": [
+        {
+          "title": "正式发布双阶段 CI",
+          "detail": "等待本地出口后执行 PR 矩阵与合并 commit 的 main 矩阵；任一失败都停止 Tag 与 Release。"
+        },
         {
           "title": "0.4.0 最终远端 CI",
           "detail": "run 30734873022 已 4 / 4 通过；0.4.0 的本地与远端出口均闭合。"
@@ -374,6 +393,10 @@
         {
           "title": "治理记录一致性",
           "detail": "R-020/R-021/R-024/R-025、版本、许可证、安装、产品审计与最终 CI 均已同步。"
+        },
+        {
+          "title": "开源协作与安全入口",
+          "detail": "Security、Code of Conduct、Bug/Feature Issue Forms、PR 模板、稳定安装路径与不可变 CI revision 已在本地候选形成。"
         }
       ]
     },
@@ -382,7 +405,7 @@
       "items": [
         {
           "title": "0.4.0 边界外能力",
-          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Git Tag 不进入当前执行队列；它们不是当前双 Adapter 用户路径的未接接口。"
+          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、运行时发布与调度不进入当前执行队列；v0.4.0 GitHub Release 与 Git Tag 已转入正式开源发布主线。"
         }
       ]
     }
@@ -393,13 +416,13 @@
     "Subloop",
     "Library Edition",
     "多 Loop 构建",
-    "发布与调度"
+    "运行时发布与调度"
   ],
   "risks": [
     {
       "level": "medium",
-      "title": "GitHub Actions action 版本存在弃用提示",
-      "detail": "checkout@v4 与 setup-python@v5 在当前托管运行器上被提示仍以 Node 20 为目标；GitHub 强制使用 Node 24 后本次 4 / 4 成功，因此登记为非阻塞维护项。"
+      "title": "正式发布仍依赖远端不可逆门槛",
+      "detail": "本地合同完成不等于 Release 已存在；PR/main CI、Tag、资产摘要、私密漏洞报告与 main 保护必须逐项回读成功，任一失败都保持 RELEASE CANDIDATE。"
     },
     {
       "level": "medium",
@@ -459,6 +482,10 @@
     {
       "state": "ready",
       "title": "0.4.0 main 集成、GitHub 元数据与远端 CI"
+    },
+    {
+      "state": "progress",
+      "title": "v0.4.0 正式开源 Release、资产摘要与 main 保护"
     }
   ],
   "known_limits": [
@@ -480,6 +507,16 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-01",
+      "title": "v0.4.0 正式发布本地出口通过",
+      "detail": "191 tests、compileall、Schema、54 份 Markdown、当前 Codex Validator 与真实 Skill/Prompt 双构建通过；Skill Creator PRO quality lint 的单条启发式提醒经复核为必要护栏。"
+    },
+    {
+      "date": "2026-08-01",
+      "title": "v0.4.0 正式开源发布合同本地就绪",
+      "detail": "已固定 checkout@v7.0.1、setup-python@v7.0.0 与 Skill Creator PRO revision；稳定 Tag 安装路径、Security、Code of Conduct、Issue Forms 和 PR 模板已通过本地合同检查。外部发布事实继续 pending。"
+    },
     {
       "date": "2026-08-01",
       "title": "PASS · 0.4.0 双输出封板",

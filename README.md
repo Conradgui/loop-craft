@@ -17,7 +17,8 @@
 > Workflow instead of manufacturing a fake Loop.
 
 [中文版](README.zh.md) · [Design](docs/DESIGN.md) ·
-[Evaluation](docs/REAL_WORLD_EVALUATION.md) · [Contributing](CONTRIBUTING.md)
+[Evaluation](docs/REAL_WORLD_EVALUATION.md) · [Contributing](CONTRIBUTING.md) ·
+[Security](SECURITY.md)
 
 ---
 
@@ -97,7 +98,7 @@ Ask Codex to use its Skill Installer:
 
 ```text
 Use $skill-installer to install the skill at
-https://github.com/Conradgui/loop-craft/tree/main/loop-craft
+https://github.com/Conradgui/loop-craft/tree/v0.4.0/loop-craft
 ```
 
 Start a new Codex turn after installation so the Skill can be discovered.
@@ -291,6 +292,14 @@ runtime dependencies, endorsements, or vendored copies.
 The exact source revisions, adopted mechanisms, exclusions, and ownership boundaries are
 recorded in the [resource registry](docs/references/resource-registry.yaml) and summarized in
 [NOTICE](NOTICE.md).
+
+## Community
+
+Report reproducible defects through [Issues](https://github.com/Conradgui/loop-craft/issues)
+and propose changes through [Pull Requests](https://github.com/Conradgui/loop-craft/pulls).
+Read [Contributing](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before
+participating. Suspected vulnerabilities and authority-boundary bypasses belong in the private
+channel described by the [Security Policy](SECURITY.md), never in a public Issue.
 
 ## License
 
