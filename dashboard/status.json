@@ -1,23 +1,23 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-08-01T23:33:59-07:00",
+  "updated_at": "2026-08-01T23:47:34-07:00",
   "overall": {
-    "label": "RELEASE CANDIDATE · v0.4.0 正式开源发布",
-    "tone": "progress",
-    "summary": "0.4.0 产品能力保持 PASS：三入口、Skill / Compact Prompt 双 Adapter、Evidence 与 verify 均已闭合。正式开源发布合同已在隔离分支补齐：稳定版本安装路径、不可变 CI 依赖、Security、Code of Conduct、Issue Forms 与 PR 模板已本地可用；PR CI、main CI、v0.4.0 Release、私密漏洞报告和 main 保护仍待远端真实裁决。"
+    "label": "PASS · v0.4.0 正式开源发布",
+    "tone": "ready",
+    "summary": "0.4.0 产品能力与正式开源发布均已闭合：三入口、Skill / Compact Prompt 双 Adapter、Evidence 与 verify 保持 PASS；PR #1 与 release commit 7dfe489 的远端矩阵分别 4 / 4 成功。annotated v0.4.0 Tag、可校验 Skill ZIP、Security、Code of Conduct、Issue / PR 合同、私密漏洞报告和受保护 main 已在 GitHub 实际存在。"
   },
   "milestone": {
     "name": "M4 · v0.4.0 正式开源发布",
-    "state": "active",
-    "progress": 60,
-    "progress_label": "发布设计 1 / 1；仓库合同 1 / 1；本地出口 1 / 1；PR / main CI 0 / 1；Release / 保护 0 / 1",
-    "next": "推送 ready PR 并等待 PR / main 双阶段远端 CI，再从已验证 commit 创建 v0.4.0 Release 并保护 main"
+    "state": "complete",
+    "progress": 100,
+    "progress_label": "发布设计 1 / 1；仓库合同 1 / 1；本地出口 1 / 1；PR / main CI 1 / 1；Release / 保护 1 / 1",
+    "next": "v0.4.0 已正式发布；后续版本继续通过受保护 PR、精确 main CI、不可变 Tag 与可校验资产交付"
   },
   "metrics": [
     {
       "label": "当前本地版本",
-      "value": "codex/oss-release-readiness · 0.4.0",
-      "tone": "progress"
+      "value": "v0.4.0 · release@7dfe489",
+      "tone": "ready"
     },
     {
       "label": "首次远端 CI",
@@ -71,8 +71,8 @@
     },
     {
       "label": "阶段出口",
-      "value": "PRODUCT PASS · RELEASE PENDING",
-      "tone": "progress"
+      "value": "PASS · product + OSS release",
+      "tone": "ready"
     },
     {
       "label": "当前 Adapter 输出",
@@ -86,8 +86,13 @@
     },
     {
       "label": "正式开源仓库合同",
-      "value": "LOCAL PASS · remote pending",
-      "tone": "progress"
+      "value": "REMOTE PASS · profile 100%",
+      "tone": "ready"
+    },
+    {
+      "label": "v0.4.0 Release 资产",
+      "value": "ZIP + SHA256SUMS · verified",
+      "tone": "ready"
     }
   ],
   "handoff": {
@@ -123,16 +128,16 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "codex/oss-release-readiness · local candidate",
-      "state": "progress",
-      "detail": "产品 0.4.0 基线之上已补齐不可变 CI、稳定安装和公开协作合同；尚未推送或改变远端 Release 状态。"
+      "value": "v0.4.0 · 7dfe489 verified release",
+      "state": "ready",
+      "detail": "本地已从 release commit 生成版本化 Skill ZIP，并与 GitHub 重新下载资产的 SHA-256 交叉一致。"
     },
     {
       "kind": "remote",
       "title": "远端可恢复版本",
       "value": "origin/main · 0.4.0 verified baseline",
       "state": "ready",
-      "detail": "候选 c2382c3 已由 GitHub Actions run 30734873022 的 Ubuntu / Windows × Python 3.12 / 3.13 四项全部验证成功；随后只推送 [skip ci] 事实记录。"
+      "detail": "origin/main 的 release commit 7dfe489 已由 run 30736349070 的 Ubuntu / Windows × Python 3.12 / 3.13 四项验证成功；annotated v0.4.0 Tag 固定指向该 commit。"
     }
   ],
   "issues": [
@@ -219,6 +224,11 @@
     }
   ],
   "delivered": [
+    {
+      "title": "v0.4.0 正式 GitHub Release",
+      "detail": "稳定 Tag 安装路径、仅含 loop-craft/ 的版本化 ZIP、SHA256SUMS、双阶段 CI、私密漏洞报告、Community Profile 100% 与受保护 main 已实际交付。",
+      "state": "ready"
+    },
     {
       "title": "Skill / Compact Prompt 双 Adapter",
       "detail": "同一 Final Execution IR 可按一次 build 一种格式，确定性产出 Codex Skill 或自然语言 Compact Prompt；两条路径均绑定独立 Evidence 并支持 clean / drift verify。",
@@ -332,8 +342,8 @@
     {
       "id": "N9",
       "title": "v0.4.0 正式开源发布",
-      "detail": "本地仓库合同、191 tests、Validator、链接与真实双产物均通过；下一步是 ready PR、PR/main 双阶段 CI、可校验 Release 资产、Private Vulnerability Reporting 与 main 保护。",
-      "state": "active"
+      "detail": "PR #1、PR/main 双阶段 4 / 4 CI、annotated v0.4.0、ZIP/SHA256SUMS、Private Vulnerability Reporting、Wiki 收口、Community Profile 100% 与 main 保护均完成。",
+      "state": "done"
     }
   ],
   "work_lanes": {
@@ -346,7 +356,7 @@
         },
         {
           "title": "v0.4.0 稳定开源分发",
-          "detail": "当前 active mainline：让用户从不可变 Tag 安装，并让 Artifact、SHA-256、CI 与仓库权限形成可复核发布链。"
+          "detail": "已交付：用户可从不可变 v0.4.0 Tag 安装；Artifact、SHA-256、双阶段 CI 与仓库权限形成可复核发布链。"
         }
       ]
     },
@@ -355,7 +365,7 @@
       "items": [
         {
           "title": "正式发布双阶段 CI",
-          "detail": "等待本地出口后执行 PR 矩阵与合并 commit 的 main 矩阵；任一失败都停止 Tag 与 Release。"
+          "detail": "PR run 30736303934 与 main run 30736349070 均 4 / 4 成功；Tag 精确指向 main 验证 commit。"
         },
         {
           "title": "0.4.0 最终远端 CI",
@@ -396,7 +406,7 @@
         },
         {
           "title": "开源协作与安全入口",
-          "detail": "Security、Code of Conduct、Bug/Feature Issue Forms、PR 模板、稳定安装路径与不可变 CI revision 已在本地候选形成。"
+          "detail": "Security、Code of Conduct、Bug/Feature Issue Forms、PR 模板、稳定安装路径、私密漏洞报告与不可变 CI revision 已进入 GitHub。"
         }
       ]
     },
@@ -421,8 +431,8 @@
   "risks": [
     {
       "level": "medium",
-      "title": "正式发布仍依赖远端不可逆门槛",
-      "detail": "本地合同完成不等于 Release 已存在；PR/main CI、Tag、资产摘要、私密漏洞报告与 main 保护必须逐项回读成功，任一失败都保持 RELEASE CANDIDATE。"
+      "title": "Release 资产目前由受控手工流程生成",
+      "detail": "v0.4.0 的 archive、摘要、上传和回读均已验证，但尚未自动化；未来版本必须重复同一 commit 绑定与下载后摘要复核，不能只依赖上传成功提示。"
     },
     {
       "level": "medium",
@@ -484,7 +494,7 @@
       "title": "0.4.0 main 集成、GitHub 元数据与远端 CI"
     },
     {
-      "state": "progress",
+      "state": "ready",
       "title": "v0.4.0 正式开源 Release、资产摘要与 main 保护"
     }
   ],
@@ -507,6 +517,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-01",
+      "title": "PASS · v0.4.0 正式开源发布",
+      "detail": "release@7dfe489 经 PR/main 双阶段 4 / 4 CI；annotated Tag、正式 Release、ZIP/SHA256SUMS、私密漏洞报告、Community Profile 100%、Wiki 收口与 main 严格保护均已回读。"
+    },
     {
       "date": "2026-08-01",
       "title": "v0.4.0 正式发布本地出口通过",
