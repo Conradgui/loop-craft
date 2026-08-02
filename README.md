@@ -1,12 +1,17 @@
 # Loop Craft
 
+[![CI](https://github.com/Conradgui/loop-craft/actions/workflows/validate.yml/badge.svg)](https://github.com/Conradgui/loop-craft/actions/workflows/validate.yml)
+[![Version](https://img.shields.io/badge/version-0.4.0-5b5bd6)](CHANGELOG.md)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776ab)](pyproject.toml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 > **Turn real feedback cycles into Agent Loops that can observe, act, verify, adapt—and stop.**
 >
 > Loop Craft finds the Loop inside a goal, an existing Skill, or an authorized work record.
 > It tests whether feedback can genuinely change the next action, shapes the result into one
 > approved **Loop Package**, and sends that shared model to two independent outputs: an
-> **Evidence Package** for traceability, and an **Adjuster** for delivery as a Skill or other
-> compatible formats.
+> **Evidence Package** for traceability, and an **Adjuster** for delivery as a complete Skill
+> or a copy-ready Compact Prompt.
 >
 > If the work does not contain a real feedback loop, Loop Craft preserves it as an ordinary
 > Workflow instead of manufacturing a fake Loop.
@@ -48,9 +53,9 @@ flowchart TB
     C6 --> EP["Evidence Packager<br/>Evidence Package"]
     C6 --> AR["Adjuster<br/>Adapter Router"]
 
-    AR --> S["Skill"]
-    AR -. planned .-> P["Compact Prompt"]
-    AR -. future adapters .-> F["Runtime · Future Loop standard<br/>Other compatible formats"]
+    AR --> S["Codex Skill"]
+    AR --> P["Compact Prompt"]
+    AR -. future compatibility .-> F["Future Loop standard<br/>Other compatible formats"]
 ```
 
 **Divide at the entry.** From scratch, Existing Skill, and Conversation each recover evidence
@@ -67,8 +72,8 @@ Router is its engineering name.
 
 Here, **Loop Package** is a product mental model for one approved, platform-neutral behavior
 representation. It is not a claim that Loop Craft has published an industry archive format.
-The solid Skill edge is what works today. Dotted edges mark planned or future adapters rather
-than current capabilities.
+The two solid edges work today. The dotted edge is a future compatibility direction rather
+than a current conformance claim.
 
 ## Choose your starting point
 
@@ -114,6 +119,8 @@ Use $loop-craft to assess this existing Skill and decide whether a Loop belongs 
 Use $loop-craft to distill this authorized conversation into a reusable Skill.
 
 Use $loop-craft to build this approved definition into a local Skill with separate evidence.
+
+Use $loop-craft to build this approved definition into a Compact Prompt with separate evidence.
 ```
 
 The first three requests begin with source recovery and a reviewable Candidate. The fourth is
@@ -121,27 +128,36 @@ for an already approved Definition and therefore uses truthful Direct Build prov
 
 ## What you get
 
-A successful current build produces two sibling outputs:
+A successful build chooses one Adapter and produces one Artifact plus separate Evidence:
 
 ```text
 <output-dir>/
-├── artifact/<skill-id>/     clean Skill for the target Agent
-│   ├── SKILL.md
+├── artifact/<id>/           exactly one selected output
+│   ├── SKILL.md             Codex Skill build
 │   ├── agents/openai.yaml
 │   └── references/final-execution-ir.json
-└── evidence/                inspectable build evidence; never shipped inside the Skill
+│          or
+│   └── PROMPT.md            Compact Prompt build
+└── evidence/                inspectable build evidence; kept outside the Artifact
     ├── accepted-definition.json
     ├── final-execution-ir.json
     ├── source-map.json
     ├── validation-report.json
     ├── build-manifest.json
-    ├── entry-evidence.json
+    ├── entry-evidence.json             optional, route-bound
+    ├── native-validation.json          optional, Codex Skill only
     └── source-package-manifest.json   optional for source-preserving upgrades
 ```
 
-The **Artifact** contains only behavior and resources needed by the target Agent. The
-**Evidence Package** records what was approved, what was compiled, how fields map to sources,
-what was validated, and the digests binding the result.
+The default `codex-skill` Adapter produces the complete Skill and binds the current Codex
+native-validator receipt when supplied. The `compact-prompt` Adapter produces a short,
+copy-ready expression of the same approved behavior. It is runtime-delegated: the receiving
+Agent must supply tools, state, and execution, so the Prompt is never presented as a runtime
+or a self-auditing package.
+
+The **Artifact** contains only behavior and resources needed by its target use. The
+**Evidence Package** records what was approved, what was compiled, which Adapter was selected,
+how fields map to sources, what was validated, and the digests binding the result.
 
 Raw conversations, private source payloads, development notes, and absolute local paths enter
 neither output. Entry Evidence keeps bounded provenance-labelled summaries and approval; Source
@@ -197,7 +213,7 @@ the Gate but cannot prove build determinism.
 | Pre-approval safety | Zero files written before approval across the three blind runs, checked against the filesystem |
 | Real user paths | Preserved From-scratch, Existing Skill, and Conversation demos verify clean with the current Core |
 | Cold-start product flow | One fresh read-only Agent traced all six user-facing routes and passed interface, boundary, handoff, and usability review |
-| Deterministic release gate | 171 tests plus schema, validator, real build/verify, and drift checks passed on Ubuntu/Windows × Python 3.12/3.13 |
+| Deterministic release gate | The 0.4.0 local candidate passes 190 tests, compileall, current Codex native validation, and real clean Skill/Prompt builds; remote matrix validation follows the final push |
 
 These are bounded claims, not proof of perfect classification, complete privacy, authentication,
 or general platform conformance. Read the full method and failures in
@@ -212,37 +228,40 @@ or general platform conformance. Read the full method and failures in
 - Ordinary zero-Loop Workflow packaging and bounded single-Loop Skill packaging.
 - Source-preserving Existing Skill builds, including regular `package.json`, missing
   frontmatter, and non-authoritative source directory names.
-- Clean Skill Artifact plus independent, manifest-bound Entry and Source Package Evidence.
+- Selectable deterministic `codex-skill` and `compact-prompt` outputs from the same Final
+  Execution IR; one build emits one Artifact.
+- Current Codex native-validator receipts for Skill builds, without post-build mutation.
+- Clean Artifact plus independent, manifest-bound Entry, Source Package, and optional native
+  validation Evidence.
 - Deterministic compilation and read-only drift verification.
 
 Known limitations remain explicit in the
 [risk register](docs/project-management/risk-register.md). Multi-Loop requests can be assessed
 and decomposed, but they cannot be built as one current package.
 
-## Evolution paths
+## Compatibility direction
 
 The Adjuster boundary exists so additional formats can project from the same semantic model
 without changing its accepted behavior:
 
-- **Compact Prompt adapter — planned.** A short invocation expression, not a claim that the
-  Prompt alone contains the complete self-auditing Loop.
-- **Runtime adapter — future.** Capability bindings, state, scheduling, and execution semantics
-  require their own contracts.
 - **Future Loop-standard adapter — compatibility direction.** This may map Core, extension,
   and vendor fields when a relevant standard exists; it is not a current dependency,
   certification, or conformance claim.
 - **Other packaging and catalog adapters — future.** Publication, installation automation,
   Library Edition, and remote catalogs remain separate product decisions.
 
+Runtime is not a missing step after the current Adapters. It would be a separate execution
+product responsible for capability binding, state, scheduling, permissions, and retries.
 Runtime, Override, Subloop execution, multi-Loop builds, publishing, scheduling, distributed
-execution, and installation automation are not implemented today.
+execution, and installation automation remain outside the current product boundary.
 
 ## For developers
 
 Run the deterministic Core from `loop-craft/` with Python 3.12+ and `jsonschema`:
 
 ```bash
-python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --entry-evidence <approved-entry-evidence.json>
+python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --adapter codex-skill --native-validator <current-quick-validate.py> --entry-evidence <approved-entry-evidence.json>
+python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --adapter compact-prompt --entry-evidence <approved-entry-evidence.json>
 python scripts/build_loop.py verify <existing-output-dir>
 ```
 

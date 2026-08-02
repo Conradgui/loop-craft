@@ -2,6 +2,41 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.4.0 - 2026-08-01
+
+Dual-output Adapter release.
+
+### Added
+
+- A deterministic Compact Prompt Adapter that projects the same approved Final Execution IR
+  into one copy-ready `PROMPT.md`, with `emulated` compatibility and
+  `runtime_delegated` conformance stated explicitly.
+- `--adapter codex-skill|compact-prompt` selection. One build emits one Artifact plus its
+  separate, adapter-bound Evidence Package; the existing default remains `codex-skill`.
+- Optional `--native-validator` support for Codex Skill builds. The Manifest binds a
+  path-free Native Validation Receipt containing the current validator script digest and
+  normalized result digests.
+- Adapter-neutral Artifact contracts and adapter-aware read-only verification for both Skill
+  and Prompt drift.
+
+### Changed
+
+- Evidence no longer assumes every Artifact embeds a Skill-only Final Execution IR reference;
+  every Adapter now binds the compiled IR through an explicit digest contract.
+- Current Codex compatibility findings must be fixed in the Adapter or template and rebuilt;
+  generated Artifacts are never patched in place while retaining stale Evidence.
+- Final staging promotion has a bounded retry for the observed transient Windows
+  `PermissionError`; persistent permission failures still stop the build.
+- Version metadata is unified at `0.4.0`.
+
+### Boundaries
+
+- Compact Prompt preserves the approved behavior, authority, verification, stopping and
+  invariant content, but it does not supply tools, state, scheduling, or independent audit.
+- Source-preserving Existing Skill upgrades remain Codex Skill builds. Runtime, multi-Loop,
+  Override, Subloop, publishing, scheduling, installation automation, Release and Git tags
+  remain outside this version.
+
 ## 0.3.0 - 2026-07-31
 
 Product-path closure release.

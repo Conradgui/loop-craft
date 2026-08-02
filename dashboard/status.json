@@ -1,22 +1,22 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-08-01T22:21:16-07:00",
+  "updated_at": "2026-08-01T22:45:32-07:00",
   "overall": {
-    "label": "ACTIVE · 0.4.0 双输出闭环",
+    "label": "CANDIDATE · 0.4.0 本地双输出闭合",
     "tone": "progress",
-    "summary": "0.3.0 的 Codex Skill + Evidence 主链保持已验证；审计确认原定 Compact Prompt 只存在于旧 Loopy 与设计记录，尚未进入当前 Core。已批准 0.4.0 混合方案：补齐 Compact Prompt Adapter，保留确定性 Codex Skill Adapter，并增加当前 Codex 原生 Validator 与 Skill Creator PRO 质量门。Runtime、多 Loop、发布调度继续不进入本轮。"
+    "summary": "三个入口继续汇合到同一 Compiler 与 Final Execution IR；一次 build 现在可选择确定性 Codex Skill 或语义完整、runtime-delegated 的 Compact Prompt，并为所选 Artifact 生成独立 Evidence。Codex Skill 可附带当前官方 Validator 的摘要绑定收据。本地实现与两条真实 verify 路径已闭合，待合并 main、同步 GitHub 元数据并通过 0.4.0 远端 CI。Runtime 是独立执行产品，不是本轮缺失尾项。"
   },
   "milestone": {
     "name": "M3 · 0.4.0 Skill / Prompt 双 Adapter",
     "state": "active",
-    "progress": 20,
-    "progress_label": "事实审计 1 / 1；方案确认 1 / 1；规格复核 1 / 1；实施计划 1 / 1；实现与验证 0 / 1",
-    "next": "按 TDD 实现 Adapter 中立合同、Compact Prompt、路由、Evidence 与 Codex 原生兼容门"
+    "progress": 85,
+    "progress_label": "设计 1 / 1；实现 1 / 1；本地双产物 1 / 1；文档与看板 1 / 1；远端 CI 0 / 1",
+    "next": "完成最终本地出口，合并 main、同步 GitHub description/topics，并以 0.4.0 远端矩阵 CI 裁决"
   },
   "metrics": [
     {
-      "label": "当前本地 main",
-      "value": "main@4ebd041 · ahead origin 6",
+      "label": "当前本地候选",
+      "value": "codex/dual-adapter · 0.4.0",
       "tone": "progress"
     },
     {
@@ -56,12 +56,12 @@
     },
     {
       "label": "许可证与版本",
-      "value": "Apache-2.0 · 0.3.0",
+      "value": "Apache-2.0 · 0.4.0",
       "tone": "ready"
     },
     {
-      "label": "0.3.0 候选验证",
-      "value": "171 passed · 3 Demo clean",
+      "label": "0.4.0 本地候选验证",
+      "value": "190 passed · Skill / Prompt clean",
       "tone": "ready"
     },
     {
@@ -71,13 +71,18 @@
     },
     {
       "label": "阶段出口",
-      "value": "ACTIVE · 0.4.0 设计门",
+      "value": "LOCAL PASS · remote pending",
       "tone": "progress"
     },
     {
       "label": "当前 Adapter 输出",
-      "value": "1 / 2 · Skill ready",
-      "tone": "progress"
+      "value": "2 / 2 · Skill + Prompt",
+      "tone": "ready"
+    },
+    {
+      "label": "Codex 原生兼容收据",
+      "value": "Skill is valid! · digest-bound",
+      "tone": "ready"
     }
   ],
   "handoff": {
@@ -113,16 +118,16 @@
     {
       "kind": "local",
       "title": "当前本地版本",
-      "value": "main · 0fe3edb candidate + closure facts",
-      "state": "ready",
-      "detail": "main 已 fast-forward 集成 Conversation Demo、R-020/R-021、Apache-2.0、候选验证与产品接口审计；纯事实 closure commit 使用 [skip ci]。"
+      "value": "codex/dual-adapter · 0.4.0 local candidate",
+      "state": "progress",
+      "detail": "双 Adapter、Evidence 绑定、原生 Validator 收据、双语 README 与版本事实已在隔离分支闭合；最终本地出口通过后合并 main。"
     },
     {
       "kind": "remote",
       "title": "远端可恢复版本",
-      "value": "origin/main · 0fe3edb candidate + closure facts",
-      "state": "ready",
-      "detail": "candidate main@0fe3edb 已由 GitHub Actions run 30626392947 的 Ubuntu / Windows × Python 3.12 / 3.13 四个任务全部验证成功；随后只推送 [skip ci] 事实记录。"
+      "value": "origin/main · 0.3.0 verified baseline",
+      "state": "progress",
+      "detail": "远端仍是已验证的 0.3.0 基线；0.4.0 尚未推送，GitHub 元数据与 Ubuntu / Windows × Python 3.12 / 3.13 矩阵 CI 待同步。"
     }
   ],
   "issues": [
@@ -210,8 +215,18 @@
   ],
   "delivered": [
     {
+      "title": "Skill / Compact Prompt 双 Adapter",
+      "detail": "同一 Final Execution IR 可按一次 build 一种格式，确定性产出 Codex Skill 或自然语言 Compact Prompt；两条路径均绑定独立 Evidence 并支持 clean / drift verify。",
+      "state": "ready"
+    },
+    {
+      "title": "当前 Codex 原生兼容收据",
+      "detail": "Codex Skill 构建可调用当前官方 quick_validate.py；Evidence 只保存路径无关的脚本摘要、产物摘要、退出码和结论，复验会检查绑定与篡改。",
+      "state": "ready"
+    },
+    {
       "title": "确定性 Core 构建链",
-      "detail": "Accepted Definition → Compiler → Skill / Evidence / Drift；已进入 Git 基线。",
+      "detail": "Accepted Definition → Compiler → Final Execution IR → Artifact / Evidence / Drift；已进入 0.4.0 本地候选。",
       "state": "ready"
     },
     {
@@ -300,7 +315,13 @@
     {
       "id": "N7",
       "title": "补齐 Skill / Compact Prompt 双 Adapter",
-      "detail": "设计已确认：一次 build 选择一种输出；Codex Skill 保持确定性构建并增加原生 Validator，Compact Prompt 从旧 Loopy 规则迁移，两条路径分别绑定 Evidence。",
+      "detail": "已完成 Adapter 中立合同、Compact Prompt、路由、Evidence、verify、Codex 原生 Validator 摘要收据和用户调用说明；本地 Skill / Prompt 两条真实构建均 clean。",
+      "state": "done"
+    },
+    {
+      "id": "N8",
+      "title": "0.4.0 远端封板",
+      "detail": "完成最终本地出口后合并 main，更新 GitHub description/topics，推送 0.4.0 并等待 Ubuntu / Windows × Python 3.12 / 3.13 CI；不创建 Release 或 Git Tag。",
       "state": "active"
     }
   ],
@@ -310,13 +331,17 @@
       "items": [
         {
           "title": "0.4.0 双 Adapter 用户路径",
-          "detail": "当前 active mainline：Adapter Router 支持 codex-skill / compact-prompt 二选一；补齐 Adapter 中立 Evidence、Codex 原生兼容门与两条真实 verify 路径。"
+          "detail": "本地主线已交付：Adapter Router 支持 codex-skill / compact-prompt 二选一；Adapter 中立 Evidence、Codex 原生兼容门与两条真实 verify 路径均已接通。"
         }
       ]
     },
     "validation": {
       "label": "验证 · 绑定具体风险",
       "items": [
+        {
+          "title": "0.4.0 最终远端 CI",
+          "detail": "当前唯一 active validation：推送 main 后等待 Ubuntu / Windows × Python 3.12 / 3.13 矩阵；结果决定是否封板。"
+        },
         {
           "title": "0.3.0 最终远端 CI",
           "detail": "run 30626392947 已 4 / 4 通过；Node action 弃用提示保留为非阻塞维护风险。"
@@ -336,7 +361,7 @@
       "items": [
         {
           "title": "Apache-2.0 与版本一致性",
-          "detail": "标准 LICENSE 与 VERSION、pyproject、双语 README、NOTICE、CHANGELOG 已统一为 Apache-2.0 / 0.3.0。"
+          "detail": "标准 LICENSE 保持不变；VERSION、pyproject、双语 README 与 CHANGELOG 已统一为 0.4.0。"
         },
         {
           "title": "本地证据保留",
@@ -344,7 +369,7 @@
         },
         {
           "title": "双语 README 产品模型",
-          "detail": "中英文 README 已恢复三入口 → 统一 Core → Evidence / Adjuster 双出口的分—总—分架构，并把当前 Skill 与未来 Adapter 状态分开表达。"
+          "detail": "中英文 README 已明确三入口 → 统一 Core / Final IR → Evidence + Adjuster → Skill 或 Compact Prompt；当前两种实线输出与未来格式扩展清楚分开。"
         },
         {
           "title": "治理记录一致性",
@@ -357,7 +382,7 @@
       "items": [
         {
           "title": "0.4.0 边界外能力",
-          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Git Tag 不进入当前执行队列；Compact Prompt 已从演进方向移入 mainline。"
+          "detail": "Runtime、Override、Subloop、Library Edition、多 Loop、发布、调度、GitHub Release 与 Git Tag 不进入当前执行队列；它们不是当前双 Adapter 用户路径的未接接口。"
         }
       ]
     }
@@ -426,6 +451,14 @@
     {
       "state": "ready",
       "title": "main 集成、GitHub 最终 CI 与 0.3.0 PASS"
+    },
+    {
+      "state": "ready",
+      "title": "0.4.0 本地 Skill / Compact Prompt 双 Adapter"
+    },
+    {
+      "state": "progress",
+      "title": "0.4.0 main 集成、GitHub 元数据与远端 CI"
     }
   ],
   "known_limits": [
@@ -447,6 +480,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-01",
+      "title": "0.4.0 本地双 Adapter 候选闭合",
+      "detail": "确定性 Codex Skill 与自然语言 Compact Prompt 已从同一 Final Execution IR 分别构建；两种 Artifact 均有独立 Evidence 与 clean/drift verify。Skill 原生 Validator 结果以路径无关摘要收据绑定，Compact Prompt 明确为语义完整、runtime-delegated。"
+    },
     {
       "date": "2026-08-01",
       "title": "0.4.0 双 Adapter 规格复核通过",

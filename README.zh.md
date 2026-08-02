@@ -1,11 +1,16 @@
 # Loop Craft
 
+[![CI](https://github.com/Conradgui/loop-craft/actions/workflows/validate.yml/badge.svg)](https://github.com/Conradgui/loop-craft/actions/workflows/validate.yml)
+[![Version](https://img.shields.io/badge/version-0.4.0-5b5bd6)](CHANGELOG.md)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776ab)](pyproject.toml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 > **把真正的反馈闭环，变成 Agent 能观察、行动、验证、调整并及时停止的 Loop。**
 >
 > Loop Craft 从目标、既有 Skill 或已授权的工作记录中识别真正的 Loop。它先判断反馈是否
 > 确实能够改变下一步行动，再形成一份经过确认的统一 **Loop Package**，并将同一个模型分向
-> 两个独立出口：**Evidence Package** 负责可追溯性，**Adjuster** 负责将其交付为 Skill
-> 或其他兼容格式。
+> 两个独立出口：**Evidence Package** 负责可追溯性，**Adjuster** 负责将其交付为完整 Skill
+> 或可直接复制的 Compact Prompt。
 >
 > 如果工作中不存在真正的反馈闭环，Loop Craft 会把它保留为普通 Workflow，而不是为了
 > “有 Loop”强行制造循环。
@@ -47,9 +52,9 @@ flowchart TB
     C6 --> EP["Evidence Packager<br/>Evidence Package"]
     C6 --> AR["Adjuster<br/>Adapter Router"]
 
-    AR --> S["Skill"]
-    AR -. planned .-> P["Compact Prompt"]
-    AR -. future adapters .-> F["Runtime · 未来 Loop 标准<br/>其他兼容格式"]
+    AR --> S["Codex Skill"]
+    AR --> P["Compact Prompt"]
+    AR -. future compatibility .-> F["未来 Loop 标准<br/>其他兼容格式"]
 ```
 
 **入口先分。** From scratch、Existing Skill 和 Conversation 面对的原始材料不同，所以各自
@@ -64,8 +69,8 @@ flowchart TB
 名称；Adapter Router 是对应的工程名称。
 
 这里的 **Loop Package** 是“同一份经过批准、与平台无关的行为表示”这一产品心智模型，不是在
-宣称 Loop Craft 已经发布了新的行业压缩包或标准格式。Skill 使用实线，因为它现在就能生成；
-虚线只表示计划中或未来的 Adapter。
+宣称 Loop Craft 已经发布了新的行业压缩包或标准格式。Skill 与 Compact Prompt 两条实线都是
+当前能力；虚线只表示未来兼容方向，而不是当前合规声明。
 
 ## 选择你的起点
 
@@ -110,6 +115,8 @@ Skill 位置，再用所在平台提供的 Skill validator 校验。仓库里的
 使用 $loop-craft，把这段已授权的对话蒸馏成一个可复用 Skill。
 
 使用 $loop-craft，把这份已经批准的 Definition 构建成本地 Skill，并生成独立 Evidence。
+
+使用 $loop-craft，把这份已经批准的 Definition 构建成 Compact Prompt，并生成独立 Evidence。
 ```
 
 前三条请求会先恢复来源事实并给出可审阅 Candidate；第四条只适用于已经批准的 Definition，
@@ -117,26 +124,34 @@ Skill 位置，再用所在平台提供的 Skill validator 校验。仓库里的
 
 ## 你会得到什么
 
-当前一次成功构建会产出两个并列目录：
+一次成功构建会选择一个 Adapter，并产出一个 Artifact 与一份独立 Evidence：
 
 ```text
 <output-dir>/
-├── artifact/<skill-id>/     交给目标 Agent 使用的干净 Skill
-│   ├── SKILL.md
+├── artifact/<id>/           只包含本次选择的一种输出
+│   ├── SKILL.md             Codex Skill 构建
 │   ├── agents/openai.yaml
 │   └── references/final-execution-ir.json
-└── evidence/                可查验的构建证据；永远不塞进 Skill
+│          或
+│   └── PROMPT.md            Compact Prompt 构建
+└── evidence/                可查验的构建证据；与 Artifact 分开
     ├── accepted-definition.json
     ├── final-execution-ir.json
     ├── source-map.json
     ├── validation-report.json
     ├── build-manifest.json
-    ├── entry-evidence.json
+    ├── entry-evidence.json             可选，绑定入口
+    ├── native-validation.json          可选，仅 Codex Skill
     └── source-package-manifest.json   保源升级时可选
 ```
 
-**Artifact** 只保留目标 Agent 执行行为所需的说明和资源。**Evidence Package** 记录批准了什么、
-编译成了什么、各字段来自哪里、检查了什么，以及把结果绑定起来的摘要。
+默认 `codex-skill` Adapter 生成完整 Skill，并在提供当前 Codex Validator 时绑定原生验证回执。
+`compact-prompt` Adapter 把同一份已批准行为压缩成可直接复制的调用表达。它是
+runtime-delegated：工具、状态和执行环境由接收 Prompt 的 Agent 提供，因此不会被夸大成 Runtime
+或自带审计能力的完整包。
+
+**Artifact** 只保留目标用途所需的行为与资源。**Evidence Package** 记录批准了什么、编译成了
+什么、选择了哪个 Adapter、各字段来自哪里、检查了什么，以及把结果绑定起来的摘要。
 
 原始对话、私有源材料、开发笔记和本机绝对路径都不会进入这两个输出。Entry Evidence 只保留
 有 provenance 标签的有限摘要与批准；Source Package Evidence 只保留相对路径和摘要。前者回答
@@ -183,7 +198,7 @@ Skill，还是拆成分别构建的独立 Loop。当前 Core 仍只构建 0 Loop
 | 批准前安全 | 三轮盲测均为批准前 0 文件写入，并以文件系统核对而非模型自述 |
 | 真实用户路径 | 保留的 From-scratch、Existing Skill 和 Conversation Demo 均被当前 Core 验证为 clean |
 | 冷启动产品流程 | 一个全新只读 Agent 追踪六条用户路径，接口、边界、衔接和可用性四项均通过 |
-| 确定性发布出口 | 171 tests、Schema、validator、真实 build/verify 和 drift 检查在 Ubuntu/Windows × Python 3.12/3.13 通过 |
+| 确定性发布出口 | 0.4.0 本地候选已通过 190 tests、compileall、当前 Codex 原生 Validator，以及 Skill/Prompt 两份真实 clean build；最终推送后再裁决远端矩阵 |
 
 这些证据支持的是有边界的结论，不代表完美分类、完整隐私保护、身份认证或通用平台合规。
 完整方法与历史失败见[真实世界评估](docs/REAL_WORLD_EVALUATION.md)，最终阶段判断见
@@ -195,32 +210,35 @@ Skill，还是拆成分别构建的独立 Loop。当前 Core 仍只构建 0 Loop
 - 从已批准 JSON 或散文 Definition 进入的如实 Direct Build；
 - 普通 0 Loop Workflow 和有界单 Loop Skill 打包；
 - Existing Skill 保源构建，包括常见 `package.json`、缺失 frontmatter 和非权威源目录名；
-- 干净 Skill Artifact，以及独立、Manifest 绑定的 Entry / Source Package Evidence；
+- 同一 Final Execution IR 可选择确定性的 `codex-skill` 或 `compact-prompt` 输出；一次 build
+  只生成一种 Artifact；
+- Skill 构建可绑定当前 Codex 原生 Validator 回执，不在构建后直接修改产物；
+- 干净 Artifact，以及独立、Manifest 绑定的 Entry、Source Package 与可选原生验证 Evidence；
 - 确定性编译与只读 drift 校验。
 
 已知限制继续记录在[风险登记](docs/project-management/risk-register.md)。多 Loop 请求可以被评估
 和拆分，但当前不能作为一个包直接构建。
 
-## 演进方向
+## 兼容方向
 
 Adjuster 边界让未来格式可以从同一语义模型投影，而不修改已经批准的行为：
 
-- **Compact Prompt Adapter——计划中。** 它是简短调用表达，不会把一段 Prompt 宣称为完整、
-  自带审计能力的 Loop。
-- **Runtime Adapter——未来方向。** Capability Binding、状态、调度和执行语义需要独立合同。
 - **未来 Loop 标准 Adapter——兼容方向。** 当相关标准存在时，可以映射 Core、Extension 和
   Vendor 字段；当前不依赖该标准，也不声称认证或合规。
 - **其他打包与 Catalog Adapter——未来方向。** 发布、安装自动化、Library Edition 和远程
   Catalog 仍是独立产品决策。
 
-Runtime、Override、Subloop 执行、多 Loop 构建、发布、调度、分布式执行和安装自动化当前均未实现。
+Runtime 不是当前 Adapter 后面缺失的一步，而是另一类执行产品，需要独立负责 Capability
+Binding、状态、调度、权限和重试。Runtime、Override、Subloop 执行、多 Loop 构建、发布、调度、
+分布式执行和安装自动化继续位于当前产品边界之外。
 
 ## 面向开发者
 
 在 `loop-craft/` 下运行确定性 Core，需要 Python 3.12+ 与 `jsonschema`：
 
 ```bash
-python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --entry-evidence <approved-entry-evidence.json>
+python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --adapter codex-skill --native-validator <current-quick-validate.py> --entry-evidence <approved-entry-evidence.json>
+python scripts/build_loop.py build <accepted-definition.json> <new-output-dir> --adapter compact-prompt --entry-evidence <approved-entry-evidence.json>
 python scripts/build_loop.py verify <existing-output-dir>
 ```
 

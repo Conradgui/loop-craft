@@ -137,7 +137,9 @@ accepted-definition.json ──► validate ──► compile ──► Final Ex
                           → semantic        │        ▼           ▼
                                        source map  Adapter   Evidence
                                                      │           │
-                                                artifact/    evidence/
+                                               ┌─────┴─────┐     │
+                                               ▼           ▼     ▼
+                                             Skill       Prompt evidence/
 ```
 
 **Validation runs in a fixed order: schema → canonical → semantic.** The order is not
@@ -151,23 +153,25 @@ input before projecting, so the Final Execution IR shares no nested object with 
 mutable input. Determinism is tested by recursively reversing every dict key order in the
 input and comparing canonical bytes and digests of the output.
 
-**The adapter is a projection too.** It renders `SKILL.md`, `agents/openai.yaml`, and
-`references/final-execution-ir.json` from the Final Execution IR. It does not decide
-behavior, and it never writes Evidence.
+**Each adapter is a projection too.** One build selects one Adapter. `codex-skill` renders
+`SKILL.md`, `agents/openai.yaml`, and `references/final-execution-ir.json`;
+`compact-prompt` renders one copy-ready `PROMPT.md`. Neither decides behavior or writes
+Evidence. The Prompt preserves approved behavior semantics but is `runtime_delegated` because
+its receiving Agent supplies tools, state, and execution.
 
-Free text in the rendered Markdown is emitted as a single-line JSON string literal. This
-closes structural injection — a value containing newlines and `##` cannot become new
-Markdown headings — at a real cost to readability: rendered titles carry visible quotes.
-That trade was taken deliberately. It is not general HTML sanitization and must not be
-described as such.
+Codex Skill free text in structural Markdown positions is emitted as a single-line JSON string
+literal. Compact Prompt text is whitespace-normalized and placed inside one blockquote
+paragraph. These are format-specific projection rules, not general HTML sanitization.
 
 **The pipeline is atomic.** It stages into a `TemporaryDirectory` created inside
 `output_root.parent`, writes adapter output then Evidence, and only calls
-`staging_root.replace(output_root)` after both succeed. An invalid definition or an adapter
+`staging_root.replace(output_root)` after both succeed. Because Windows filesystem filters can
+briefly lock a newly written staging tree, only that final promotion retries a bounded
+`PermissionError`; persistent failures still propagate. An invalid definition or an adapter
 failure leaves no partial output directory. An already-occupied output path is rejected up
 front, including when it is a dangling symlink.
 
-## 5. Two orthogonal evidence bindings
+## 5. Three orthogonal evidence bindings
 
 The Build Manifest can bind two independent proofs. Neither implies nor duplicates the
 other, and `verify` derives the expected Evidence file set dynamically from whichever
@@ -177,10 +181,11 @@ bindings are present.
 |---|---|---|
 | **Source Package Evidence** | *Which source bytes were preserved?* | Sorted POSIX-relative paths, per-file digests, `preserve`/`overlay`/`generated` action, complete source digest. Never an absolute path. |
 | **Entry Evidence** | *Why was this behavior accepted?* | Controlled source IDs, provenance-labelled fact summaries, resolved clarifications, a bounded Candidate Review summary, and the approval record. Bound to the accepted definition's canonical digest. |
+| **Native Validation Receipt** | *Which current Codex validator accepted this Skill?* | Validator script digest, normalized stdout/stderr digests, exit code, and pass status. Never the local validator path. Codex Skill only. |
 
-Keeping them separate matters because they have different lifetimes and different trust
-properties. A source-preserving upgrade needs the first; a from-scratch design has no source
-package but still needs the second.
+Keeping them separate matters because they have different lifetimes and trust properties. A
+source-preserving upgrade needs the first; an approved design needs the second; a native Codex
+compatibility claim needs the third. Compact Prompt Evidence never fabricates the third.
 
 **What Entry Evidence is not.** Validation enforces shape, rejects local absolute paths,
 fixes the approval scope, checks the 0/1 classification against the actual Loop count, and
@@ -221,8 +226,8 @@ actions requiring separate authorization.
 
 Not implemented. Listed so nobody has to rediscover the boundary:
 
-Multi-Loop builds · Runtime · Override · Subloop · Compact Prompt output ·
-Library Edition · publishing · scheduling · installation automation · distributed execution
+Multi-Loop builds · Runtime · Override · Subloop · Library Edition · publishing · scheduling ·
+installation automation · distributed execution
 
 Known limitations with open remediation are tracked in
 [risk-register.md](project-management/risk-register.md), not here.
