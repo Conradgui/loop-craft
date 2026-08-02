@@ -2,7 +2,7 @@
 
 > 日期：2026-07-31
 >
-> 状态：设计已获用户口头确认，等待书面规格复核
+> 状态：设计已获用户书面确认，进入实施
 >
 > 目标版本：0.4.0 candidate
 >
@@ -130,10 +130,14 @@ Adapter 必须保留会改变行为的 required 能力、验证规则、停止�
 
 ### 6.3 兼容性结论
 
-- `native + self_contained`：必要语义均可在 Prompt 中表达；
+- `emulated + runtime_delegated`：必要行为语义均在 Prompt 中表达，但工具、状态和执行能力由
+  接收 Prompt 的 Agent 环境提供；
 - `degraded`：只允许 Optional 能力降级，并在 Evidence 中列明；
 - `unsupported`：required 能力、审批、验证或停止语义无法无损表达，构建失败；
 - `lossy` 产物不得被交付为完整 Loop。
+
+Compact Prompt 可以是语义完整、可复制的调用表达，但不得声称自己携带运行时、工具绑定或独立
+审计能力。
 
 ## 7. Codex Skill 兼容门
 

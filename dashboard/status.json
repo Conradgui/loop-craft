@@ -1,6 +1,6 @@
 {
   "project": "Loop Craft",
-  "updated_at": "2026-07-31T21:09:48-07:00",
+  "updated_at": "2026-08-01T22:21:16-07:00",
   "overall": {
     "label": "ACTIVE · 0.4.0 双输出闭环",
     "tone": "progress",
@@ -9,9 +9,9 @@
   "milestone": {
     "name": "M3 · 0.4.0 Skill / Prompt 双 Adapter",
     "state": "active",
-    "progress": 10,
-    "progress_label": "事实审计 1 / 1；方案确认 1 / 1；规格复核 0 / 1；实现与验证 0 / 1",
-    "next": "复核双 Adapter 与 Codex 兼容门设计规格，然后进入定向实施"
+    "progress": 20,
+    "progress_label": "事实审计 1 / 1；方案确认 1 / 1；规格复核 1 / 1；实施计划 1 / 1；实现与验证 0 / 1",
+    "next": "按 TDD 实现 Adapter 中立合同、Compact Prompt、路由、Evidence 与 Codex 原生兼容门"
   },
   "metrics": [
     {
@@ -447,6 +447,11 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-01",
+      "title": "0.4.0 双 Adapter 规格复核通过",
+      "detail": "用户确认混合方案并批准实施；实施计划已拆分为公共 Artifact、Compact Prompt、Router、Evidence、原生 Validator、Agent 用户路径、文档与 GitHub 收口。Prompt 明确为语义完整但 runtime-delegated。"
+    },
     {
       "date": "2026-07-31",
       "title": "0.4.0 双 Adapter 混合方案获批",
