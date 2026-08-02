@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -29,12 +28,18 @@ SUPPORTED_EXECUTION_FIELDS = {
 }
 
 
-def _literal(value: Any) -> str:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        separators=(",", ":"),
-        sort_keys=True,
+def _clean(value: str) -> str:
+    return " ".join(value.split())
+
+
+def _list_phrase(values: list[str]) -> str:
+    return " | ".join(_clean(value) for value in values) or "none"
+
+
+def _mapping_phrase(values: dict[str, str]) -> str:
+    return " | ".join(
+        f"{key} — {_clean(value)}"
+        for key, value in sorted(values.items())
     )
 
 
@@ -77,49 +82,49 @@ def _render_prompt(execution: dict[str, Any]) -> str:
     authority = execution["authority"]
     capabilities = execution["capabilities"]
     clauses = [
-        "Use when " + _literal(applicability["use_when"]),
-        "Do not use when " + _literal(applicability["do_not_use_when"]),
-        "Goal: " + execution["purpose"]["outcome"],
-        "Inputs: " + _literal(interface["inputs"]),
-        "Outputs: " + _literal(interface["outputs"]),
-        "Allowed actions: " + _literal(authority["allowed"]),
+        "Use when " + _list_phrase(applicability["use_when"]),
+        "Do not use when " + _list_phrase(applicability["do_not_use_when"]),
+        "Goal: " + _clean(execution["purpose"]["outcome"]),
+        "Inputs: " + _list_phrase(interface["inputs"]),
+        "Outputs: " + _list_phrase(interface["outputs"]),
+        "Allowed actions: " + _list_phrase(authority["allowed"]),
         "Ask for approval before: "
-        + _literal(authority["approval_required"]),
-        "Forbidden actions: " + _literal(authority["forbidden"]),
+        + _list_phrase(authority["approval_required"]),
+        "Forbidden actions: " + _list_phrase(authority["forbidden"]),
         "Required Agent capabilities: "
-        + _literal(capabilities["required"]),
+        + _list_phrase(capabilities["required"]),
         "Optional Agent capabilities: "
-        + _literal(capabilities["optional"]),
+        + _list_phrase(capabilities["optional"]),
     ]
 
     workflow = execution.get("workflow")
     if workflow is not None:
         clauses.extend(
             [
-                "Steps: " + _literal(workflow["steps"]),
+                "Steps: " + _list_phrase(workflow["steps"]),
                 "Success evidence: "
-                + _literal(workflow["success_evidence"]),
+                + _list_phrase(workflow["success_evidence"]),
                 "Failure or stop: "
-                + _literal(workflow["failure_or_stop"]),
+                + _list_phrase(workflow["failure_or_stop"]),
             ]
         )
 
     for loop in execution["loops"]:
-        cycle = [
-            {"phase": node["id"], "instruction": node["instruction"]}
+        cycle = " → ".join(
+            f"{node['id']} — {_clean(node['instruction'])}"
             for node in loop["nodes"]
-        ]
+        )
         clauses.extend(
             [
-                f"Loop {loop['id']}: " + _literal(cycle),
+                f"Loop {loop['id']}: " + cycle,
                 "Terminal conditions: "
-                + _literal(loop["terminal_mapping"]),
-                "Invariants: " + _literal(loop["invariants"]),
+                + _mapping_phrase(loop["terminal_mapping"]),
+                "Invariants: " + _list_phrase(loop["invariants"]),
             ]
         )
 
     clauses.append(
-        "The receiving Agent must supply the named tools, state, and execution environment."
+        "The receiving Agent must supply the named tools, state, and execution environment"
     )
     return "; ".join(clauses) + "."
 

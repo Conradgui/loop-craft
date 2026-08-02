@@ -78,6 +78,11 @@ def test_renders_one_loop_without_dropping_behavior_boundaries(
 
     for value in expected:
         assert value in text
+    assert "Inputs: skill_path" in text
+    assert '["skill_path"]' not in text
+    prompt_line = text.split("Prompt:\n> ", maxsplit=1)[1]
+    assert prompt_line.rstrip().endswith("environment.")
+    assert not prompt_line.rstrip().endswith("environment..")
 
 
 def test_renders_zero_loop_workflow_without_inventing_a_loop(
