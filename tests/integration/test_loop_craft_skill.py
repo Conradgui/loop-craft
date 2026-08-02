@@ -12,7 +12,7 @@ FIXTURE = ROOT / "tests" / "fixtures" / "accepted-definition.valid.json"
 EXPECTED_SHORT_DESCRIPTION = "Design, upgrade, and package bounded agent workflows"
 EXPECTED_DEFAULT_PROMPT = (
     "Use $loop-craft to design, distill, or upgrade a workflow and package "
-    "the approved result as a Skill with separate evidence."
+    "the approved result as a Skill or Compact Prompt with separate evidence."
 )
 EXPECTED_OPENAI_YAML = (
     "interface:\n"
@@ -29,6 +29,10 @@ ENTRY_BUILD_COMMAND = (
     "<new-output-directory> --entry-evidence <reviewed-entry-evidence.json>"
 )
 VERIFY_COMMAND = "python scripts/build_loop.py verify <existing-output-directory>"
+PROMPT_BUILD_COMMAND = (
+    "python scripts/build_loop.py build <accepted-definition.json> "
+    "<new-output-directory> --adapter compact-prompt"
+)
 
 
 def test_loop_craft_contains_core_and_no_dev_docs() -> None:
@@ -223,11 +227,32 @@ def test_core_build_reference_documents_exact_cli_commands() -> None:
     )
 
     assert BUILD_COMMAND in reference
+    assert PROMPT_BUILD_COMMAND in reference
     assert VERIFY_COMMAND in reference
     assert (
         "The runtime must provide Python and jsonschema; if either dependency "
         "is missing, stop and do not guess or install it."
     ) in reference
+
+
+def test_product_skill_connects_both_adapter_delivery_paths() -> None:
+    skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    core_text = (SKILL / "references" / "core-build.md").read_text(
+        encoding="utf-8"
+    )
+    combined = skill_text + "\n" + core_text
+
+    assert "`codex-skill`" in combined
+    assert "`compact-prompt`" in combined
+    assert "--native-validator" in core_text
+    assert "runtime-delegated" in combined
+    assert "source-preserving" in combined
+    assert "Compact Prompt" in combined
+    assert "current built-in `skill-creator`" in core_text
+    assert "Skill Creator PRO" in core_text
+    assert "eb23656e56ea3555599a6c5278a8b5834dc56b6d" in core_text
+    assert "modify the Adapter" in core_text
+    assert "generated Artifact in place" in core_text
 
 
 def test_approved_entries_bind_structured_entry_evidence() -> None:

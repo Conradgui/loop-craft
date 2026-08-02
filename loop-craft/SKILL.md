@@ -9,6 +9,15 @@ Route the request into one of the supported paths below. Keep the interview and 
 
 All three design entries recover their own source-specific Candidate Behavior Contract, then apply the single shared [references/loopability-gate.md](references/loopability-gate.md) and [references/candidate-review.md](references/candidate-review.md). Do not duplicate or modify the seven Gate checks inside an entry. A Candidate becomes an accepted definition only after explicit approval of its behavior, authority, representable must-preserve constraints, boundary, and deliverable; only a 1-loop definition has `loops[0].invariants`. For every approved entry build, create the reviewed structured Entry Evidence described in [references/core-build.md](references/core-build.md) and pass it with `--entry-evidence`.
 
+## Delivery adapters
+
+After approval, read [references/core-build.md](references/core-build.md) and choose exactly one output for the build:
+
+- `codex-skill` produces the complete Codex Skill Artifact. Require the current built-in Codex validator before claiming native compatibility.
+- `compact-prompt` produces one copy-ready Prompt with separate Evidence. It preserves the approved behavior semantics but is runtime-delegated: the receiving Agent must supply tools, state, and execution.
+
+Use `codex-skill` for every source-preserving Existing Skill upgrade. Do not compress a complete source Skill package into a Compact Prompt. Never use one Adapter's output as another Adapter's input.
+
 ## From-scratch design
 
 When the user wants to turn a goal into a new loop, read [references/from-scratch.md](references/from-scratch.md) and follow it from interview through delivery.
@@ -60,4 +69,4 @@ Read [references/core-build.md](references/core-build.md) before running a comma
 
 ## Current boundary
 
-This version supports From-scratch single-Loop design, ordinary zero-Loop Skill packaging, existing-Skill assessment with a source-preserving single-Loop upgrade, authorized Conversation Distillation into either an ordinary zero-Loop Skill or a compatible single-Loop Skill, accepted-definition builds, and drift verification. Multi-Loop builds, Runtime, Override, Subloop, scheduling, publishing, installation, and Library Edition remain outside the current boundary. State that boundary when it affects the request instead of silently approximating support.
+This version supports From-scratch single-Loop design, ordinary zero-Loop packaging, existing-Skill assessment with a source-preserving single-Loop upgrade, authorized Conversation Distillation into either an ordinary zero-Loop workflow or a compatible single-Loop workflow, accepted-definition builds, selectable `codex-skill` or `compact-prompt` delivery where compatible, and drift verification. Multi-Loop builds, Runtime, Override, Subloop, scheduling, publishing, installation, and Library Edition remain outside the current boundary. State that boundary when it affects the request instead of silently approximating support.

@@ -4,6 +4,15 @@ Use only the commands below. Run them from the `loop-craft` directory.
 
 The runtime must provide Python and jsonschema; if either dependency is missing, stop and do not guess or install it.
 
+## Choose one delivery Adapter
+
+One build produces one Artifact plus separate Evidence:
+
+- `codex-skill` is the default and produces a complete Codex Skill directory.
+- `compact-prompt` produces a copy-ready `PROMPT.md`. It is semantically complete for the accepted 0/1-Loop definition but runtime-delegated; the receiving Agent supplies tools, state, and execution.
+
+Every source-preserving Existing Skill build uses `codex-skill`. Stop if a request combines `compact-prompt` with `--source-skill` or `--package-manifest`.
+
 ## Build an accepted definition
 
 Require an existing, readable JSON definition that matches `scripts/loopcraft_core/kernel/schemas/accepted-definition.schema.json`. Require a new output path that does not already exist.
@@ -12,7 +21,21 @@ Require an existing, readable JSON definition that matches `scripts/loopcraft_co
 python scripts/build_loop.py build <accepted-definition.json> <new-output-directory>
 ```
 
-A successful build exits `0`. The output root contains sibling `artifact/` and `evidence/` directories. `artifact/` contains the generated target Skill. `evidence/` contains the accepted definition, final execution data, source map, validation report, and build manifest. The `skill-package-v0.1` profile accepts either an approved ordinary Workflow with zero Loops or one approved Loop. A zero-Loop definition must include `behavior_contract.workflow.steps`, `success_evidence`, and `failure_or_stop`.
+The command above remains the low-level backward-compatible Codex Skill build. Before delivering a current-native Codex compatibility claim, locate the current built-in `skill-creator` Skill in the active Codex skill inventory, require its real `scripts/quick_validate.py`, and bind it during the build:
+
+```powershell
+python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --adapter codex-skill --native-validator <current-skill-creator-quick-validate.py>
+```
+
+If the current built-in Validator is unavailable or fails, stop before delivery. Do not silently fall back to an older validator or claim current Codex compatibility.
+
+For a Compact Prompt:
+
+```powershell
+python scripts/build_loop.py build <accepted-definition.json> <new-output-directory> --adapter compact-prompt
+```
+
+A successful build exits `0`. The output root contains sibling `artifact/` and `evidence/` directories. `artifact/` contains the selected Skill or Compact Prompt. `evidence/` contains the accepted definition, final execution data, source map, validation report, and build manifest; a native-validated Skill also contains a Manifest-bound `native-validation.json`. The `skill-package-v0.1` profile accepts either an approved ordinary Workflow with zero Loops or one approved Loop. A zero-Loop definition must include `behavior_contract.workflow.steps`, `success_evidence`, and `failure_or_stop`.
 
 Historical builds may omit Entry Evidence and remain verifiable. Every new build must bind the truthful record for its route:
 
@@ -52,7 +75,13 @@ python scripts/build_loop.py build <accepted-definition.json> <new-output-direct
 
 `--source-skill` and `--package-manifest` must be supplied together. This route accepts only `skill-package-v0.1` with exactly one Loop. The source directory name is not identity authority; the accepted Definition identity determines the Artifact directory. If source `SKILL.md` has frontmatter, its safely parsed name must match the accepted Definition identity. If it has missing frontmatter, the Adapter generates canonical name and description frontmatter from that identity and the accepted applicability, then preserves the original source body bytes after it. Existing frontmatter name conflicts, malformed or unterminated frontmatter, and duplicate names stop the build. The build re-inventories the source and stops if anything differs from the reviewed manifest, if source and output overlap, or if the resulting `SKILL.md` exceeds 500 lines.
 
-The source package is never modified. The new artifact preserves source-owned metadata, `package.json`, references, scripts, assets, and license material byte-for-byte; appends the approved `## Feedback Loop` section to `SKILL.md`; and generates `references/final-execution-ir.json`. When frontmatter is generated, the Source Map distinguishes generated frontmatter fields from the preserved source body. The source-package manifest proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. They are independent Manifest bindings and neither duplicates nor requires the other outside this approved-entry command.
+The source package is never modified. The new artifact preserves source-owned metadata, `package.json`, references, scripts, assets, and license material byte-for-byte; appends the approved `## Feedback Loop` section to `SKILL.md`; and generates `references/final-execution-ir.json`. When frontmatter is generated, the Source Map distinguishes generated frontmatter fields from the preserved source body. The source-package manifest proves which source bytes were preserved; Entry Evidence records why the behavior was accepted. They are independent Manifest bindings and neither duplicates nor requires the other outside this approved-entry command. Pass the current built-in Validator through `--native-validator` before delivering the upgraded Skill.
+
+## Review Adapter compatibility changes
+
+When the Codex Skill Adapter, its templates, or the current Codex Skill format changes, and before a release candidate, review a freshly generated Skill with the current built-in `skill-creator`. Also run Skill Creator PRO at pinned revision `eb23656e56ea3555599a6c5278a8b5834dc56b6d` for its deterministic quality lint and risk-scaled review method.
+
+Treat both reviews as findings, not as a second generator. To fix a valid finding, modify the Adapter, template, or shared contract, then rebuild from the same accepted Final Execution IR and regenerate Evidence. Never modify a generated Artifact in place and continue using its previous Source Map or digest.
 
 ## Verify an existing build
 
